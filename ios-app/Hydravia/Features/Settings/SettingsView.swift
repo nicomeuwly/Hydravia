@@ -1,0 +1,356 @@
+import HydraviaCore
+import HydraviaData
+import StoreKit
+import SwiftUI
+
+/// Settings as a native grouped list. Each editable value opens a sheet that
+/// edits a draft: Cancel throws it away, Save commits it in one go.
+///
+struct SettingsView: View {
+    @Environment(SettingsStore.self) private var settings
+    @Environment(HydrationStore.self) private var hydration
+    @Environment(AppRouter.self) private var router
+    @Environment(\.reminders) private var reminders
+    @Environment(StoreService.self) private var store
+    @Environment(BlockerService.self) private var blocker
+    @State private var managesSubscription = false
+    @State private var restoreResult: Bool?
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var notificationPermission: ReminderService.Permission = .notDetermined
+    /// What the switch shows while the permission round-trip is in flight, so
+    /// it doesn't snap back off and flick on again.
+    @State private var pendingNotificationsToggle: Bool?
+
+    private enum Editor: String, Identifiable {
+        case weight, schedule, interval
+        var id: String { rawValue }
+    }
+
+    @State private var editor: Editor?
+    @Environment(LocationPermission.self) private var location
+    private enum Weather: Equatable { case loading, known(Double), unavailable }
+    @State private var weather = Weather.loading
+    @State private var confirmDelete = false
+    @State private var deleteFailed = false
+    @State private var deleted = false
+
+    var body: some View {
+        let current = settings.settings
+
+        NavigationStack {
+            Form {
+                Section {
+                    row(.settingsDailyGoal, value: "\(settings.dailyGoalMl.formatted()) \(String(localized: .commonMl))") {
+                        editor = .weight
+                    }
+                    row(.settingsActiveHours, value: "\(current.window.wake.formatted) – \(current.window.sleep.formatted)") {
+                        editor = .schedule
+                    }
+                    row(.settingsReminderInterval,
+                        value: ReminderInterval(rawValue: current.window.intervalMin)?.shortLabel ?? "—") {
+                        editor = .interval
+                    }
+                } header: {
+                    Text(.settingsSectionHydration)
+                }
+
+                Section {
+                    Toggle(isOn: notificationsBinding) {
+                        Text(.settingsNotifications)
+                        if notificationPermission == .denied {
+                            Text(.settingsNotificationsDenied)
+                        }
+                    }
+                    .tint(Palette.accentCyan)
+                } header: {
+                    Text(.settingsSectionReminders)
+                }
+
+                ScreenTimeSection()
+
+                Section {
+                    Button {
+                        location.requestOrOpenSettings()
+                    } label: {
+                        LabeledContent {
+                            Image(systemName: location.status == .granted ? "checkmark.circle.fill" : "chevron.right")
+                                .foregroundStyle(location.status == .granted ? Palette.success : Palette.textTertiary)
+                                .accessibilityLabel(Text(location.status == .granted ? .settingsPermissionGranted : .settingsLocationDenied))
+                        } label: {
+                            Text(.settingsLocationAccess)
+                            if location.status == .denied {
+                                Text(.settingsLocationDenied)
+                            }
+                        }
+                    }
+                    .tint(Palette.textPrimary)
+
+                    if location.status == .granted {
+                        LabeledContent {
+                            switch weather {
+                            case .loading:
+                                ProgressView()
+                            case .known(let celsius):
+                                // °C or °F per the user's region.
+                                Text(Measurement(value: celsius, unit: UnitTemperature.celsius),
+                                     format: .measurement(width: .abbreviated, usage: .weather,
+                                                          numberFormatStyle: .number.precision(.fractionLength(0))))
+                            case .unavailable:
+                                Text(verbatim: "—")
+                            }
+                        } label: {
+                            Text(.settingsCurrentWeather)
+                        }
+                    }
+                } header: {
+                    Text(.settingsSectionWeather)
+                }
+
+                Section {
+                    LabeledContent {
+                        Text(store.isPremium ? .settingsPlanPremium : .settingsPlanFree)
+                    } label: {
+                        Text(.settingsPlan)
+                    }
+                    if store.isPremium {
+                        Button { managesSubscription = true } label: {
+                            Text(.settingsManageSubscription).foregroundStyle(Palette.textPrimary)
+                        }
+                    } else {
+                        Button { router.sheet = .paywall } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(.settingsGoPremium).foregroundStyle(Palette.primaryDark)
+                                Text(.settingsGoPremiumSub)
+                                    .font(.brandFootnote)
+                                    .foregroundStyle(Palette.textSecondary)
+                            }
+                        }
+                        Button {
+                            Task { restoreResult = await store.restore() }
+                        } label: {
+                            Text(.paywallRestore).foregroundStyle(Palette.textPrimary)
+                        }
+                    }
+                } header: {
+                    Text(.settingsSectionSubscription)
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        confirmDelete = true
+                    } label: {
+                        LabeledContent {
+                            Text(.settingsErase).foregroundStyle(Palette.error)
+                        } label: {
+                            Text(.settingsDeleteHistory).foregroundStyle(Palette.textPrimary)
+                        }
+                    }
+                } header: {
+                    Text(.settingsSectionData)
+                }
+
+                #if DEBUG
+                Section("Dev") {
+                    Button("Simulate a reminder") { router.reminderFired = true }
+                    Button("Real reminder in 10 s") { Task { await reminders?.scheduleTestReminder() } }
+                    Button("Relock apps now") { blocker.relockNow() }
+                    Button("Restart onboarding") { settings.settings.onboardingDone = false }
+                }
+                #endif
+            }
+            .font(.bodyRegular)
+            .navigationTitle(Text(.settingsTitle))
+            .task(id: scenePhase) {
+                // Refreshed on return from iOS Settings.
+                notificationPermission = await reminders?.permission() ?? .notDetermined
+            }
+            .task(id: location.status) {
+                guard location.status == .granted else { return }
+                weather = await WeatherService.shared.currentTemperature().map(Weather.known) ?? .unavailable
+            }
+            .sheet(item: $editor) { editor in
+                switch editor {
+                case .weight:
+                    DraftSheet(title: .settingsWeightModalTitle, value: current.weightKg, detent: .medium) { draft in
+                        VStack(spacing: Spacing.sm) {
+                            WeightPicker(weightKg: draft)
+                            Text("\(HydrationGoal.dailyMl(weightKg: draft.wrappedValue).formatted()) \(String(localized: .commonMl))")
+                                .font(.cardTitle)
+                                .foregroundStyle(Palette.primaryDark)
+                                .contentTransition(.numericText())
+                                .animation(Motion.count, value: draft.wrappedValue)
+                            Text(.weightHint)
+                                .font(.brandFootnote)
+                                .foregroundStyle(Palette.textSecondary)
+                        }
+                    } onSave: { settings.settings.weightKg = $0 }
+                case .schedule:
+                    DraftSheet(title: .settingsScheduleModalTitle, value: current.window, detent: .fraction(0.64)) { draft in
+                        ActiveWindowEditor(window: draft)
+                    } onSave: { settings.settings.window = $0 }
+                case .interval:
+                    DraftSheet(title: .settingsIntervalModalTitle, value: current.window.intervalMin, detent: .medium) { draft in
+                        IntervalPicker(minutes: draft)
+                    } onSave: { settings.settings.window.intervalMin = $0 }
+                }
+            }
+            .confirmationDialog(Text(.settingsDeleteConfirmTitle), isPresented: $confirmDelete, titleVisibility: .visible) {
+                Button(role: .destructive) {
+                    do {
+                        try hydration.deleteAll()
+                        deleted = true
+                    } catch {
+                        deleteFailed = true
+                    }
+                } label: {
+                    Text(.settingsDelete)
+                }
+            } message: {
+                Text(.settingsDeleteConfirmBody)
+            }
+            .alert(Text(.settingsDeletedTitle), isPresented: $deleted) {
+                Button(role: .cancel) {} label: { Text(.commonOk) }
+            } message: {
+                Text(.settingsDeletedBody)
+            }
+            .alert(Text(.settingsDeleteHistory), isPresented: $deleteFailed) {
+                Button(role: .cancel) {} label: { Text(.commonOk) }
+            }
+            .sensoryFeedback(.success, trigger: deleted) { _, new in new }
+            // Apple's own sheet: change plan, cancel, see renewal date.
+            .manageSubscriptionsSheet(isPresented: $managesSubscription)
+            .alert(Text(restoreResult == true ? .settingsRestoredTitle : .settingsNoPurchaseTitle),
+                   isPresented: Binding { restoreResult != nil } set: { if !$0 { restoreResult = nil } }) {
+                Button(role: .cancel) {} label: { Text(.commonOk) }
+            } message: {
+                Text(restoreResult == true ? .settingsRestoredBody : .settingsNoPurchaseBody)
+            }
+        }
+    }
+
+    /// On only if the user wants reminders AND iOS allows them. Turning it on
+    /// asks the first time; once refused, iOS won't ask again, so it opens
+    /// the app's page in Settings instead.
+    private var notificationsBinding: Binding<Bool> {
+        Binding {
+            pendingNotificationsToggle ?? (settings.settings.notificationsEnabled && notificationPermission == .granted)
+        } set: { wantsOn in
+            guard wantsOn else {
+                settings.settings.notificationsEnabled = false
+                return
+            }
+            // Reminders are the premium ritual: free users get the offer.
+            guard store.isPremium || AppConfig.isDevMode else {
+                router.sheet = .paywall
+                return
+            }
+            pendingNotificationsToggle = true
+            Task {
+                defer { pendingNotificationsToggle = nil }
+                switch await reminders?.permission() ?? .denied {
+                case .granted:
+                    settings.settings.notificationsEnabled = true
+                case .notDetermined:
+                    let granted = await reminders?.requestPermission() ?? false
+                    notificationPermission = granted ? .granted : .denied
+                    settings.settings.notificationsEnabled = granted
+                case .denied:
+                    LocationPermission.openSettings()
+                }
+            }
+        }
+    }
+
+    private func row(_ label: LocalizedStringResource, value: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            LabeledContent {
+                HStack(spacing: Spacing.sm) {
+                    Text(value)
+                        .foregroundStyle(Palette.textSecondary)
+                        .contentTransition(.numericText())
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Palette.textTertiary)
+                }
+            } label: {
+                Text(label).foregroundStyle(Palette.textPrimary)
+            }
+        }
+    }
+}
+
+/// A sheet editing a copy of a value: Cancel discards, Save commits.
+private struct DraftSheet<Value: Equatable, Content: View>: View {
+    let title: LocalizedStringResource
+    @State private var draft: Value
+    @State private var confirmDiscard = false
+    let detent: PresentationDetent
+    @ViewBuilder let content: (Binding<Value>) -> Content
+    let onSave: (Value) -> Void
+    private let original: Value
+
+    @Environment(\.dismiss) private var dismiss
+
+    init(
+        title: LocalizedStringResource,
+        value: Value,
+        detent: PresentationDetent,
+        @ViewBuilder content: @escaping (Binding<Value>) -> Content,
+        onSave: @escaping (Value) -> Void
+    ) {
+        self.title = title
+        self._draft = State(initialValue: value)
+        self.original = value
+        self.detent = detent
+        self.content = content
+        self.onSave = onSave
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                content($draft)
+                    .padding(.horizontal, Spacing.screen)
+                    .padding(.vertical, Spacing.lg)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .background(Palette.background)
+            .navigationTitle(Text(title))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // Icon buttons (the iOS 26 toolbar idiom) leave the title room.
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
+                        if draft == original { dismiss() } else { confirmDiscard = true }
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                    .accessibilityLabel(Text(.commonCancel))
+                    .confirmationDialog(Text(.commonCancel), isPresented: $confirmDiscard) {
+                        Button(role: .destructive) { dismiss() } label: { Text(.commonCancel) }
+                        Button(role: .confirm) {
+                            onSave(draft)
+                            dismiss()
+                        } label: { Text(.commonSave) }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm) {
+                        onSave(draft)
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
+                    }
+                    .accessibilityLabel(Text(.commonSave))
+                    .disabled(draft == original)
+                }
+            }
+        }
+        .presentationDetents([detent])
+        .interactiveDismissDisabled(draft != original)
+    }
+}
+
+#Preview {
+    SettingsView().injecting(AppDependencies.preview())
+}

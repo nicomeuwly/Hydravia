@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import Home from '../../components/Home.astro';
+
+const lang = 'en' as const;
+---
+
+<Base
+  lang={lang}
+  path=""
+  title="Hydravia · Drink. Unlock. Carry on."
+  description="A hydration ritual, not another counter. When the reminder lands your apps lock: drink your dose and everything opens back up. On iOS."
+>
+  <Home lang={lang} />
+</Base>

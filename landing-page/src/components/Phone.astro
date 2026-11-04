@@ -1,0 +1,50 @@
+---
+/**
+ * A screenshot in a device frame.
+ *
+ * The screenshots are real captures from the iOS simulator at 1206×2622
+ * (iPhone 17), downscaled to 414×900. The frame is pure CSS — a border, a
+ * radius and a shadow — rather than a PNG bezel, which keeps it sharp at any
+ * density and costs nothing to download.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  /** Eager-load the hero shot; lazy-load the rest. */
+  priority?: boolean;
+  class?: string;
+}
+const { src, alt, priority = false, class: cls } = Astro.props;
+---
+
+<div class:list={['phone', cls]}>
+  <img
+    src={src}
+    alt={alt}
+    width="414"
+    height="900"
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    decoding="async"
+  />
+</div>
+
+<style>
+  .phone {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 44px;
+    padding: 9px;
+    background: linear-gradient(160deg, #22333d, #0d1a22);
+    box-shadow:
+      0 24px 60px rgba(7, 49, 74, 0.34),
+      0 2px 0 rgba(255, 255, 255, 0.14) inset;
+  }
+  .phone img {
+    width: 100%;
+    height: auto;
+    border-radius: 36px;
+    display: block;
+  }
+</style>

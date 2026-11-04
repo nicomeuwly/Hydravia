@@ -1,0 +1,152 @@
+---
+import Legal from '../layouts/Legal.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { LEGAL_ENTITY, LEGAL_ADDRESS, LEGAL_JURISDICTION, PRODUCTS } from '../config';
+
+const lang = 'fr' as const;
+---
+
+<Legal
+  lang={lang}
+  path="/terms"
+  heading="Conditions d’utilisation"
+  title="Conditions d’utilisation · Hydravia"
+  description="Conditions d’utilisation de Hydravia : abonnement, essai gratuit, résiliation, limitations et avertissement santé."
+>
+  <p>
+    En téléchargeant et en utilisant Hydravia, tu acceptes les conditions ci-dessous.
+    Prends le temps de lire au minimum la section 3 (abonnement) et la section 6
+    (avertissement santé).
+  </p>
+
+  <h2>1. Éditeur</h2>
+  <p>
+    Hydravia est édité par <span class="todo">{LEGAL_ENTITY}</span>, dont l’adresse
+    est <span class="todo">{LEGAL_ADDRESS}</span>. Contact :
+    <ContactEmail />.
+  </p>
+
+  <h2>2. Objet de l’application</h2>
+  <p>
+    Hydravia est une application d’aide à l’hydratation. Elle calcule un objectif
+    quotidien indicatif à partir de ton poids, envoie des rappels aux intervalles que
+    tu définis, et peut bloquer temporairement les applications que tu as
+    sélectionnées jusqu’à ce que tu confirmes avoir bu.
+  </p>
+  <p>
+    La confirmation « j’ai bu » repose sur ta déclaration. L’application ne peut pas
+    vérifier que tu as effectivement bu, et ne le prétend pas.
+  </p>
+
+  <h2>3. Abonnement, essai gratuit et résiliation</h2>
+  <p>
+    Hydravia propose un essai gratuit de <strong>{PRODUCTS.trialDays} jours</strong>,
+    puis un abonnement payant à renouvellement automatique, en formule mensuelle ou
+    annuelle. Les tarifs applicables sont ceux affichés dans l’application au moment
+    de la souscription, dans la devise de ton compte App Store.
+  </p>
+  <h3>Renouvellement automatique</h3>
+  <ul>
+    <li>
+      Le paiement est débité sur ton compte Apple à la confirmation de l’achat, ou à
+      l’issue de la période d’essai si tu ne l’as pas annulée avant.
+    </li>
+    <li>
+      L’abonnement <strong>se renouvelle automatiquement</strong> sauf s’il est annulé
+      au moins <strong>24 heures avant la fin de la période en cours</strong>.
+    </li>
+    <li>
+      Le renouvellement est débité dans les 24 heures précédant la fin de la période
+      en cours, au tarif de la formule choisie.
+    </li>
+    <li>
+      Toute portion non utilisée d’un essai gratuit est perdue lorsque tu souscris un
+      abonnement payant.
+    </li>
+  </ul>
+  <h3>Comment annuler</h3>
+  <p>
+    La résiliation s’effectue à tout moment depuis <strong>Réglages iOS → ton nom →
+    Abonnements</strong>. La gestion des abonnements relève de ton compte Apple :
+    nous ne pouvons ni souscrire ni résilier à ta place. L’annulation prend effet à la
+    fin de la période déjà payée, pendant laquelle tu conserves l’accès.
+  </p>
+  <h3>Remboursements</h3>
+  <p>
+    Les achats étant traités par Apple, les demandes de remboursement relèvent de leur
+    politique et s’effectuent sur
+    <a href="https://reportaproblem.apple.com" rel="noopener noreferrer" target="_blank">reportaproblem.apple.com</a>.
+  </p>
+
+  <h2>4. Autorisations système</h2>
+  <p>
+    Certaines fonctionnalités reposent sur des autorisations que tu accordes
+    explicitement : notifications (pour les rappels), Temps d’écran (pour le verrou
+    des apps) et position (pour ajuster la dose à la température). Chacune est
+    facultative et révocable dans les réglages de ton téléphone. Refuser une
+    autorisation désactive la fonctionnalité correspondante, sans empêcher
+    l’utilisation du reste de l’application.
+  </p>
+
+  <h2>5. Usage acceptable</h2>
+  <p>Tu t’engages à ne pas :</p>
+  <ul>
+    <li>décompiler, désosser ou tenter d’extraire le code source de l’application ;</li>
+    <li>contourner les mécanismes de facturation ou d’abonnement ;</li>
+    <li>utiliser l’application d’une manière contraire aux lois applicables.</li>
+  </ul>
+
+  <h2>6. Avertissement santé</h2>
+  <p>
+    <strong>
+      Hydravia n’est pas un dispositif médical et ne fournit aucun conseil médical.
+    </strong>
+    Les objectifs et doses proposés sont des estimations générales calculées à partir
+    de ton poids, de l’heure et de la température ; ils ne tiennent pas compte de ton
+    état de santé, de tes traitements, d’une grossesse, d’une activité sportive
+    intense ni d’aucune pathologie.
+  </p>
+  <p>
+    Les besoins en eau varient fortement d’une personne à l’autre. Une consommation
+    excessive d’eau peut être dangereuse. Si tu as un doute, une pathologie rénale ou
+    cardiaque, ou si tu suis un traitement, demande l’avis d’un professionnel de santé :
+    son avis prime toujours sur ce qu’affiche l’application. Écoute ta soif.
+  </p>
+
+  <h2>7. Disponibilité et limitation de responsabilité</h2>
+  <p>
+    L’application est fournie « en l’état ». Nous ne garantissons pas qu’elle sera
+    exempte d’erreurs ni disponible sans interruption. En particulier, le
+    déclenchement des rappels et du verrou dépend du système d’exploitation, des
+    autorisations accordées et de l’état de ton appareil : un rappel peut ne pas se
+    déclencher (mode avion, batterie faible, autorisations révoquées, redémarrage).
+  </p>
+  <p>
+    Dans les limites permises par la loi, notre responsabilité ne saurait être engagée
+    pour un préjudice indirect résultant de l’utilisation ou de l’impossibilité
+    d’utiliser l’application. Aucune clause des présentes conditions ne limite les
+    droits que la loi t’accorde en tant que consommateur.
+  </p>
+
+  <h2>8. Propriété intellectuelle</h2>
+  <p>
+    L’application, son nom, son logo, son design et son contenu sont protégés. Ton
+    abonnement te confère un droit d’usage personnel et non exclusif, pas un transfert
+    de propriété.
+  </p>
+
+  <h2>9. Modification des conditions</h2>
+  <p>
+    Ces conditions peuvent être modifiées. En cas de changement substantiel, nous
+    te préviendrons dans l’application ou avant le renouvellement de ton abonnement.
+    La poursuite de l’utilisation vaut acceptation des conditions à jour.
+  </p>
+
+  <h2>10. Droit applicable</h2>
+  <p>
+    Les présentes conditions sont régies par le droit
+    <span class="todo">{LEGAL_JURISDICTION}</span>. Pour toute question, écris-nous à
+    <ContactEmail /> : nous privilégions
+    toujours une résolution amiable.
+  </p>
+</Legal>

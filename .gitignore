@@ -1,0 +1,10 @@
+# Only the native app and the landing page live in this repo.
+/hydravia/
+/design/
+/PLAN_IMPLEMENTATION_Waterlokk.md
+/.claude/
+
+# Leftover from the Xcode template
+/ios-app/Untitled Project/
+
+.DS_Store

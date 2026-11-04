@@ -1,0 +1,444 @@
+import StoreKit
+import SwiftUI
+
+/// Hydravia Pro paywall, in two steps: what you get, then the offer.
+///
+/// Choices carried over from the Expo app (Mobbin study, July 2026): yearly
+/// listed first and preselected, a Blinkist-style trial timeline whose day-5
+/// heads-up is a REAL notification, "no commitment" spelled out under the CTA,
+/// no fake social proof or urgency. New natively: a returning user who
+/// already used their trial is never promised a free week.
+struct PaywallView: View {
+    enum Source { case onboarding, app }
+
+    let source: Source
+    let onFinish: () -> Void
+
+    @Environment(StoreService.self) private var store
+    @Environment(\.purchase) private var purchase
+
+    private enum Stage { case intro, offer }
+    @State private var stage = Stage.intro
+    @State private var selectedID = StoreService.yearlyID
+    @State private var isPurchasing = false
+    @State private var showsError = false
+    @State private var showsPending = false
+    @State private var restoreResult: Bool?
+
+    private static let termsURL = URL(string: "https://hydravia.app/terms")!
+    private static let privacyURL = URL(string: "https://hydravia.app/privacy")!
+
+    var body: some View {
+        ZStack {
+            Palette.background.ignoresSafeArea()
+            switch stage {
+            case .intro: intro.transition(.opacity)
+            case .offer: offer.transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+        }
+        .animation(Motion.slow, value: stage)
+        .onAppear {
+            // Only promise a trial the App Store confirmed; otherwise (unknown
+            // yet, or already used) go straight to the plans.
+            if !offersTrial { stage = .offer }
+        }
+        .onChange(of: store.isEligibleForTrial) { _, eligible in
+            if eligible != true { stage = .offer }
+        }
+        .alert(Text(.paywallSubscribe), isPresented: $showsPending) {
+            Button(role: .cancel) { onFinish() } label: { Text(.commonOk) }
+        } message: {
+            Text(.paywallPending)
+        }
+        .alert(Text(.paywallErrorTitle), isPresented: $showsError) {
+            Button(role: .cancel) {} label: { Text(.commonOk) }
+        } message: {
+            Text(.paywallErrorBody)
+        }
+        .alert(Text(restoreResult == true ? .settingsRestoredTitle : .settingsNoPurchaseTitle),
+               isPresented: Binding { restoreResult != nil } set: { if !$0 { restoreResult = nil } }) {
+            Button(role: .cancel) {
+                if restoreResult == true { onFinish() }
+            } label: { Text(.commonOk) }
+        } message: {
+            Text(restoreResult == true ? .settingsRestoredBody : .settingsNoPurchaseBody)
+        }
+        .sensoryFeedback(.selection, trigger: selectedID)
+    }
+
+    // MARK: Intro
+
+    private var intro: some View {
+        VStack(alignment: .leading, spacing: Spacing.xxl) {
+            brand.padding(.top, Spacing.xxl)
+
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                Text(.paywallIntroTitle)
+                    .font(.brand(.bold, size: 34, relativeTo: .largeTitle))
+                    .kerning(-0.8)
+                    .foregroundStyle(Palette.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                Text(.paywallIntroSub)
+                    .font(.bodyRegular)
+                    .foregroundStyle(Palette.textSecondary)
+            }
+
+            VStack(alignment: .leading, spacing: Spacing.lg) {
+                feature(.paywallFeature1, icon: "lock.fill")
+                feature(.paywallFeature2, icon: "sun.max.fill")
+                feature(.paywallFeature3, icon: "flame.fill")
+            }
+
+            Spacer()
+
+            VStack(spacing: Spacing.sm) {
+                Button { stage = .offer } label: {
+                    Label { Text(.commonContinue) } icon: { Image(systemName: "chevron.right") }
+                        .labelStyle(TrailingIconLabelStyle())
+                }
+                .buttonStyle(.primary)
+                skipButton
+            }
+        }
+        .padding(.horizontal, Spacing.xxl)
+        .padding(.bottom, Spacing.lg)
+    }
+
+    private func feature(_ text: LocalizedStringResource, icon: String) -> some View {
+        HStack(spacing: Spacing.md) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(Palette.primaryDark)
+                .frame(width: 34, height: 34)
+                .background(Palette.backgroundElement, in: .circle)
+            Text(text)
+                .font(.bodyEmphasis)
+                .foregroundStyle(Palette.textPrimary)
+        }
+    }
+
+    // MARK: Offer
+
+    private var offer: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.xl) {
+                brand
+                Text(offersTrial ? .paywallPlanTitle : .paywallNoTrialTitle)
+                    .font(.brand(.bold, size: 30, relativeTo: .largeTitle))
+                    .kerning(-0.7)
+                    .foregroundStyle(Palette.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+
+                if offersTrial {
+                    TrialTimeline(chargeDate: chargeDate)
+                }
+
+                plans
+
+                VStack(spacing: Spacing.sm) {
+                    Button(action: buy) {
+                        if isPurchasing {
+                            ProgressView().tint(.white)
+                        } else {
+                            Label {
+                                Text(offersTrial ? .paywallCta : .paywallSubscribe)
+                            } icon: { Image(systemName: "chevron.right") }
+                                .labelStyle(TrailingIconLabelStyle())
+                        }
+                    }
+                    .buttonStyle(.primary)
+                    .disabled(isPurchasing || selectedProduct == nil)
+
+                    // What is billed, and when — always visible, not only on
+                    // the selected card (App Review requirement).
+                    if let billing {
+                        Text(billing)
+                            .font(.brandFootnote)
+                            .foregroundStyle(Palette.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Text(.paywallCtaSub)
+                        .font(.brandFootnote)
+                        .foregroundStyle(Palette.textSecondary)
+                    skipButton
+                }
+
+                footer
+            }
+            .padding(.horizontal, Spacing.xxl)
+            .padding(.vertical, Spacing.xl)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+    }
+
+    @ViewBuilder
+    private var plans: some View {
+        if store.productsFailedToLoad {
+            Label { Text(.paywallUnavailable) } icon: { Image(systemName: "wifi.exclamationmark") }
+                .font(.brandFootnote)
+                .foregroundStyle(Palette.textSecondary)
+                .task { await store.loadProducts() }
+        } else if let yearly = store.yearly, let monthly = store.monthly {
+            VStack(spacing: Spacing.md) {
+                PlanCard(
+                    title: .paywallPlanYearly,
+                    price: yearly.displayPrice,
+                    detail: String(localized: .paywallPerMonth(perMonth(yearly))),
+                    badge: savings(yearly: yearly, monthly: monthly),
+                    legal: legal,
+                    isSelected: selectedID == yearly.id
+                ) { selectedID = yearly.id }
+
+                PlanCard(
+                    title: .paywallPlanMonthly,
+                    price: monthly.displayPrice,
+                    detail: nil,
+                    badge: nil,
+                    legal: legal,
+                    isSelected: selectedID == monthly.id
+                ) { selectedID = monthly.id }
+            }
+        } else {
+            ProgressView().frame(maxWidth: .infinity, minHeight: 160)
+        }
+    }
+
+    private var footer: some View {
+        HStack(spacing: Spacing.lg) {
+            Link(destination: Self.termsURL) { Text(.paywallTerms) }
+            Text(verbatim: "·")
+            Link(destination: Self.privacyURL) { Text(.paywallPrivacy) }
+            Text(verbatim: "·")
+            Button {
+                Task { restoreResult = await store.restore() }
+            } label: { Text(.paywallRestore) }
+        }
+        .font(.brandCaption)
+        .foregroundStyle(Palette.textSecondary)
+        .tint(Palette.primaryDark)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var skipButton: some View {
+        Button(action: onFinish) {
+            Text(source == .app ? .paywallSkipApp : .paywallSkipOnboarding)
+                .font(.brand(.semiBold, size: 16, relativeTo: .body))
+                .foregroundStyle(Palette.textSecondary)
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.pressable)
+    }
+
+    private var brand: some View {
+        HStack(spacing: Spacing.sm) {
+            Image(systemName: "drop.fill")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 32, height: 32)
+                .background(Palette.primaryDark, in: .rect(cornerRadius: 9, style: .continuous))
+            Text(verbatim: "Hydravia")
+                .font(.brand(.bold, size: 18, relativeTo: .headline))
+                .foregroundStyle(Palette.textPrimary)
+        }
+        .accessibilityHidden(true)
+    }
+
+    // MARK: Logic
+
+    private var selectedProduct: Product? {
+        selectedID == StoreService.yearlyID ? store.yearly : store.monthly
+    }
+
+    /// A trial is promised only when the App Store confirmed it.
+    private var offersTrial: Bool { store.isEligibleForTrial == true }
+
+    /// Today + the configured trial period (not a hardcoded week).
+    private var chargeDate: Date {
+        let calendar = Calendar.autoupdatingCurrent
+        guard let period = store.trialPeriod else { return calendar.date(byAdding: .day, value: 7, to: .now) ?? .now }
+        let component: Calendar.Component = switch period.unit {
+        case .day: .day
+        case .week: .weekOfYear
+        case .month: .month
+        case .year: .year
+        @unknown default: .day
+        }
+        return calendar.date(byAdding: component, value: period.value, to: .now) ?? .now
+    }
+
+    private var legal: String {
+        offersTrial
+            ? String(localized: .paywallPlanLegal(chargeDate.formatted(.dateTime.day().month(.abbreviated))))
+            : String(localized: .paywallNoTrialLegal)
+    }
+
+    /// "7 days free, then $17.99 per year. Renews automatically…"
+    private var billing: String? {
+        guard let product = selectedProduct else { return nil }
+        let price = String(localized: product.id == StoreService.yearlyID
+                           ? .paywallBilledYearly(product.displayPrice)
+                           : .paywallBilledMonthly(product.displayPrice))
+        if offersTrial, let period = store.trialPeriod {
+            let free = period.formatted(product.subscriptionPeriodFormatStyle.locale(.autoupdatingCurrent))
+            return String(localized: .paywallTrialThen(free, price))
+        }
+        return String(localized: .paywallRenewsAt(price))
+    }
+
+    private func perMonth(_ yearly: Product) -> String {
+        (yearly.price / 12).formatted(yearly.priceFormatStyle)
+    }
+
+    /// "−25 %": what yearly saves over twelve months of monthly.
+    private func savings(yearly: Product, monthly: Product) -> String? {
+        let fullYear = monthly.price * 12
+        guard fullYear > 0 else { return nil }
+        let saved = NSDecimalNumber(decimal: 1 - yearly.price / fullYear).doubleValue
+        guard saved >= 0.05 else { return nil }
+        return "−" + saved.formatted(.percent.precision(.fractionLength(0)))
+    }
+
+    private func buy() {
+        guard let product = selectedProduct, !isPurchasing else { return }
+        isPurchasing = true
+        Task {
+            defer { isPurchasing = false }
+            do {
+                let result = try await purchase(product)
+                switch await store.complete(result) {
+                case .success:
+                    // The trial-end heads-up is scheduled by StoreService from
+                    // the verified transaction.
+                    onFinish()
+                case .failed:
+                    showsError = true
+                case .pending:
+                    showsPending = true
+                case .cancelled:
+                    break
+                }
+            } catch {
+                showsError = true
+            }
+        }
+    }
+}
+
+// MARK: - Pieces
+
+private struct PlanCard: View {
+    let title: LocalizedStringResource
+    let price: String
+    let detail: String?
+    let badge: String?
+    let legal: String
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                HStack(alignment: .center) {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 22))
+                        .foregroundStyle(isSelected ? Palette.primaryDark : Palette.textTertiary)
+                        .contentTransition(.symbolEffect(.replace))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(.cardTitle)
+                            .foregroundStyle(Palette.textPrimary)
+                        if let detail {
+                            Text(detail)
+                                .font(.brandFootnote)
+                                .foregroundStyle(Palette.textSecondary)
+                        }
+                    }
+                    Spacer()
+                    if let badge {
+                        Text(badge)
+                            .font(.brand(.bold, size: 12, relativeTo: .caption))
+                            .foregroundStyle(Palette.amberDeep)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Palette.amber.opacity(0.15), in: .capsule)
+                    }
+                    Text(price)
+                        .font(.bodyEmphasis)
+                        .foregroundStyle(Palette.textPrimary)
+                }
+                if isSelected {
+                    Text(legal)
+                        .font(.brand(.regular, size: 12.5, relativeTo: .caption))
+                        .foregroundStyle(Palette.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .transition(.opacity)
+                }
+            }
+            .padding(Spacing.lg)
+            .background(.white, in: .rect(cornerRadius: Radius.lg, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: Radius.lg, style: .continuous)
+                    .strokeBorder(isSelected ? Palette.primaryDark : Palette.border, lineWidth: isSelected ? 2 : 1)
+            }
+            .animation(Motion.press, value: isSelected)
+        }
+        .buttonStyle(PressableStyle(scale: 0.98))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+/// Today / day 5 / day 7 — what happens, and when. Risk reduction beats
+/// persuasion.
+private struct TrialTimeline: View {
+    let chargeDate: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            step(icon: "lock.open.fill", title: .paywallTimelineToday, text: Text(.paywallTimelineTodayText), isLast: false)
+            step(icon: "bell.fill", title: .paywallTimelineDay5, text: Text(.paywallTimelineDay5Text), isLast: false)
+            step(icon: "star.fill", title: .paywallTimelineDay7,
+                 text: Text(.paywallTimelineDay7Text(chargeDate.formatted(.dateTime.day().month(.abbreviated)))),
+                 isLast: true)
+        }
+    }
+
+    private func step(icon: String, title: LocalizedStringResource, text: Text, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: Spacing.md) {
+            VStack(spacing: 0) {
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 30, height: 30)
+                    .background(isLast ? Palette.amber : Palette.primaryDark, in: .circle)
+                if !isLast {
+                    Rectangle()
+                        .fill(Palette.border)
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                }
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.brand(.bold, size: 15, relativeTo: .subheadline))
+                    .foregroundStyle(Palette.textPrimary)
+                text
+                    .font(.brandFootnote)
+                    .foregroundStyle(Palette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.bottom, isLast ? 0 : Spacing.lg)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Title then icon, for "Continue ›" style buttons.
+private struct TrailingIconLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 6) {
+            configuration.title
+            configuration.icon
+        }
+    }
+}

@@ -1,0 +1,148 @@
+---
+import Legal from '../../layouts/Legal.astro';
+import ContactEmail from '../../components/ContactEmail.astro';
+import { LEGAL_ENTITY, LEGAL_ADDRESS, LEGAL_JURISDICTION, PRODUCTS } from '../../config';
+
+const lang = 'en' as const;
+---
+
+<Legal
+  lang={lang}
+  path="/terms"
+  heading="Terms of Use"
+  title="Terms of Use · Hydravia"
+  description="Hydravia terms of use: subscription, free trial, cancellation, limitations and health disclaimer."
+>
+  <p>
+    By downloading and using Hydravia you agree to the terms below. Please read at
+    least section 3 (subscription) and section 6 (health disclaimer).
+  </p>
+
+  <h2>1. Publisher</h2>
+  <p>
+    Hydravia is published by <span class="todo">{LEGAL_ENTITY}</span>, at
+    <span class="todo">{LEGAL_ADDRESS}</span>. Contact:
+    <ContactEmail />.
+  </p>
+
+  <h2>2. What the app does</h2>
+  <p>
+    Hydravia is a hydration aid. It calculates an indicative daily goal from your
+    weight, sends reminders at the intervals you choose, and can temporarily block
+    apps you have selected until you confirm that you drank.
+  </p>
+  <p>
+    The "I drank it" confirmation is based on your own declaration. The app cannot
+    verify that you actually drank, and does not claim to.
+  </p>
+
+  <h2>3. Subscription, free trial and cancellation</h2>
+  <p>
+    Hydravia offers a <strong>{PRODUCTS.trialDays}-day</strong> free trial, followed
+    by an auto-renewing subscription, billed monthly or yearly. Applicable prices are
+    those shown in the app at the time of purchase, in your App Store account's
+    currency.
+  </p>
+  <h3>Automatic renewal</h3>
+  <ul>
+    <li>
+      Payment is charged to your Apple account on confirmation of purchase, or at the
+      end of the free trial if you have not cancelled beforehand.
+    </li>
+    <li>
+      The subscription <strong>renews automatically</strong> unless cancelled at least
+      <strong>24 hours before the end of the current period</strong>.
+    </li>
+    <li>
+      Renewal is charged within 24 hours prior to the end of the current period, at
+      the rate of the selected plan.
+    </li>
+    <li>
+      Any unused portion of a free trial is forfeited when you purchase a
+      subscription.
+    </li>
+  </ul>
+  <h3>How to cancel</h3>
+  <p>
+    You can cancel at any time in <strong>iOS Settings → your name →
+    Subscriptions</strong>. Subscription management belongs to your Apple account: we
+    can neither subscribe nor cancel on your behalf. Cancellation takes effect at the
+    end of the period already paid for, during which you keep access.
+  </p>
+  <h3>Refunds</h3>
+  <p>
+    Since purchases are processed by Apple, refund requests fall under their policy
+    and are made at
+    <a href="https://reportaproblem.apple.com" rel="noopener noreferrer" target="_blank">reportaproblem.apple.com</a>.
+  </p>
+
+  <h2>4. System permissions</h2>
+  <p>
+    Some features rely on permissions you grant explicitly: notifications (for
+    reminders), Screen Time (for the app lock) and location (to adjust the dose to
+    the temperature). Each one is optional and revocable in your phone's settings.
+    Declining a permission disables the matching feature without preventing you from
+    using the rest of the app.
+  </p>
+
+  <h2>5. Acceptable use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>decompile, reverse-engineer or attempt to extract the app's source code;</li>
+    <li>circumvent billing or subscription mechanisms;</li>
+    <li>use the app in any way that breaks applicable law.</li>
+  </ul>
+
+  <h2>6. Health disclaimer</h2>
+  <p>
+    <strong>
+      Hydravia is not a medical device and provides no medical advice.
+    </strong>
+    The goals and doses it suggests are general estimates derived from your weight,
+    the time of day and the temperature. They do not account for your health
+    conditions, medication, pregnancy, intense physical activity or any medical
+    condition.
+  </p>
+  <p>
+    Water needs vary considerably from person to person, and drinking excessive
+    amounts of water can be dangerous. If you are unsure, have a kidney or heart
+    condition, or are under treatment, seek advice from a healthcare professional:
+    their advice always takes precedence over what the app displays. Listen to your
+    thirst.
+  </p>
+
+  <h2>7. Availability and limitation of liability</h2>
+  <p>
+    The app is provided "as is". We do not warrant that it will be error-free or
+    available without interruption. In particular, reminders and the lock depend on
+    the operating system, the permissions granted and the state of your device: a
+    reminder may fail to fire (airplane mode, low battery, revoked permissions,
+    restart).
+  </p>
+  <p>
+    To the extent permitted by law, we are not liable for indirect damages arising
+    from the use of, or inability to use, the app. Nothing in these terms limits the
+    rights the law grants you as a consumer.
+  </p>
+
+  <h2>8. Intellectual property</h2>
+  <p>
+    The app, its name, logo, design and content are protected. Your subscription
+    grants a personal, non-exclusive right of use, not a transfer of ownership.
+  </p>
+
+  <h2>9. Changes to these terms</h2>
+  <p>
+    These terms may be amended. In the event of a substantial change you will be
+    informed in the app or before your subscription renews. Continued use constitutes
+    acceptance of the updated terms.
+  </p>
+
+  <h2>10. Governing law</h2>
+  <p>
+    These terms are governed by the law of
+    <span class="todo">{LEGAL_JURISDICTION}</span>. For any question write to
+    <ContactEmail />. We always prefer an
+    amicable resolution.
+  </p>
+</Legal>

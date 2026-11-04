@@ -1,0 +1,131 @@
+---
+import Base from './Base.astro';
+import { t, localePath, type Lang } from '../i18n';
+import { LEGAL_UPDATED } from '../config';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  path: string;
+  heading: string;
+}
+const { title, description, lang, path, heading } = Astro.props;
+
+const updated = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(LEGAL_UPDATED));
+---
+
+<Base title={title} description={description} lang={lang} path={path}>
+  <article class="legal">
+    <div class="wrap inner">
+      <a class="back" href={localePath(lang)}>← {t(lang, 'common.backHome')}</a>
+      <h1>{heading}</h1>
+      <p class="updated">{t(lang, 'common.updated')} : {updated}</p>
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal {
+    padding-block: clamp(40px, 6vw, 72px) clamp(64px, 9vw, 96px);
+  }
+  .inner {
+    max-width: 780px;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 28px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .back:hover {
+    color: var(--primary-dark);
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 44px);
+    margin-bottom: 10px;
+  }
+  .updated {
+    margin: 0 0 44px;
+    color: var(--text-tertiary);
+    font-size: 15px;
+  }
+
+  /* Long-form legal text: generous measure, clear hierarchy, and any
+     [À COMPLÉTER] placeholder visibly flagged so it cannot ship unnoticed. */
+  .prose :global(h2) {
+    font-size: 22px;
+    margin: 44px 0 14px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+  .prose :global(h3) {
+    font-size: 17.5px;
+    margin: 26px 0 10px;
+  }
+  .prose :global(p),
+  .prose :global(li) {
+    color: var(--text-secondary);
+    font-size: 16.5px;
+  }
+  .prose :global(p) {
+    margin: 0 0 16px;
+  }
+  .prose :global(ul) {
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+  .prose :global(li) {
+    margin-bottom: 8px;
+  }
+  .prose :global(strong) {
+    color: var(--text-primary);
+  }
+  .prose :global(a) {
+    color: var(--primary-dark);
+  }
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 20px;
+    font-size: 15.5px;
+  }
+  .prose :global(th),
+  .prose :global(td) {
+    text-align: left;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .prose :global(th) {
+    background: var(--bg-element);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .prose :global(td) {
+    color: var(--text-secondary);
+  }
+  .prose :global(.todo) {
+    background: #fff4e0;
+    border: 1px dashed var(--accent);
+    color: #8a5a12;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-weight: 600;
+    font-size: 0.94em;
+    white-space: nowrap;
+  }
+</style>

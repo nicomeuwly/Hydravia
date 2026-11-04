@@ -1,0 +1,161 @@
+---
+import Legal from '../layouts/Legal.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { LEGAL_ENTITY, LEGAL_ADDRESS } from '../config';
+
+const lang = 'fr' as const;
+---
+
+<Legal
+  lang={lang}
+  path="/privacy"
+  heading="Politique de confidentialité"
+  title="Politique de confidentialité · Hydravia"
+  description="Comment Hydravia traite tes données : historique local, position pour la météo, abonnements. Aucun compte, aucun traqueur."
+>
+  <p>
+    Hydravia est conçu pour fonctionner sans compte et sans serveur. L’essentiel de
+    tes données ne quitte jamais ton téléphone. Cette page décrit précisément ce qui
+    reste en local, les rares cas où une information est transmise à un tiers, et
+    pourquoi.
+  </p>
+
+  <h2>1. Qui est responsable du traitement</h2>
+  <p>
+    L’éditeur de l’application est <span class="todo">{LEGAL_ENTITY}</span>, dont
+    l’adresse est <span class="todo">{LEGAL_ADDRESS}</span>. Pour toute question
+    relative à tes données, écris à <ContactEmail />.
+  </p>
+
+  <h2>2. Ce qui reste sur ton téléphone</h2>
+  <p>
+    Les informations suivantes sont stockées dans une base de données locale, sur ton
+    appareil uniquement. Elles ne sont ni transmises, ni sauvegardées sur nos
+    serveurs, pour la simple raison que nous n’en avons pas.
+  </p>
+  <ul>
+    <li><strong>Ton poids</strong>, utilisé pour calculer ton objectif quotidien.</li>
+    <li><strong>Tes horaires actifs</strong> (réveil, coucher) et ton intervalle de rappel.</li>
+    <li>
+      <strong>Ton historique de consommation</strong> : chaque quantité bue, sa date et
+      son heure.
+    </li>
+    <li><strong>Tes préférences</strong> : notifications activées, apps sélectionnées pour le verrou.</li>
+  </ul>
+  <p>
+    Tu peux effacer l’intégralité de cet historique à tout moment depuis
+    <strong>Réglages → Données → Supprimer l’historique</strong>. La suppression est
+    immédiate et définitive. Désinstaller l’application efface également ces données.
+  </p>
+
+  <h2>3. Position et météo</h2>
+  <p>
+    Si tu accordes l’accès à ta position, et seulement dans ce cas, Hydravia relève tes
+    coordonnées approximatives pour connaître la température extérieure, qui ajuste
+    légèrement la dose recommandée quand il fait chaud.
+  </p>
+  <p>
+    Ces coordonnées sont transmises à <strong>Open-Meteo</strong>
+    (<a href="https://open-meteo.com/en/terms" rel="noopener noreferrer" target="_blank">open-meteo.com</a>),
+    un service météo qui ne requiert aucune clé d’identification et n’associe la
+    requête à aucun profil. La position n’est pas conservée par Hydravia : elle sert
+    à la requête, puis seule la température est gardée en mémoire pendant 30 minutes.
+  </p>
+  <p>
+    Si tu refuses cette permission, l’application fonctionne normalement : le calcul
+    de dose ignore simplement la météo.
+  </p>
+
+  <h2>4. Temps d’écran et blocage des apps</h2>
+  <p>
+    Sur iOS, le verrou repose sur <strong>Temps d’écran</strong> (le cadre
+    <em>Family Controls</em> d’Apple). Cette API est volontairement cloisonnée par
+    Apple : elle permet à Hydravia d’appliquer un blocage sur des apps que
+    <strong>tu sélectionnes toi-même</strong>, sans jamais lui donner accès à tes
+    statistiques d’utilisation.
+  </p>
+  <p>
+    Concrètement, <strong>Hydravia ne peut pas voir</strong> quelles apps tu utilises,
+    ni combien de temps. La sélection que tu effectues reste sur ton appareil, dans un
+    conteneur géré par le système. Tu peux retirer cette autorisation à tout moment
+    dans <strong>Réglages iOS → Temps d’écran</strong>.
+  </p>
+
+  <h2>5. Abonnements</h2>
+  <p>
+    Les paiements sont traités par <strong>Apple</strong>. Nous ne voyons jamais tes
+    moyens de paiement.
+  </p>
+  <p>
+    Pour savoir si ton abonnement est actif, l’application utilise
+    <strong>RevenueCat</strong>
+    (<a href="https://www.revenuecat.com/privacy" rel="noopener noreferrer" target="_blank">revenuecat.com/privacy</a>),
+    qui reçoit un identifiant anonyme généré par leur SDK ainsi que le reçu d’achat
+    fourni par Apple. Aucun nom, aucune adresse email et aucune de tes données
+    d’hydratation ne leur sont transmis.
+  </p>
+
+  <h2>6. Ce que nous ne faisons pas</h2>
+  <ul>
+    <li>Aucun compte utilisateur, donc aucun email ni mot de passe collecté.</li>
+    <li>Aucun traqueur publicitaire, aucun SDK d’analytics comportemental.</li>
+    <li>Aucune revente ni partage de données à des fins commerciales.</li>
+    <li>Aucun profilage publicitaire, et aucun suivi entre applications.</li>
+  </ul>
+
+  <h2>7. Récapitulatif des destinataires</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Destinataire</th>
+        <th>Donnée transmise</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Open-Meteo</td>
+        <td>Coordonnées approximatives</td>
+        <td>Seulement si tu autorises la position</td>
+      </tr>
+      <tr>
+        <td>RevenueCat</td>
+        <td>Identifiant anonyme, reçu d’achat</td>
+        <td>Seulement si tu souscris ou restaures un abonnement</td>
+      </tr>
+      <tr>
+        <td>Apple</td>
+        <td>Données de paiement</td>
+        <td>Seulement lors d’un achat</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. Tes droits</h2>
+  <p>
+    Le RGPD te donne un droit d’accès, de rectification, d’effacement, de limitation
+    et de portabilité sur tes données personnelles. Comme Hydravia ne détient aucune
+    base de données te concernant, l’essentiel de ces droits s’exerce directement
+    depuis ton téléphone : tes données sont sur ton appareil, et tu peux les
+    consulter ou les supprimer à tout moment.
+  </p>
+  <p>
+    Pour une demande concernant les données détenues par nos sous-traitants, écris à
+    <ContactEmail />. Tu disposes également du
+    droit d’introduire une réclamation auprès de l’autorité de protection des données
+    de ton pays.
+  </p>
+
+  <h2>9. Enfants</h2>
+  <p>
+    Hydravia ne s’adresse pas aux enfants de moins de 13 ans et ne collecte pas
+    sciemment leurs données.
+  </p>
+
+  <h2>10. Modifications</h2>
+  <p>
+    Cette politique peut évoluer si l’application change. La date de dernière mise à
+    jour figure en haut de cette page ; en cas de changement significatif, nous
+    l’indiquerons dans l’application.
+  </p>
+</Legal>

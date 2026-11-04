@@ -1,0 +1,595 @@
+---
+/**
+ * The home page body, shared by /fr and /en.
+ *
+ * Both language routes render this with a different `lang`, so the structure
+ * exists once and the copy comes entirely from src/i18n. Adding a language
+ * later means adding a catalogue, not copying this file.
+ */
+import Phone from './Phone.astro';
+import AppStoreButton from './AppStoreButton.astro';
+import { t, localePath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const steps = [
+  { n: '01', title: t(lang, 'how.step1.title'), body: t(lang, 'how.step1.body') },
+  { n: '02', title: t(lang, 'how.step2.title'), body: t(lang, 'how.step2.body') },
+  { n: '03', title: t(lang, 'how.step3.title'), body: t(lang, 'how.step3.body') },
+];
+
+const features = [
+  { title: t(lang, 'feat.dose.title'), body: t(lang, 'feat.dose.body'), icon: 'dose' },
+  { title: t(lang, 'feat.lock.title'), body: t(lang, 'feat.lock.body'), icon: 'lock' },
+  { title: t(lang, 'feat.streak.title'), body: t(lang, 'feat.streak.body'), icon: 'chart' },
+  { title: t(lang, 'feat.privacy.title'), body: t(lang, 'feat.privacy.body'), icon: 'shield' },
+];
+
+const faqs = [
+  { q: t(lang, 'faq.q1'), a: t(lang, 'faq.a1') },
+  { q: t(lang, 'faq.q2'), a: t(lang, 'faq.a2') },
+  { q: t(lang, 'faq.q3'), a: t(lang, 'faq.a3') },
+  { q: t(lang, 'faq.q4'), a: t(lang, 'faq.a4') },
+  { q: t(lang, 'faq.q5'), a: t(lang, 'faq.a5') },
+];
+
+const privacyPoints = [
+  t(lang, 'privacy.p1'),
+  t(lang, 'privacy.p2'),
+  t(lang, 'privacy.p3'),
+  t(lang, 'privacy.p4'),
+];
+
+// FAQPage structured data, generated from the same array the page renders, so
+// the two can never disagree.
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<!-- ═══ Hero ═══ -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <p class="badge">{t(lang, 'hero.badge')}</p>
+      <h1>{t(lang, 'hero.title')}</h1>
+      <p class="lede">{t(lang, 'hero.body')}</p>
+      <div class="hero-cta">
+        <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+        <p class="note">{t(lang, 'hero.ctaNote')}</p>
+      </div>
+    </div>
+    <div class="hero-shot">
+      <Phone src="/shots/home.webp" alt={t(lang, 'hero.shotAlt')} priority />
+    </div>
+  </div>
+
+  <!-- Decorative wave, echoing the rising water inside the app. -->
+  <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+    <path
+      fill="var(--bg)"
+      d="M0,64 C240,110 480,10 720,40 C960,70 1200,120 1440,86 L1440,120 L0,120 Z"></path>
+  </svg>
+</section>
+
+<!-- ═══ Problem ═══ -->
+<section class="problem">
+  <div class="wrap narrow">
+    <h2>{t(lang, 'problem.title')}</h2>
+    <p class="body">{t(lang, 'problem.body')}</p>
+    <p class="kicker">{t(lang, 'problem.kicker')}</p>
+  </div>
+</section>
+
+<!-- ═══ How it works ═══ -->
+<section id="how" class="how">
+  <div class="wrap">
+    <p class="eyebrow">{t(lang, 'how.eyebrow')}</p>
+    <h2 class="sec-title">{t(lang, 'how.title')}</h2>
+
+    <div class="how-grid">
+      <ol class="steps">
+        {
+          steps.map((s) => (
+            <li>
+              <span class="step-n">{s.n}</span>
+              <div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="how-shots">
+        <Phone src="/shots/unlock.webp" alt={t(lang, 'how.shotAlt')} class="shot-a" />
+        <Phone src="/shots/unlock-dose.webp" alt={t(lang, 'how.doseAlt')} class="shot-b" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Features ═══ -->
+<section id="features" class="features">
+  <div class="wrap">
+    <p class="eyebrow">{t(lang, 'feat.eyebrow')}</p>
+    <h2 class="sec-title">{t(lang, 'feat.title')}</h2>
+
+    <div class="feat-layout">
+      <ul class="feat-grid">
+        {
+          features.map((f) => (
+            <li class="card">
+              <span class="ficon" aria-hidden="true">
+                {f.icon === 'dose' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.7S5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-12.3-7-12.3Z" />
+                  </svg>
+                )}
+                {f.icon === 'lock' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                )}
+                {f.icon === 'chart' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 20V10M12 20V4M18 20v-6" />
+                  </svg>
+                )}
+                {f.icon === 'shield' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                  </svg>
+                )}
+              </span>
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="feat-shot">
+        <Phone src="/shots/history.webp" alt={t(lang, 'feat.streakAlt')} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Privacy ═══ -->
+<section class="privacy">
+  <div class="wrap privacy-in">
+    <h2>{t(lang, 'privacy.title')}</h2>
+    <ul>
+      {
+        privacyPoints.map((p) => (
+          <li>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            <span>{p}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="privacy-link" href={localePath(lang, '/privacy')}>
+      {t(lang, 'privacy.link')} →
+    </a>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section id="faq" class="faq">
+  <div class="wrap narrow">
+    <p class="eyebrow">{t(lang, 'faq.eyebrow')}</p>
+    <h2 class="sec-title">{t(lang, 'faq.title')}</h2>
+    <div class="faq-list">
+      {
+        faqs.map((f) => (
+          <details>
+            <summary>
+              <span>{f.q}</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </summary>
+            <p>{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Final CTA ═══ -->
+<section class="final">
+  <div class="wrap final-in">
+    <h2>{t(lang, 'final.title')}</h2>
+    <p>{t(lang, 'final.body')}</p>
+    <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+    <p class="note">{t(lang, 'hero.ctaNote')}</p>
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} is:inline />
+
+<style>
+  /* ── Shared section furniture ── */
+  .eyebrow {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--accent-cyan);
+    margin: 0 0 12px;
+  }
+  .sec-title {
+    font-size: clamp(28px, 4.4vw, 42px);
+    margin-bottom: 44px;
+    max-width: 20ch;
+  }
+  .narrow {
+    max-width: 760px;
+  }
+  section {
+    padding-block: clamp(64px, 9vw, 108px);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(120% 90% at 78% 8%, rgba(62, 155, 199, 0.32), transparent 62%),
+      linear-gradient(168deg, #0b3d5c 0%, #07314a 62%, #062940 100%);
+    color: #fff;
+    padding-top: clamp(56px, 8vw, 92px);
+    padding-bottom: clamp(110px, 14vw, 168px);
+    overflow: hidden;
+  }
+  .hero-in {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(32px, 6vw, 72px);
+    align-items: center;
+  }
+  .badge {
+    display: inline-block;
+    margin: 0 0 22px;
+    padding: 7px 15px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--r-full);
+  }
+  .hero h1 {
+    /* The three-line break is intentional — it mirrors the app's welcome
+       screen, where the same words stack the same way. */
+    white-space: pre-line;
+    font-size: clamp(44px, 7.4vw, 76px);
+    letter-spacing: -0.035em;
+    margin-bottom: 24px;
+  }
+  .lede {
+    font-size: clamp(17px, 1.9vw, 19.5px);
+    color: rgba(255, 255, 255, 0.76);
+    max-width: 46ch;
+    margin: 0 0 34px;
+  }
+  .hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .note {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .hero-shot {
+    display: flex;
+    justify-content: center;
+  }
+  .wave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    width: 100%;
+    height: clamp(56px, 8vw, 104px);
+  }
+
+  /* ── Problem ── */
+  .problem h2 {
+    white-space: pre-line;
+    font-size: clamp(26px, 4.2vw, 40px);
+    margin-bottom: 22px;
+  }
+  .problem .body {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin: 0 0 26px;
+  }
+  .problem .kicker {
+    font-size: clamp(19px, 2.5vw, 24px);
+    font-weight: 700;
+    color: var(--primary-dark);
+    line-height: 1.35;
+    margin: 0;
+    padding-left: 20px;
+    border-left: 4px solid var(--accent-cyan);
+  }
+
+  /* ── How ── */
+  .how {
+    background: var(--white);
+  }
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: clamp(32px, 6vw, 64px);
+    align-items: center;
+  }
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 30px;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+  .step-n {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent-cyan);
+    background: var(--bg-element);
+    border-radius: var(--r-full);
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+  }
+  .steps h3 {
+    font-size: 19px;
+    margin-bottom: 7px;
+  }
+  .steps p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+  .how-shots {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Two phones, slightly overlapped and tilted — the pair reads as one
+     sequence rather than two unrelated captures. */
+  .how-shots :global(.shot-a) {
+    transform: rotate(-4deg) translateX(6%);
+    z-index: 1;
+  }
+  .how-shots :global(.shot-b) {
+    transform: rotate(5deg) translateX(-16%) translateY(7%) scale(0.9);
+    opacity: 0.97;
+  }
+
+  /* ── Features ── */
+  .feat-layout {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: clamp(32px, 5vw, 60px);
+    align-items: center;
+  }
+  .feat-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 26px 24px;
+    box-shadow: var(--shadow-light);
+  }
+  .ficon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-sm);
+    background: var(--bg-element);
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 17.5px;
+    margin-bottom: 9px;
+  }
+  .card p {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--text-secondary);
+  }
+  .feat-shot {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── Privacy ── */
+  .privacy {
+    background: var(--white);
+  }
+  .privacy-in {
+    max-width: 860px;
+  }
+  .privacy h2 {
+    font-size: clamp(26px, 3.8vw, 36px);
+    margin-bottom: 28px;
+  }
+  .privacy ul {
+    list-style: none;
+    margin: 0 0 28px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 28px;
+  }
+  .privacy li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+    font-size: 16.5px;
+    color: var(--text-primary);
+  }
+  .privacy li svg {
+    color: var(--accent-cyan);
+    margin-top: 5px;
+  }
+  .privacy-link {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--primary-dark);
+  }
+  .privacy-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ── FAQ ── */
+  .faq-list {
+    display: grid;
+    gap: 12px;
+  }
+  details {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 4px 22px;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    cursor: pointer;
+    list-style: none;
+    padding-block: 18px;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--text-primary);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary svg {
+    flex: none;
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+  }
+  details[open] summary svg {
+    transform: rotate(180deg);
+  }
+  details p {
+    margin: 0 0 20px;
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 62ch;
+  }
+
+  /* ── Final CTA ── */
+  .final {
+    background: linear-gradient(150deg, #0b3d5c, #07314a);
+    color: #fff;
+    text-align: center;
+  }
+  .final-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .final h2 {
+    font-size: clamp(30px, 4.6vw, 46px);
+  }
+  .final p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 48ch;
+    font-size: 17.5px;
+  }
+  .final :global(.btn) {
+    margin-top: 12px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .hero-in,
+    .how-grid,
+    .feat-layout {
+      grid-template-columns: 1fr;
+    }
+    .hero-copy {
+      text-align: center;
+    }
+    .hero .lede {
+      margin-inline: auto;
+    }
+    .hero-cta {
+      align-items: center;
+    }
+    .sec-title,
+    .problem h2 {
+      max-width: none;
+    }
+    /* The screenshot leads on desktop but follows the pitch on mobile:
+       read the promise, then see it. */
+    .hero-shot {
+      order: 2;
+      margin-top: 12px;
+    }
+    .feat-shot {
+      display: none;
+    }
+    .how-shots {
+      margin-top: 20px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .feat-grid,
+    .privacy ul {
+      grid-template-columns: 1fr;
+    }
+    .how-shots :global(.shot-b) {
+      display: none;
+    }
+    .how-shots :global(.shot-a) {
+      transform: none;
+    }
+  }
+</style>

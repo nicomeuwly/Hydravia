@@ -1,0 +1,118 @@
+---
+import Logo from './Logo.astro';
+import { t, localePath, type Lang } from '../i18n';
+import ContactEmail from './ContactEmail.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="ft">
+  <div class="wrap ft-in">
+    <div class="ft-brand">
+      <a href={localePath(lang)} class="brand" aria-label="Hydravia">
+        <Logo size={36} color="#fff" />
+        <span>Hydravia</span>
+      </a>
+      <p class="tagline">{t(lang, 'footer.tagline')}</p>
+    </div>
+
+    <nav class="ft-nav" aria-label={t(lang, 'footer.legal')}>
+      <h2>{t(lang, 'footer.legal')}</h2>
+      <a href={localePath(lang, '/privacy')}>{t(lang, 'footer.privacy')}</a>
+      <a href={localePath(lang, '/terms')}>{t(lang, 'footer.terms')}</a>
+    </nav>
+
+    <nav class="ft-nav" aria-label={t(lang, 'footer.support')}>
+      <h2>{t(lang, 'footer.support')}</h2>
+      <ContactEmail label={t(lang, 'footer.contact')} />
+    </nav>
+  </div>
+
+  <div class="wrap ft-btm">
+    <p>© {year} Hydravia. {t(lang, 'footer.rights')}</p>
+  </div>
+</footer>
+
+<style>
+  .ft {
+    background: var(--water-deep);
+    color: rgba(255, 255, 255, 0.72);
+    padding-top: 56px;
+    margin-top: 0;
+  }
+  .ft-in {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .tagline {
+    margin: 12px 0 0;
+    font-size: 15px;
+    max-width: 30ch;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .ft-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ft-nav h2 {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .ft-nav a {
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.18s ease;
+  }
+  .ft-nav a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+  /* The unfilled-contact placeholder lands on the dark footer, where the
+     light-background .todo styling would be unreadable. */
+  .ft-nav :global(.todo) {
+    font-size: 13.5px;
+    color: #ffd9a0;
+    border: 1px dashed rgba(255, 217, 160, 0.5);
+    border-radius: 4px;
+    padding: 2px 8px;
+    display: inline-block;
+  }
+  .ft-btm {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-block: 20px;
+  }
+  .ft-btm p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  @media (max-width: 720px) {
+    .ft-in {
+      grid-template-columns: 1fr 1fr;
+    }
+    .ft-brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

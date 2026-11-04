@@ -1,0 +1,107 @@
+---
+import Logo from './Logo.astro';
+import { t, localePath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  path?: string;
+}
+const { lang, path = '' } = Astro.props;
+const home = localePath(lang);
+
+// The language switch keeps the reader on the same page rather than dumping
+// them on the home page — important on the legal pages, which is where people
+// most often switch looking for a version they can read.
+const other: Lang = lang === 'fr' ? 'en' : 'fr';
+const otherHref = localePath(other, path);
+---
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a href={home} class="brand" aria-label="Hydravia">
+      <Logo size={48} color="var(--primary-dark)" />
+      <span>Hydravia</span>
+    </a>
+
+    <nav class="nav" aria-label="Navigation">
+      <a href={`${home === '/' ? '' : home}#how`}>{t(lang, 'nav.how')}</a>
+      <a href={`${home === '/' ? '' : home}#features`}>{t(lang, 'nav.features')}</a>
+      <a href={`${home === '/' ? '' : home}#faq`}>{t(lang, 'nav.faq')}</a>
+      <a href={otherHref} class="lang" hreflang={other} aria-label={t(lang, 'a11y.langSwitch')}>
+        {other.toUpperCase()}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    /* Opaque by default. The frosted look is only applied where
+       backdrop-filter is actually supported — otherwise a translucent bar
+       lets the scrolling page show straight through the logo. */
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+    .hdr {
+      /* Still mostly opaque: enough translucency to feel like glass, not
+         enough for body text to be legible through it. */
+      background: rgba(243, 247, 249, 0.94);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+    }
+  }
+  .hdr-in {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: var(--primary-dark);
+    text-decoration: none;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 3vw, 26px);
+  }
+  .nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.18s ease;
+  }
+  .nav a:hover {
+    color: var(--primary-dark);
+  }
+  .lang {
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-full);
+    padding: 5px 12px;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.04em;
+  }
+  .lang:hover {
+    border-color: var(--primary-dark);
+  }
+
+  /* Below 640px the section links crowd the bar; the language switch and the
+     logo are what matter on a phone, so the rest steps aside. */
+  @media (max-width: 640px) {
+    .nav a:not(.lang) {
+      display: none;
+    }
+  }
+</style>

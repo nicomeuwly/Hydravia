@@ -1,0 +1,22 @@
+---
+import { CONTACT_EMAIL, HAS_CONTACT_EMAIL } from '../config';
+
+/**
+ * The contact address, as a mailto link once it is real and as a flagged
+ * placeholder until then. Used everywhere the email appears so the two states
+ * are decided in one place.
+ */
+interface Props {
+  /** Text to show instead of the raw address, e.g. "Contact us". */
+  label?: string;
+}
+const { label } = Astro.props;
+---
+
+{
+  HAS_CONTACT_EMAIL ? (
+    <a href={`mailto:${CONTACT_EMAIL}`}>{label ?? CONTACT_EMAIL}</a>
+  ) : (
+    <span class="todo">{CONTACT_EMAIL}</span>
+  )
+}

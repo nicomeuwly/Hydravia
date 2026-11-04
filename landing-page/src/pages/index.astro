@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import Home from '../components/Home.astro';
+
+const lang = 'fr' as const;
+---
+
+<Base
+  lang={lang}
+  path=""
+  title="Hydravia · Bois. Débloque. Avance."
+  description="Un rituel d'hydratation, pas un compteur. À l'heure du rappel, tes apps se verrouillent : tu bois ta dose et tout se débloque. Sur iOS."
+>
+  <Home lang={lang} />
+</Base>
