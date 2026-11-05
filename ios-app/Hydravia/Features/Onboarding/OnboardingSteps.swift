@@ -27,13 +27,8 @@ struct WelcomeStep: View {
                 // never be pushed off screen.
                 ScrollView {
                     VStack(alignment: .leading, spacing: Spacing.xl) {
-                        Image(systemName: "drop.fill")
-                            .font(.system(size: 30, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 64, height: 64)
-                            .background(Palette.primaryDark, in: .rect(cornerRadius: Radius.lg, style: .continuous))
+                        AppLogo(size: 64)
                             .padding(.top, Spacing.xxxl)
-                            .accessibilityHidden(true)
 
                         Text(.welcomeHeadline)
                             .font(.brand(.bold, size: 44, relativeTo: .largeTitle))
@@ -225,11 +220,7 @@ struct NotificationsStep: View {
 private struct NotificationPreview: View {
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.md) {
-            Image(systemName: "drop.fill")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 38, height: 38)
-                .background(Palette.primaryDark, in: .rect(cornerRadius: 9, style: .continuous))
+            AppLogo(size: 38)
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Text(verbatim: "Hydravia").font(.system(.subheadline, weight: .semibold))

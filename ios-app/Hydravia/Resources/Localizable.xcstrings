@@ -1015,7 +1015,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bois ta dose →"
+            "value" : "Bois ton verre →"
           }
         }
       }
@@ -1603,7 +1603,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avec ta position, Hydravia ajuste tes doses les jours de chaleur. Tu bois un peu plus quand il fait chaud, sans même y penser."
+            "value" : "Avec ta position, Hydravia ajuste ton verre les jours de chaleur. Tu bois un peu plus quand il fait chaud, sans même y penser."
           }
         }
       }
@@ -1633,7 +1633,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DOSES +15 %"
+            "value" : "+15 % D’EAU"
           }
         }
       }
@@ -1691,7 +1691,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adapte la dose à la météo."
+            "value" : "Adapte ton verre à la météo."
           }
         }
       }
@@ -1753,7 +1753,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stop le scroll. Une dose d’eau et tes apps sont à toi."
+            "value" : "Stop le scroll. Un verre d’eau et tes apps sont à toi."
           }
         }
       }
@@ -1782,7 +1782,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tes apps font une pause. Bois ta dose pour les réveiller."
+            "value" : "Tes apps font une pause. Bois ton verre pour les réveiller."
           }
         }
       }
@@ -1840,7 +1840,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta dose t’attend. Tes apps aussi."
+            "value" : "Ton verre t’attend. Tes apps aussi."
           }
         }
       }
@@ -1880,25 +1880,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wie versprochen sagen wir dir Bescheid. Mit zwei Tipps kündigen — oder einfach weitermachen."
+            "value" : "Kurze Erinnerung vor dem Ende deiner Testphase. Mit zwei Tipps kündigen — oder einfach weitermachen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Just as promised, here’s your heads-up. Cancel in two taps, or do nothing to carry on."
+            "value" : "A quick heads-up before your trial ends. Cancel in two taps, or do nothing to carry on."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Como prometimos, te avisamos. Puedes cancelar en dos toques, o no hacer nada para continuar."
+            "value" : "Un aviso antes de que termine tu prueba. Puedes cancelar en dos toques, o no hacer nada para continuar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comme promis, on te prévient. Tu peux annuler en 2 taps, ou ne rien faire pour continuer."
+            "value" : "Petit rappel avant la fin de ton essai. Tu peux annuler en 2 taps, ou ne rien faire pour continuer."
           }
         }
       }
@@ -2398,35 +2398,6 @@
         }
       }
     },
-    "paywall.ctaSub" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ohne Verpflichtung · Jederzeit kündbar"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No commitment · Cancel any time"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin compromiso · Cancela cuando quieras"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans engagement · Annule à tout moment"
-          }
-        }
-      }
-    },
     "paywall.errorBody" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2538,7 +2509,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dose adaptée à la météo et à ta soif"
+            "value" : "Quantité adaptée à la météo et à ta soif"
           }
         }
       }
@@ -2597,35 +2568,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Essaie Hydravia\ngratuitement"
-          }
-        }
-      }
-    },
-    "paywall.noTrialLegal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verlängert sich automatisch. Jederzeit in deinen Einstellungen kündbar."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renews automatically. Cancel any time in your settings."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se renueva automáticamente. Cancela cuando quieras desde tus ajustes."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renouvellement automatique. Annule à tout moment depuis tes réglages."
           }
         }
       }
@@ -2713,36 +2655,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "soit %@/mois"
-          }
-        }
-      }
-    },
-    "paywall.planLegal" : {
-      "comment" : "Arguments: date of the first charge.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verlängert sich automatisch nach der Gratis-Testphase. Erste Abbuchung am %1$@. Jederzeit in den Einstellungen kündbar."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renews automatically when the free trial ends. First charge on %1$@. Cancel any time from your settings."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se renueva automáticamente al terminar la prueba gratis. Primer cobro el %1$@. Cancela cuando quieras desde los ajustes."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renouvellement automatique à la fin de l’essai gratuit. Premier prélèvement le %1$@. Annulable à tout moment depuis les réglages."
           }
         }
       }
@@ -3067,64 +2979,6 @@
         }
       }
     },
-    "paywall.timelineDay5" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tag 5"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Day 5"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Día 5"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jour 5"
-          }
-        }
-      }
-    },
-    "paywall.timelineDay5Text" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wir sagen dir Bescheid, dass die Testphase endet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "We'll let you know the trial is nearly over."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Te avisamos de que la prueba está por terminar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On te prévient que l'essai touche à sa fin."
-          }
-        }
-      }
-    },
     "paywall.timelineDay7" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3237,7 +3091,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accès complet : le rituel de déblocage et les doses adaptées."
+            "value" : "Accès complet : le rituel de déblocage et les quantités adaptées."
           }
         }
       }
@@ -4090,25 +3944,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auf Premium wechseln"
+            "value" : "Auf Pro upgraden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Go Premium"
+            "value" : "Go Pro"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pasar a Premium"
+            "value" : "Pasar a Pro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passer à Premium"
+            "value" : "Passer à Pro"
           }
         }
       }
@@ -4137,7 +3991,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le rituel complet : déblocage et doses adaptées"
+            "value" : "Le rituel complet : déblocage et quantités adaptées"
           }
         }
       }
@@ -4224,7 +4078,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refusé — la dose ignore la météo"
+            "value" : "Refusé — la quantité ignore la météo"
           }
         }
       }
@@ -4612,25 +4466,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium"
+            "value" : "Pro"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium"
+            "value" : "Pro"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium"
+            "value" : "Pro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium"
+            "value" : "Pro"
           }
         }
       }
@@ -5153,7 +5007,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DOSE RECOMMANDÉE"
+            "value" : "QUANTITÉ RECOMMANDÉE"
           }
         }
       }
@@ -5269,7 +5123,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une dose d’eau et tu reprends la main"
+            "value" : "Un verre d’eau et tu reprends la main"
           }
         }
       }
@@ -5443,7 +5297,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible d'enregistrer ta dose. Réessaie."
+            "value" : "Impossible d'enregistrer ton verre. Réessaie."
           }
         }
       }
@@ -5676,7 +5530,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un rituel d’hydratation, pas un compteur. À chaque rappel, les apps que tu as choisies se mettent en pause. Bois ta dose d’eau et elles se rouvrent, tout simplement."
+            "value" : "Un rituel d’hydratation, pas un compteur. À chaque rappel, les apps que tu as choisies se mettent en pause. Bois ton verre d’eau et elles se rouvrent, tout simplement."
           }
         }
       }
@@ -5970,7 +5824,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "C’est l’heure de ta dose d’eau."
+            "value" : "C’est l’heure de ton verre d’eau."
           }
         }
       }

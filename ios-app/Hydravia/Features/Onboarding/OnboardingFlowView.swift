@@ -135,11 +135,16 @@ struct OnboardingScaffold<Content: View>: View {
     private func header(index: Int) -> some View {
         HStack(spacing: Spacing.lg) {
             Button { dismiss() } label: {
+                // A plain glass circle: the .glass button style pads the
+                // label into a lozenge.
                 Image(systemName: "chevron.left")
                     .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Palette.primaryDark)
                     .frame(width: 44, height: 44)
+                    .glassEffect(.regular.interactive(), in: .circle)
+                    .contentShape(.circle)
             }
-            .buttonStyle(.glass)
+            .buttonStyle(.plain)
             .accessibilityLabel(Text(.onboardingBack))
 
             HStack(spacing: 6) {

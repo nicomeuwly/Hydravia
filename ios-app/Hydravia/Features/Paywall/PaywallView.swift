@@ -165,9 +165,6 @@ struct PaywallView: View {
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(.paywallCtaSub)
-                        .font(.brandFootnote)
-                        .foregroundStyle(Palette.textSecondary)
                     skipButton
                 }
 
@@ -209,7 +206,6 @@ struct PaywallView: View {
                     price: yearly.displayPrice,
                     detail: String(localized: .paywallPerMonth(perMonth(yearly))),
                     badge: savings(yearly: yearly, monthly: monthly),
-                    legal: legal,
                     isSelected: selectedID == yearly.id
                 ) { selectedID = yearly.id }
 
@@ -218,7 +214,6 @@ struct PaywallView: View {
                     price: monthly.displayPrice,
                     detail: nil,
                     badge: nil,
-                    legal: legal,
                     isSelected: selectedID == monthly.id
                 ) { selectedID = monthly.id }
             }
@@ -272,11 +267,7 @@ struct PaywallView: View {
 
     private var brand: some View {
         HStack(spacing: Spacing.sm) {
-            Image(systemName: "drop.fill")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(width: 32, height: 32)
-                .background(Palette.primaryDark, in: .rect(cornerRadius: 9, style: .continuous))
+            AppLogo(size: 32)
             Text(verbatim: "Hydravia")
                 .font(.brand(.bold, size: 18, relativeTo: .headline))
                 .foregroundStyle(Palette.textPrimary)
@@ -305,12 +296,6 @@ struct PaywallView: View {
         @unknown default: .day
         }
         return calendar.date(byAdding: component, value: period.value, to: .now) ?? .now
-    }
-
-    private var legal: String {
-        offersTrial
-            ? String(localized: .paywallPlanLegal(chargeDate.formatted(.dateTime.day().month(.wide))))
-            : String(localized: .paywallNoTrialLegal)
     }
 
     /// "7 days free, then $17.99 per year. Renews automatically…"
@@ -388,7 +373,6 @@ private struct PlanCard: View {
     let price: String
     let detail: String?
     let badge: String?
-    let legal: String
     let isSelected: Bool
     let onSelect: () -> Void
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -428,13 +412,6 @@ private struct PlanCard: View {
                         .font(.bodyEmphasis)
                         .foregroundStyle(Palette.textPrimary)
                 }
-                if isSelected {
-                    Text(legal)
-                        .font(.brand(.regular, size: 12.5, relativeTo: .caption))
-                        .foregroundStyle(Palette.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .transition(.opacity)
-                }
             }
             // Both cards span the width, whatever their content.
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -459,7 +436,6 @@ private struct TrialTimeline: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             step(icon: "lock.open.fill", title: .paywallTimelineToday, text: Text(.paywallTimelineTodayText), isLast: false)
-            step(icon: "bell.fill", title: .paywallTimelineDay5, text: Text(.paywallTimelineDay5Text), isLast: false)
             step(icon: "star.fill", title: .paywallTimelineDay7,
                  text: Text(.paywallTimelineDay7Text(chargeDate.formatted(.dateTime.day().month(.wide)))),
                  isLast: true)

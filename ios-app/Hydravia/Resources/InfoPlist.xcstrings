@@ -67,7 +67,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hydravia utilise ta localisation pour adapter ta dose à la température extérieure."
+            "value" : "Hydravia utilise ta localisation pour adapter la quantité d’eau à la température extérieure."
           }
         }
       }

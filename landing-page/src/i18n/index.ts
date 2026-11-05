@@ -32,7 +32,7 @@ export const fr = {
   'hero.badge': 'Sur iOS',
   'hero.title': 'Bois.\nDébloque.\nAvance.',
   'hero.body':
-    "Un rituel d'hydratation, pas un compteur de plus. À l'heure du rappel, tes apps se verrouillent. Tu bois ta dose, tout se débloque.",
+    "Un rituel d'hydratation, pas un compteur de plus. À l'heure du rappel, tes apps se verrouillent. Tu bois ton verre, tout se débloque.",
   'hero.cta': 'Télécharger sur l’App Store',
   'hero.ctaNote': '7 jours d’essai · sans engagement',
   'hero.shotAlt':
@@ -53,22 +53,22 @@ export const fr = {
     'À l’intervalle que tu as choisi, les apps que tu as sélectionnées se bloquent. Uniquement pendant tes heures actives, jamais la nuit.',
   'how.step2.title': 'Tu dis comment tu vas',
   'how.step2.body':
-    'Une seule question. Ta réponse, la météo du jour et ce que tu as déjà bu donnent une dose précise, pas un verre générique.',
+    'Une seule question. Ta réponse, la météo du jour et ce que tu as déjà bu donnent la quantité juste, pas un chiffre au hasard.',
   'how.step3.title': 'Tu bois, tu reprends la main',
   'how.step3.body':
     'Tu confirmes, et le verrou se lève jusqu’au prochain rappel. Le niveau d’eau monte derrière l’écran. C’est tout.',
   'how.shotAlt':
     'Écran de verrouillage de Hydravia demandant « Comment tu te sens, là, maintenant ? » avec trois réponses.',
   'how.doseAlt':
-    'Hydravia affichant une dose recommandée de 350 ml et le bouton « J’ai bu ».',
+    'Hydravia affichant une quantité recommandée de 350 ml et le bouton « J’ai bu ».',
 
   // ── Features ──────────────────────────────────────────────────────────────
   'feat.eyebrow': 'CE QUI CHANGE',
   'feat.title': 'Pensé pour tenir dans la durée',
 
-  'feat.dose.title': 'Une dose calculée, pas un verre au hasard',
+  'feat.dose.title': 'La quantité juste, calculée pour toi',
   'feat.dose.body':
-    'Ton poids fixe l’objectif. Ce que tu as déjà bu, le temps qu’il reste avant le coucher, ta soif du moment et la température extérieure ajustent chaque dose.',
+    'Ton poids fixe l’objectif. Ce que tu as déjà bu, le temps qu’il reste avant le coucher, ta soif du moment et la température extérieure ajustent chaque verre.',
 
   'feat.lock.title': 'Un vrai verrou, pas une notification',
   'feat.lock.body':
@@ -109,9 +109,9 @@ export const fr = {
   'faq.a3':
     'C’est la seule façon, sur iOS, de bloquer d’autres apps. Apple encadre cet accès très strictement : Hydravia peut poser un verrou, mais ne peut lire aucune de tes statistiques d’usage. Tu peux retirer l’autorisation à tout moment dans les réglages.',
 
-  'faq.q4': 'Comment la dose est-elle calculée ?',
+  'faq.q4': 'Comment la quantité est-elle calculée ?',
   'faq.a4':
-    'L’objectif quotidien se calcule à partir de ton poids : environ 33 ml par kilo, toujours entre 1,5 et 4 litres. Chaque dose répartit ensuite ce qu’il te reste à boire sur les rappels qui précèdent ton heure de coucher, puis s’ajuste selon ta soif et la température extérieure.',
+    'L’objectif quotidien se calcule à partir de ton poids : environ 33 ml par kilo, toujours entre 1,5 et 4 litres. Chaque verre répartit ensuite ce qu’il te reste à boire sur les rappels qui précèdent ton heure de coucher, puis s’ajuste selon ta soif et la température extérieure.',
 
   'faq.q5': 'Combien ça coûte ?',
   'faq.a5':

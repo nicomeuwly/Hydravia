@@ -94,3 +94,19 @@ extension View {
         modifier(GlassCardModifier(radius: radius, legibility: legibility, interactive: interactive))
     }
 }
+
+// MARK: - App logo
+
+/// The real app icon, rounded like the Home Screen draws it.
+struct AppLogo: View {
+    var size: CGFloat
+
+    var body: some View {
+        Image(.appLogo)
+            .resizable()
+            .interpolation(.high)
+            .frame(width: size, height: size)
+            .clipShape(.rect(cornerRadius: size * 0.225, style: .continuous))
+            .accessibilityHidden(true)
+    }
+}
