@@ -183,8 +183,7 @@ nonisolated enum Blocker {
     /// The dose was drunk: lift the shield for `minutes`, and have the monitor
     /// put it back afterwards. An unlock running past bedtime simply ends with
     /// the window.
-    static func grantUnlock(minutes: Int, now: Date = .now, calendar: Calendar = .autoupdatingCurrent) throws {
-        let until = now.addingTimeInterval(TimeInterval(minutes * 60))
+    static func grantUnlock(until: Date, calendar: Calendar = .autoupdatingCurrent) throws {
         unlockedUntil = until
         lowerShield()
 

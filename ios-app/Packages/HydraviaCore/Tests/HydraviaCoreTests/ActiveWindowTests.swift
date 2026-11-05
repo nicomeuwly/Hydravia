@@ -31,6 +31,27 @@ struct ActiveWindowTests {
         #expect(window.nextReminder(after: MinuteOfDay(hour: 6, minute: 0)) == .today(MinuteOfDay(hour: 8, minute: 0)))
     }
 
+    @Test func lastReminderIsTheLatestAtOrBeforeNow() {
+        #expect(window.lastReminder(atOrBefore: MinuteOfDay(hour: 9, minute: 0)) == MinuteOfDay(hour: 9, minute: 0))
+        #expect(window.lastReminder(atOrBefore: MinuteOfDay(hour: 9, minute: 59)) == MinuteOfDay(hour: 9, minute: 0))
+        #expect(window.lastReminder(atOrBefore: MinuteOfDay(hour: 7, minute: 30)) == nil)
+    }
+
+    @Test func anUnlockEndsAtTheNextReminderNotAnIntervalAfterTheDrink() {
+        // Drank at 10:20 for the 10:00 reminder: locked again for 11:00.
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 20)) == MinuteOfDay(hour: 11, minute: 0))
+    }
+
+    @Test func anUnlockLastsAtLeastTheMinimumBreak() {
+        // Drank at 10:50: 11:00 is too close, the break runs to 12:00.
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 50)) == MinuteOfDay(hour: 12, minute: 0))
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 45)) == MinuteOfDay(hour: 11, minute: 0))
+    }
+
+    @Test func noUnlockEndAfterTheLastReminder() {
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 21, minute: 50)) == nil)
+    }
+
     @Test func nextReminderRollsOverToTomorrow() {
         #expect(window.nextReminder(after: MinuteOfDay(hour: 21, minute: 30)) == .tomorrow(MinuteOfDay(hour: 8, minute: 0)))
     }

@@ -307,7 +307,7 @@ struct UnlockView: View {
         router.reminderFired = false
         Task { await reminders?.clearDeliveredReminders() }
         // The phone is free until the next reminder is due.
-        blocker.unlockAfterDrinking(intervalMin: settings.settings.window.intervalMin)
+        blocker.unlockAfterDrinking(window: settings.settings.window)
     }
 }
 

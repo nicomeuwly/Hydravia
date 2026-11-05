@@ -110,6 +110,23 @@ public struct ActiveWindow: Equatable, Codable, Sendable {
         return .tomorrow(first)
     }
 
+    /// The latest of today's reminders at or before `now`, if one has fired.
+    public func lastReminder(atOrBefore now: MinuteOfDay) -> MinuteOfDay? {
+        reminderSlots.last { $0 <= now }
+    }
+
+    /// Shortest break an unlock earns: drinking just before a reminder
+    /// shouldn't relock the phone a minute later.
+    public static let minimumBreakMin = 15
+
+    /// When an unlock earned at `now` ends: at a reminder, so every reminder
+    /// finds the apps locked (an unlock counted from the drink would run
+    /// past the next one). The first reminder at least `minimumBreakMin`
+    /// away; nil when there's none left today (the window's end relocks).
+    public func unlockEnd(after now: MinuteOfDay) -> MinuteOfDay? {
+        reminderSlots.first { $0.value >= now.value + Self.minimumBreakMin }
+    }
+
     /// Minutes from midnight past which a bedtime is late enough that the user
     /// is plausibly reaching for a window the app can't express. Screens
     /// surface the midnight cut-off from here so a night owl doesn't read

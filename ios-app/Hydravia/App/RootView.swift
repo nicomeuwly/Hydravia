@@ -50,9 +50,22 @@ struct RootView: View {
     /// A banner seen but not tapped still means "time to drink" — and so
     /// does a shield standing over the user's apps.
     private func checkUnansweredReminder() async {
-        if await reminders?.hasUnansweredReminder() == true || blocker.isShieldUp {
+        if await reminders?.hasUnansweredReminder() == true || blocker.isShieldUp || reminderPassedSinceLastDrink {
             router.reminderFired = true
         }
+    }
+
+    /// A reminder went off since the last glass: still due, whatever became
+    /// of its notification (tapped, cleared, or the app relaunched).
+    private var reminderPassedSinceLastDrink: Bool {
+        guard areRemindersEnabled else { return false }
+        let calendar = Calendar.autoupdatingCurrent
+        let now = Date.now
+        guard let slot = settings.settings.window.lastReminder(atOrBefore: MinuteOfDay(now, calendar: calendar)),
+              let due = calendar.date(bySettingHour: slot.value / 60, minute: slot.value % 60, second: 0, of: now)
+        else { return false }
+        let lastDrink = hydration.todayEntries.map(\.createdAt).max()
+        return lastDrink.map { $0 < due } ?? true
     }
 
     var body: some View {

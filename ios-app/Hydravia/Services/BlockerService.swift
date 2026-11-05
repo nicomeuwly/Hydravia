@@ -92,10 +92,18 @@ final class BlockerService {
         apply()
     }
 
-    /// The dose is drunk: the phone is free until the next reminder is due.
-    func unlockAfterDrinking(intervalMin: Int) {
+    /// The dose is drunk: the phone is free until the next reminder, so
+    /// that reminder finds the apps locked whenever the dose was drunk (at
+    /// least `ActiveWindow.minimumBreakMin` away). After the day's last
+    /// reminder, free until bedtime.
+    func unlockAfterDrinking(window: ActiveWindow, now: Date = .now) {
+        let calendar = Calendar.autoupdatingCurrent
+        let minute = MinuteOfDay(now, calendar: calendar)
+        let end = window.unlockEnd(after: minute) ?? window.sleep
+        let until = calendar.date(bySettingHour: end.value / 60, minute: end.value % 60, second: 0, of: now)
+            ?? now.addingTimeInterval(TimeInterval(window.intervalMin * 60))
         do {
-            try Blocker.grantUnlock(minutes: intervalMin)
+            try Blocker.grantUnlock(until: until)
         } catch {
             logger.error("Could not schedule the relock: \(error.localizedDescription, privacy: .public)")
         }
