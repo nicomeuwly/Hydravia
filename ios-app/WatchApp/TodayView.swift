@@ -1,8 +1,9 @@
 import HydraviaData
 import SwiftUI
 
-/// The watch's one screen: today's water as a ring, the next reminder, and
-/// (with Pro) the favourite amounts to pour in one tap.
+/// The watch's screen, in two vertical pages: today's water as a ring with
+/// the next reminder, then (with Pro) the favourite amounts to pour in one
+/// tap, or why there's nothing to tap.
 struct TodayView: View {
     @Environment(WatchModel.self) private var model
 
@@ -11,34 +12,59 @@ struct TodayView: View {
             // Re-evaluated every minute: midnight resets the count and the
             // reminder line moves on.
             TimelineView(.everyMinute) { context in
-                ScrollView {
-                    VStack(spacing: 12) {
-                        // Before the iPhone's first numbers, the goal would
-                        // be a made-up one: only the way to set things up.
-                        if model.hasSnapshot {
-                            ProgressRing(
-                                progress: model.local.progress(at: context.date),
-                                consumedMl: model.local.todayMl(at: context.date),
-                                goalMl: model.local.state.goalMl
-                            )
-                            .frame(height: 118)
-
-                            StatusLine(local: model.local, now: context.date)
-                        }
-
-                        if !model.hasSnapshot {
-                            Note(icon: "iphone", title: Text(.watchSetupTitle), detail: Text(.watchSetupBody))
-                        } else if model.hasPro {
-                            PourButtons(amounts: model.favoritesMl) { model.pour($0) }
-                        } else {
-                            Note(icon: "lock.fill", title: Text(.watchProTitle), detail: Text(.watchProBody))
-                        }
+                // Before the iPhone's first numbers, the goal would be a
+                // made-up one: only the way to set things up.
+                if model.hasSnapshot {
+                    TabView {
+                        ringPage(now: context.date)
+                        actionPage(now: context.date)
                     }
-                    .padding(.horizontal, 4)
+                    .tabViewStyle(.verticalPage)
+                } else {
+                    ScrollView {
+                        Note(icon: "iphone", title: Text(.watchSetupTitle), detail: Text(.watchSetupBody))
+                            .padding(.top, 8)
+                    }
                 }
             }
             .navigationTitle(Text(verbatim: "Hydravia"))
             .containerBackground(WatchPalette.background, for: .navigation)
+        }
+    }
+
+    private func ringPage(now: Date) -> some View {
+        VStack(spacing: 10) {
+            ProgressRing(
+                progress: model.local.progress(at: now),
+                consumedMl: model.local.todayMl(at: now),
+                goalMl: model.local.state.goalMl
+            )
+            .frame(maxHeight: .infinity)
+            StatusLine(local: model.local, now: now)
+        }
+        // Clear of the title, which sits over the page's top.
+        .padding(.top, 14)
+        .padding(.horizontal, 4)
+    }
+
+    private func actionPage(now: Date) -> some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                // The count stays in sight while pouring.
+                Text(.watchTotal(model.local.todayMl(at: now).formatted(), model.local.state.goalMl.formatted()))
+                    .font(.brand(.bold, size: 17, relativeTo: .headline))
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(model.local.todayMl(at: now))))
+                    .animation(.snappy, value: model.local.todayMl(at: now))
+                    .frame(maxWidth: .infinity)
+                if model.hasPro {
+                    PourButtons(amounts: model.favoritesMl) { model.pour($0) }
+                } else {
+                    Note(icon: "lock.fill", title: Text(.watchProTitle), detail: Text(.watchProBody))
+                }
+            }
+            .padding(.top, 4)
+            .padding(.horizontal, 4)
         }
     }
 }
@@ -131,12 +157,26 @@ private struct PourButtons: View {
                         Image(systemName: "drop.fill")
                     }
                     .font(.brand(.bold, size: 16, relativeTo: .body))
-                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.white)
+                    // Three to a screen, with the count above them: the
+                    // system button is too tall for that.
+                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .background(WatchPalette.secondaryBlue, in: .capsule)
+                    .contentShape(.capsule)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(WatchPalette.secondaryBlue)
+                .buttonStyle(PourButtonStyle())
             }
         }
+    }
+}
+
+/// Sinks a little under the finger.
+private struct PourButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .opacity(configuration.isPressed ? 0.8 : 1)
+            .animation(.snappy(duration: 0.15), value: configuration.isPressed)
     }
 }
 
