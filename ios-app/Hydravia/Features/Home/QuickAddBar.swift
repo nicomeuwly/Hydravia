@@ -19,7 +19,7 @@ struct QuickAddBar: View {
 
     @State private var pours = 0
 
-    private static let confirmationSeconds = 4
+    private static let confirmationSeconds = 3
 
     private var amount: Int {
         QuickAdd.amount(last: lastAmountMl, favorites: settings.settings.favoriteAmountsMl)
