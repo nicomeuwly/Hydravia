@@ -14,8 +14,6 @@ struct RootView: View {
     @Environment(StoreService.self) private var store
     @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
-    /// Dev builds only: try the free plan without signing out of Pro.
-    @AppStorage(AppConfig.simulatesFreePlanKey) private var simulatesFreePlan = false
 
     /// What the reminder schedule depends on: any change reschedules.
     private struct Schedule: Equatable {
@@ -46,7 +44,7 @@ struct RootView: View {
     /// The ritual is free on one app; Hydravia Pro locks any selection (dev
     /// builds count as Pro to test without a purchase).
     private var isPro: Bool {
-        store.isPremium || (AppConfig.isDevMode && !simulatesFreePlan)
+        store.hasPro
     }
 
     /// A banner seen but not tapped still means "time to drink" — and so

@@ -22,6 +22,18 @@ final class StoreService {
     private(set) var yearly: Product?
     private(set) var monthly: Product?
     private(set) var isPremium = false
+
+    /// What the app unlocks: the subscription, or in a dev build Pro unless
+    /// the dev section simulates the free plan (which wins over a sandbox
+    /// purchase too, so the free plan can be tried on a subscribed device).
+    var hasPro: Bool {
+        AppConfig.isDevMode ? !simulatesFreePlan : isPremium
+    }
+
+    /// Dev only (see `hasPro`). Persisted so it survives relaunches.
+    var simulatesFreePlan = UserDefaults.standard.bool(forKey: AppConfig.simulatesFreePlanKey) {
+        didSet { UserDefaults.standard.set(simulatesFreePlan, forKey: AppConfig.simulatesFreePlanKey) }
+    }
     /// False until the App Store has answered once: screens gating on premium
     /// shouldn't flash "locked" for an actual subscriber at launch.
     private(set) var hasLoadedEntitlements = false
