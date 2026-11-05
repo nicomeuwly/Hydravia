@@ -92,17 +92,19 @@ public struct DayTotal: Equatable, Sendable {
 /// the totals directly makes a completely missed day invisible: 2 500 / — /
 /// 2 500 would read as an unbroken two-day streak. Everything here works on
 /// calendar days, filling the gaps back in, so a missed day breaks the streak
-/// the way a user expects. Today is always excluded: it is still in progress,
-/// so a partial day must not read as a broken streak.
+/// the way a user expects. Today counts as soon as its goal is reached, and
+/// never against the user while it's still in progress: a partial day must
+/// not read as a broken streak.
 ///
 /// Expects one total per day and a positive goal; with a non-positive goal no
 /// day counts as reached (there is nothing to reach).
 public enum Streak {
-    /// Consecutive goal-meeting days counting back from yesterday.
+    /// Consecutive goal-meeting days ending today (once reached) or
+    /// yesterday (while today is still in progress).
     public static func current(_ totals: [DayTotal], goalMl: Int, today: LocalDay) -> Int {
         let reached = reachedDays(totals, goalMl: goalMl, today: today)
         var streak = 0
-        var cursor = today.adding(days: -1)
+        var cursor = reached.contains(today) ? today : today.adding(days: -1)
         while reached.contains(cursor) {
             streak += 1
             cursor = cursor.adding(days: -1)
@@ -110,12 +112,12 @@ public enum Streak {
         return streak
     }
 
-    /// Goal-meeting days in the window, today excluded.
+    /// Goal-meeting days in the window, today included once reached.
     public static func daysReached(_ totals: [DayTotal], goalMl: Int, today: LocalDay) -> Int {
         reachedDays(totals, goalMl: goalMl, today: today).count
     }
 
-    /// Longest run of consecutive goal-meeting days, today excluded.
+    /// Longest run of consecutive goal-meeting days, today included once reached.
     public static func best(_ totals: [DayTotal], goalMl: Int, today: LocalDay) -> Int {
         let ordinals = reachedDays(totals, goalMl: goalMl, today: today).map(\.ordinal).sorted()
         var best = 0
@@ -131,6 +133,7 @@ public enum Streak {
 
     private static func reachedDays(_ totals: [DayTotal], goalMl: Int, today: LocalDay) -> Set<LocalDay> {
         guard goalMl > 0 else { return [] }
-        return Set(totals.lazy.filter { $0.day != today && $0.totalMl >= goalMl }.map(\.day))
+        // Days after today can't be reached yet (a clock set back, say).
+        return Set(totals.lazy.filter { $0.day <= today && $0.totalMl >= goalMl }.map(\.day))
     }
 }

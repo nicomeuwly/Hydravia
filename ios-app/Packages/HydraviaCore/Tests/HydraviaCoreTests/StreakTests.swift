@@ -56,9 +56,15 @@ struct StreakTests {
         #expect(Streak.current(stats, goalMl: goal, today: today) == 1)
     }
 
-    @Test func todayIsIgnoredSoAPartialDayNeverBreaksTheStreak() {
+    @Test func aPartialTodayNeverBreaksTheStreak() {
         let stats = totals([(12, 2500), (13, 10)])
         #expect(Streak.current(stats, goalMl: goal, today: today) == 1)
+    }
+
+    @Test func todayCountsOnceItsGoalIsReached() {
+        let stats = totals([(11, 2500), (12, 2500), (13, 2500)])
+        #expect(Streak.current(stats, goalMl: goal, today: today) == 3)
+        #expect(Streak.current(totals([(13, 2500)]), goalMl: goal, today: today) == 1)
     }
 
     @Test func zeroWhenYesterdayFellShort() {
@@ -71,9 +77,11 @@ struct StreakTests {
         #expect(Streak.best([], goalMl: goal, today: today) == 0)
     }
 
-    @Test func countsGoalMeetingDaysExcludingToday() {
+    @Test func countsGoalMeetingDaysTodayIncludedOnceReached() {
         let stats = totals([(9, 2500), (10, 1000), (12, 2600), (13, 2600)])
-        #expect(Streak.daysReached(stats, goalMl: goal, today: today) == 2)
+        #expect(Streak.daysReached(stats, goalMl: goal, today: today) == 3)
+        let partialToday = totals([(9, 2500), (12, 2600), (13, 100)])
+        #expect(Streak.daysReached(partialToday, goalMl: goal, today: today) == 2)
     }
 
     @Test func bestRunIsBrokenByGaps() {

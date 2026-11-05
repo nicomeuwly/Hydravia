@@ -1,8 +1,9 @@
 import Foundation
 
-/// The water's state over time: level, tilt, splash, three wave layers, a
-/// surface that ripples (tilt and pours send waves that bounce off the
-/// sides), a few ambient bubbles, and the goal-reached swarm.
+/// The water's state over time: level, tilt, a surface that ripples (tilt
+/// and pours send waves that bounce off the sides), a few ambient bubbles,
+/// and the goal-reached swarm. The steady waves themselves are a function of
+/// `time`, drawn by `WaterRenderer`.
 ///
 /// Deliberately NOT observable: it is advanced once per display frame by the
 /// `TimelineView` that draws it, and views read a value `Snapshot`. Routing
@@ -14,18 +15,19 @@ import Foundation
 /// jump sideways.
 @MainActor
 final class WaterPhysics {
-    // MARK: Tuning — same values as the Expo engine it replaces.
+    // MARK: Tuning
 
-    /// Seconds per lap of the front / middle / back wave: three speeds, so
-    /// the layers drift against each other.
-    static let frontPeriod = 9.0
-    static let middlePeriod = 6.8
-    static let backPeriod = 11.5
-    /// The level eases to a new value over this long (ease-out cubic).
-    static let levelDuration = 1.1
-    /// A splash surges for `splashRise` then decays for `splashFall`.
-    static let splashRise = 0.16
-    static let splashFall = 1.5
+    /// The level follows a spring. Poured water rises with a slight swell
+    /// past the new level and settles back (like water finding its level in
+    /// a glass); any other change (first appearance, goal edited) glides in
+    /// without overshoot.
+    private static let levelStiffness = 11.0
+    private static let pourDampingRatio = 0.7
+    private static let glideDampingRatio = 1.0
+    /// A pour livens the waves a little for `splashRise`, then lets go over
+    /// `splashFall`. Small on purpose: the pour's ripple does the talking.
+    static let splashRise = 0.2
+    static let splashFall = 1.8
     /// Underdamped on purpose: the surface overshoots and sloshes when the
     /// device stops moving, like water settling in a glass.
     static let tiltStiffness = 120.0
@@ -42,8 +44,8 @@ final class WaterPhysics {
     // comes back, losing a little each time.
     static let rippleColumns = 32
     /// Wave speed, in screen widths per second.
-    private static let rippleSpeed = 0.75
-    private static let rippleDamping = 1.4
+    private static let rippleSpeed = 0.55
+    private static let rippleDamping = 1.1
     /// How hard a change of tilt pushes the water toward one side.
     private static let tiltForcing = 0.018
     private static let rippleLimit = 2.6
@@ -59,11 +61,10 @@ final class WaterPhysics {
         var level: Double
         /// Normalised lateral tilt, -1 (left) … 1 (right).
         var roll: Double
-        /// 0 … 1 surge applied to the wave amplitude after an addition.
+        /// 0 … 1, how lively the waves are right after a pour.
         var disturbance: Double
-        var frontPhase: Double
-        var middlePhase: Double
-        var backPhase: Double
+        /// Seconds of water on screen: the steady waves travel with it.
+        var time: Double
         /// Surface displacement per column, left to right, in base wave heights.
         var ripples: [Double]
         var ambient: [AmbientBubble]
@@ -139,9 +140,10 @@ final class WaterPhysics {
     private var lastDate: Date?
     private var cached: Snapshot?
 
-    private var levelFrom = 0.0
-    private var levelTo = 0.0
-    private var levelStart = -Double.infinity
+    private var level = 0.0
+    private var levelTarget = 0.0
+    private var levelVelocity = 0.0
+    private var levelDampingRatio = 1.0
     private var splashStart: Double?
     /// Disturbance at the moment the current splash began, so a second pour
     /// during the decay surges up from there instead of popping down to 0.
@@ -161,28 +163,30 @@ final class WaterPhysics {
 
     /// Moves the water to `level` (0 … 1). `splash` adds the surge, for water
     /// that was just poured in.
-    func setLevel(_ level: Double, splash: Bool) {
-        let target = min(1, max(0, level))
-        let current = currentLevel(at: clock)
-        guard abs(target - levelTo) > 0.0001 else { return }
-        levelFrom = current
-        levelTo = target
-        levelStart = clock
-        if splash, target > current {
+    func setLevel(_ newLevel: Double, splash: Bool) {
+        let target = min(1, max(0, newLevel))
+        guard abs(target - levelTarget) > 0.0001 else { return }
+        let rise = target - level
+        levelTarget = target
+        let pour = splash && rise > 0
+        levelDampingRatio = pour && isAmbientEnabled ? Self.pourDampingRatio : Self.glideDampingRatio
+        if pour {
             splashFrom = disturbance(at: clock)
             splashStart = clock
-            if isAmbientEnabled { kick(at: .random(in: 0.25...0.75), strength: 1) }
+            // A glass's worth (~0.1 of the screen) is a full-strength pour;
+            // a sip barely stirs the surface.
+            if isAmbientEnabled { kick(at: .random(in: 0.25...0.75), strength: min(1, 0.35 + rise * 6)) }
         }
     }
 
-    /// Drops a broad, gentle swell into the surface at `x` (0 … 1): it
-    /// spreads both ways and bounces off the sides. Wide on purpose — a
-    /// narrow push reads as a spike, not as poured water.
+    /// Where the water lands: the surface dips there and the dip runs off to
+    /// both sides as two soft swells, which bounce off the edges and fade.
+    /// Wide on purpose: a narrow push reads as a spike, not as poured water.
     private func kick(at x: Double, strength: Double) {
         let columns = Self.rippleColumns
         for i in 0..<columns {
-            let d = (Double(i) / Double(columns - 1) - x) / 0.2
-            rippleVelocity[i] -= strength * 3.5 * exp(-d * d)
+            let d = (Double(i) / Double(columns - 1) - x) / 0.14
+            rippleVelocity[i] -= strength * 2.4 * exp(-d * d)
         }
     }
 
@@ -215,12 +219,10 @@ final class WaterPhysics {
         }
 
         let snapshot = Snapshot(
-            level: currentLevel(at: clock),
+            level: level,
             roll: roll,
             disturbance: disturbance(at: clock),
-            frontPhase: (clock / Self.frontPeriod).truncatingRemainder(dividingBy: 1),
-            middlePhase: (clock / Self.middlePeriod).truncatingRemainder(dividingBy: 1),
-            backPhase: (clock / Self.backPeriod).truncatingRemainder(dividingBy: 1),
+            time: clock,
             ripples: rippleHeight,
             ambient: ambient,
             bubbles: bubbles,
@@ -241,6 +243,10 @@ final class WaterPhysics {
             let acceleration = -Self.tiltStiffness * (roll - target) - Self.tiltDamping * rollVelocity
             rollVelocity += acceleration * step
             roll += rollVelocity * step
+            let k = Self.levelStiffness
+            let levelAcceleration = -k * (level - levelTarget) - 2 * levelDampingRatio * k.squareRoot() * levelVelocity
+            levelVelocity += levelAcceleration * step
+            level += levelVelocity * step
             if isAmbientEnabled {
                 stepRipples(step, tiltAcceleration: acceleration)
             }
@@ -288,7 +294,7 @@ final class WaterPhysics {
     }
 
     private func advanceAmbient(by delta: Double) {
-        let surface = 1 - currentLevel(at: clock)
+        let surface = 1 - level
         for i in ambient.indices {
             ambient[i].age += delta
             ambient[i].y -= ambient[i].speed * delta
@@ -308,12 +314,6 @@ final class WaterPhysics {
             ambientTarget = Int.random(in: Self.ambientRange)
         }
         nextBubbleIn = .random(in: 0.5...2.2)
-    }
-
-    private func currentLevel(at time: Double) -> Double {
-        let progress = min(1, max(0, (time - levelStart) / Self.levelDuration))
-        let eased = 1 - pow(1 - progress, 3)
-        return levelFrom + (levelTo - levelFrom) * eased
     }
 
     private func disturbance(at time: Double) -> Double {

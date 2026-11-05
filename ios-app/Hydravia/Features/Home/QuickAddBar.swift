@@ -79,7 +79,7 @@ struct QuickAddBar: View {
         HStack(spacing: Spacing.md) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Palette.success)
+                .foregroundStyle(Palette.secondaryBlue)
                 .accessibilityHidden(true)
             Text(.homeAdded(added.ml.formatted()))
                 .font(.brand(.bold, size: 17, relativeTo: .headline))

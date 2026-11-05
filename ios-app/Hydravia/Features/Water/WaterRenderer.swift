@@ -19,9 +19,11 @@ nonisolated enum WaterRenderer {
     /// amplitudes, and every point is recomputed each frame.
     static let points = 48
 
-    /// Base wave height for a container: 3 % of its height, capped at 14 pt.
+    /// Base wave height for a container: 0.7 % of its height, capped at
+    /// 5.5 pt. The waves stack to about twice this at their tallest, which
+    /// is rare: their crests seldom line up.
     static func waveHeight(for size: CGSize) -> Double {
-        min(size.height * 0.03, 14)
+        min(size.height * 0.007, 5.5)
     }
 
     /// The surface's ripple displacement at `t` (0 … 1 across), in points.
@@ -39,69 +41,90 @@ nonisolated enum WaterRenderer {
         return value * scale
     }
 
-    /// The water body below a travelling, tilted wave surface.
-    ///
-    /// The surface is a diagonal baseline — higher on the side the device
-    /// tilts toward, like water in a tilted glass — with the waves added on
-    /// top: a main sine (`cycles` crests across), a faint faster harmonic so
-    /// crests don't look machined, and the ripples sloshing back and forth.
-    static func waterPath(
-        in size: CGSize,
-        level: Double,
-        amplitude: Double,
-        phase: Double,
-        roll: Double,
-        phaseShift: Double = 0,
-        cycles: Double = 1,
-        ripples: [Double] = [],
-        rippleScale: Double = 0
-    ) -> Path {
-        let width = size.width
-        let height = size.height
-        let center = height * (1 - level)
-        let tilt = roll * height * maxTiltFraction
-        let yLeft = center + tilt
-        let yRight = center - tilt
+    /// One travelling wave of the surface: `crests` across the width,
+    /// `speed` in crests per second (negative runs leftward), `weight`
+    /// relative to the base height.
+    private struct Component {
+        let crests: Double
+        let speed: Double
+        let weight: Double
+    }
 
+    /// A long swell, a shorter wave running the other way and a small fast
+    /// one. Waves crossing each other keep the surface from ever repeating
+    /// or looking like a single sine sliding by.
+    private static let components = [
+        Component(crests: 1.3, speed: 0.05, weight: 1),
+        Component(crests: 2.7, speed: -0.09, weight: 0.45),
+        Component(crests: 4.6, speed: 0.15, weight: 0.2),
+    ]
+
+    /// Crest sharpness (second-order Stokes term): rounded-pointy crests,
+    /// wide flat troughs, as real water has, instead of a symmetric sine.
+    private static let steepness = 0.22
+    private static let peak = components.map(\.weight).reduce(0, +) * (1 + steepness)
+
+    /// The three surfaces, front to back. The back ones are the same water
+    /// a few points further away: slightly higher (seen in perspective) and
+    /// out of step, so together they read as the depth of one surface,
+    /// never as separate hills.
+    struct Layer: Sendable {
+        /// Points above the front surface.
+        let lift: Double
+        let tilt: Double
+        let ripple: Double
+        let seed: Double
+        let speed: Double
+
+        static let front = Layer(lift: 0, tilt: 1, ripple: 1, seed: 0, speed: 1)
+        static let middle = Layer(lift: 5, tilt: 0.97, ripple: 0.85, seed: 0.37, speed: 0.92)
+        static let back = Layer(lift: 10, tilt: 0.94, ripple: 0.7, seed: 0.71, speed: 0.84)
+    }
+
+    private static func amplitude(_ snapshot: WaterPhysics.Snapshot, in size: CGSize, calm: Bool) -> Double {
+        waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 0.4)
+    }
+
+    /// The surface's height (y, in points) at `t` (0 … 1 across).
+    static func surfaceY(_ snapshot: WaterPhysics.Snapshot, layer: Layer = .front, at t: Double,
+                         in size: CGSize, calm: Bool) -> Double {
+        let center = size.height * (1 - snapshot.level) - layer.lift
+        let tilt = snapshot.roll * size.height * maxTiltFraction * layer.tilt
+        let baseline = center + tilt * (1 - 2 * t)
+        let amplitude = amplitude(snapshot, in: size, calm: calm)
+        var height = 0.0
+        for (index, wave) in components.enumerated() {
+            let theta = 2 * Double.pi * (t * wave.crests - wave.speed * layer.speed * snapshot.time
+                                         + layer.seed * Double(index + 1))
+            height += wave.weight * (cos(theta) + steepness * cos(2 * theta))
+        }
+        let swell = ripple(snapshot.ripples, at: t, scale: waveHeight(for: size) * layer.ripple)
+        return baseline - height * amplitude - swell
+    }
+
+    /// The water body below one surface.
+    static func waterPath(_ snapshot: WaterPhysics.Snapshot, layer: Layer, in size: CGSize, calm: Bool) -> Path {
         var path = Path()
         for i in 0...points {
             let t = Double(i) / Double(points)
-            let x = width * t
-            let baseline = yLeft + (yRight - yLeft) * t
-            let swell = sin((t * cycles + phase + phaseShift) * 2 * .pi)
-            let chop = sin((t * cycles * 2.3 + phase * 2 + phaseShift + 0.3) * 2 * .pi) * 0.18
-            let y = baseline + (swell + chop) * amplitude - ripple(ripples, at: t, scale: rippleScale)
-            if i == 0 {
-                path.move(to: CGPoint(x: x, y: y))
-            } else {
-                path.addLine(to: CGPoint(x: x, y: y))
-            }
+            let point = CGPoint(x: size.width * t, y: surfaceY(snapshot, layer: layer, at: t, in: size, calm: calm))
+            if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
         }
-        path.addLine(to: CGPoint(x: width, y: height))
-        path.addLine(to: CGPoint(x: 0, y: height))
+        path.addLine(to: CGPoint(x: size.width, y: size.height))
+        path.addLine(to: CGPoint(x: 0, y: size.height))
         path.closeSubpath()
         return path
     }
 
     /// The main (front) surface — also what the header waterline is masked by.
     static func frontPath(_ snapshot: WaterPhysics.Snapshot, in size: CGSize, calm: Bool) -> Path {
-        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2)
-        return waterPath(in: size, level: snapshot.level, amplitude: amplitude,
-                         phase: snapshot.frontPhase, roll: snapshot.roll,
-                         ripples: snapshot.ripples, rippleScale: waveHeight(for: size))
+        waterPath(snapshot, layer: .front, in: size, calm: calm)
     }
 
-    /// The front surface's height at `t` (0 … 1 across), for bubbles to know
-    /// where the air begins. Same formula as `waterPath`, one point only.
+    /// The front surface's height at `t`, for bubbles to know where the air
+    /// begins.
     static func frontSurfaceY(_ snapshot: WaterPhysics.Snapshot, at t: Double, in size: CGSize, calm: Bool) -> Double {
-        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2)
-        let center = size.height * (1 - snapshot.level)
-        let tilt = snapshot.roll * size.height * maxTiltFraction
-        let baseline = (center + tilt) + (-2 * tilt) * t
-        let phase = snapshot.frontPhase
-        let swell = sin((t + phase) * 2 * .pi)
-        let chop = sin((t * 2.3 + phase * 2 + 0.3) * 2 * .pi) * 0.18
-        return baseline + (swell + chop) * amplitude - ripple(snapshot.ripples, at: t, scale: waveHeight(for: size))
+        surfaceY(snapshot, at: t, in: size, calm: calm)
     }
 
     /// Vertical extent the front surface can occupy this frame (top … bottom),
@@ -109,9 +132,9 @@ nonisolated enum WaterRenderer {
     static func surfaceBounds(_ snapshot: WaterPhysics.Snapshot, in size: CGSize, calm: Bool) -> ClosedRange<Double> {
         let center = size.height * (1 - snapshot.level)
         let tilt = abs(snapshot.roll) * size.height * maxTiltFraction
-        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2) * 1.18
+        let waves = amplitude(snapshot, in: size, calm: calm) * peak
         let ripple = (snapshot.ripples.map(abs).max() ?? 0) * waveHeight(for: size)
-        return (center - tilt - amplitude - ripple)...(center + tilt + amplitude + ripple)
+        return (center - tilt - waves - ripple)...(center + tilt + waves + ripple)
     }
 
     static func draw(
@@ -121,21 +144,12 @@ nonisolated enum WaterRenderer {
         style: WaterStyle,
         calm: Bool
     ) {
-        let base = waveHeight(for: size)
-        // Back layer: highest, widest swell, faintest — the far side of the
-        // glass. It follows tilt and ripples less than the front (parallax).
-        let backAmplitude = base * (calm ? 0.5 : 1.5) * (1 + snapshot.disturbance * 1.6)
-        let back = waterPath(in: size, level: snapshot.level + 0.016, amplitude: backAmplitude,
-                             phase: snapshot.backPhase, roll: snapshot.roll * 0.7, phaseShift: 0.45,
-                             cycles: 0.8, ripples: snapshot.ripples, rippleScale: base * 0.35)
-        context.fill(back, with: .color(style.surface.opacity(0.3)))
-
-        // Middle layer: between the two in height, speed and opacity.
-        let middleAmplitude = base * (calm ? 0.45 : 1.15) * (1 + snapshot.disturbance * 1.9)
-        let middle = waterPath(in: size, level: snapshot.level + 0.008, amplitude: middleAmplitude,
-                               phase: snapshot.middlePhase, roll: snapshot.roll * 0.85, phaseShift: 0.2,
-                               cycles: 1.3, ripples: snapshot.ripples, rippleScale: base * 0.65)
-        context.fill(middle, with: .color(style.surface.opacity(0.55)))
+        // The far surfaces first, fainter: a lighter band along the top of
+        // the water that thickens and thins as the waves pass.
+        context.fill(waterPath(snapshot, layer: .back, in: size, calm: calm),
+                     with: .color(style.surface.opacity(0.28)))
+        context.fill(waterPath(snapshot, layer: .middle, in: size, calm: calm),
+                     with: .color(style.surface.opacity(0.5)))
 
         // Front layer: the main surface, darkening with depth across the
         // whole screen (so shallow water reads deep, a full screen reads lit).
