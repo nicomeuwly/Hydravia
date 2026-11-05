@@ -1,7 +1,8 @@
 import Foundation
 
-/// The water's state over time: level, tilt, splash, waves and the
-/// goal-reached bubbles.
+/// The water's state over time: level, tilt, splash, three wave layers, a
+/// surface that ripples (tilt and pours send waves that bounce off the
+/// sides), a few ambient bubbles, and the goal-reached swarm.
 ///
 /// Deliberately NOT observable: it is advanced once per display frame by the
 /// `TimelineView` that draws it, and views read a value `Snapshot`. Routing
@@ -15,8 +16,10 @@ import Foundation
 final class WaterPhysics {
     // MARK: Tuning — same values as the Expo engine it replaces.
 
-    /// Seconds per lap of the front / back wave.
+    /// Seconds per lap of the front / middle / back wave: three speeds, so
+    /// the layers drift against each other.
     static let frontPeriod = 9.0
+    static let middlePeriod = 6.8
     static let backPeriod = 11.5
     /// The level eases to a new value over this long (ease-out cubic).
     static let levelDuration = 1.1
@@ -34,6 +37,20 @@ final class WaterPhysics {
     private static let maxFrameStep = 1.0 / 20
     private static let springSubstep = 1.0 / 240
 
+    // Ripples: a 1D wave equation across the surface, in units of the base
+    // wave height. Reflective ends, so a slosh runs to the side, bounces and
+    // comes back, losing a little each time.
+    static let rippleColumns = 32
+    /// Wave speed, in screen widths per second.
+    private static let rippleSpeed = 0.75
+    private static let rippleDamping = 1.4
+    /// How hard a change of tilt pushes the water toward one side.
+    private static let tiltForcing = 0.018
+    private static let rippleLimit = 2.6
+
+    // Ambient bubbles: a handful, never a fizz.
+    private static let ambientRange = 3...6
+
     nonisolated struct Snapshot: Sendable {
         var level: Double
         /// Normalised lateral tilt, -1 (left) … 1 (right).
@@ -41,9 +58,42 @@ final class WaterPhysics {
         /// 0 … 1 surge applied to the wave amplitude after an addition.
         var disturbance: Double
         var frontPhase: Double
+        var middlePhase: Double
         var backPhase: Double
+        /// Surface displacement per column, left to right, in base wave heights.
+        var ripples: [Double]
+        var ambient: [AmbientBubble]
         var bubbles: [Bubble]
         var celebrationAge: Double?
+    }
+
+    /// A lone bubble rising through the water. Position is normalised to the
+    /// canvas (y: 0 top, 1 bottom); the renderer adds the wobble in points and
+    /// fades it out just under the surface.
+    nonisolated struct AmbientBubble: Sendable {
+        var x: Double
+        var y: Double
+        var size: Double
+        /// Rise speed, canvas heights per second (bigger bubbles rise faster).
+        var speed: Double
+        var wobbleAmplitude: Double
+        var wobbleFrequency: Double
+        var seed: Double
+        var age: Double
+
+        static func random(startY: Double = 1.03) -> AmbientBubble {
+            let size = Double.random(in: 3...11)
+            return AmbientBubble(
+                x: .random(in: 0.06...0.94),
+                y: startY,
+                size: size,
+                speed: 0.035 + size * 0.006 + .random(in: 0...0.02),
+                wobbleAmplitude: .random(in: 2...7),
+                wobbleFrequency: .random(in: 1.2...2.6),
+                seed: .random(in: 0...(2 * .pi)),
+                age: 0
+            )
+        }
     }
 
     nonisolated struct Bubble: Sendable {
@@ -75,6 +125,8 @@ final class WaterPhysics {
     /// Desired tilt, fed by the motion sensor (or 0 when tilt is off).
     var rollTarget = 0.0
     var isTiltEnabled = true
+    /// Ripples and ambient bubbles; off under Reduce Motion / Low Power.
+    var isAmbientEnabled = true
 
     private var clock = 0.0
     private var lastDate: Date?
@@ -91,6 +143,12 @@ final class WaterPhysics {
     private var rollVelocity = 0.0
     private var bubbles: [Bubble] = []
     private var celebrationStart: Double?
+    private var rippleHeight = [Double](repeating: 0, count: rippleColumns)
+    private var rippleVelocity = [Double](repeating: 0, count: rippleColumns)
+    private var ambient: [AmbientBubble] = []
+    /// Seconds until the next ambient bubble may appear.
+    private var nextBubbleIn = 0.6
+    private var ambientTarget = Int.random(in: ambientRange)
 
     // MARK: Commands
 
@@ -106,6 +164,17 @@ final class WaterPhysics {
         if splash, target > current {
             splashFrom = disturbance(at: clock)
             splashStart = clock
+            if isAmbientEnabled { kick(at: .random(in: 0.2...0.8), strength: 2.2) }
+        }
+    }
+
+    /// Drops a bump into the surface at `x` (0 … 1): it spreads both ways and
+    /// bounces off the sides.
+    private func kick(at x: Double, strength: Double) {
+        let columns = Self.rippleColumns
+        for i in 0..<columns {
+            let d = (Double(i) / Double(columns - 1) - x) / 0.08
+            rippleVelocity[i] -= strength * 6 * exp(-d * d)
         }
     }
 
@@ -142,7 +211,10 @@ final class WaterPhysics {
             roll: roll,
             disturbance: disturbance(at: clock),
             frontPhase: (clock / Self.frontPeriod).truncatingRemainder(dividingBy: 1),
+            middlePhase: (clock / Self.middlePeriod).truncatingRemainder(dividingBy: 1),
             backPhase: (clock / Self.backPeriod).truncatingRemainder(dividingBy: 1),
+            ripples: rippleHeight,
+            ambient: ambient,
             bubbles: bubbles,
             celebrationAge: celebrationAge
         )
@@ -161,8 +233,66 @@ final class WaterPhysics {
             let acceleration = -Self.tiltStiffness * (roll - target) - Self.tiltDamping * rollVelocity
             rollVelocity += acceleration * step
             roll += rollVelocity * step
+            if isAmbientEnabled {
+                stepRipples(step, tiltAcceleration: acceleration)
+            }
             remaining -= step
         }
+        if isAmbientEnabled {
+            advanceAmbient(by: delta)
+        } else if !ambient.isEmpty || rippleHeight.contains(where: { $0 != 0 }) {
+            ambient = []
+            rippleHeight = .init(repeating: 0, count: Self.rippleColumns)
+            rippleVelocity = .init(repeating: 0, count: Self.rippleColumns)
+        }
+    }
+
+    /// One step of the damped wave equation. A change of tilt pushes the
+    /// water toward the low side (forcing grows with distance from the
+    /// centre), so a quick tilt sends a slosh across that reflects back.
+    private func stepRipples(_ step: Double, tiltAcceleration: Double) {
+        let columns = Self.rippleColumns
+        let dx = 1.0 / Double(columns - 1)
+        let c2 = Self.rippleSpeed * Self.rippleSpeed / (dx * dx)
+        let force = tiltAcceleration * Self.tiltForcing
+        for i in 0..<columns {
+            // Mirrored neighbours at the ends: the sides reflect.
+            let left = rippleHeight[i == 0 ? 1 : i - 1]
+            let right = rippleHeight[i == columns - 1 ? columns - 2 : i + 1]
+            let laplacian = left + right - 2 * rippleHeight[i]
+            let lateral = Double(i) / Double(columns - 1) - 0.5
+            rippleVelocity[i] += (c2 * laplacian - Self.rippleDamping * rippleVelocity[i] + force * lateral * 60) * step
+        }
+        // Volume stays put: the surface tilts and ripples but never rises
+        // as a whole (that's the level's job).
+        let mean = rippleVelocity.reduce(0, +) / Double(columns)
+        for i in 0..<columns {
+            rippleHeight[i] += (rippleVelocity[i] - mean) * step
+            rippleHeight[i] = min(max(rippleHeight[i], -Self.rippleLimit), Self.rippleLimit)
+        }
+    }
+
+    private func advanceAmbient(by delta: Double) {
+        let surface = 1 - currentLevel(at: clock)
+        for i in ambient.indices {
+            ambient[i].age += delta
+            ambient[i].y -= ambient[i].speed * delta
+        }
+        // Gone once well past the surface (the renderer has faded it by then).
+        ambient.removeAll { $0.y < surface - 0.04 }
+
+        nextBubbleIn -= delta
+        // No room to rise in a nearly empty glass.
+        guard nextBubbleIn <= 0, surface < 0.9 else { return }
+        if ambient.count < ambientTarget {
+            // The first few start part-way up, so the water is never empty
+            // for long after it appears.
+            let startY = ambient.isEmpty && clock < 3 ? Double.random(in: max(surface + 0.1, 0.5)...1.0) : 1.03
+            ambient.append(.random(startY: startY))
+        } else {
+            ambientTarget = Int.random(in: Self.ambientRange)
+        }
+        nextBubbleIn = .random(in: 0.7...2.8)
     }
 
     private func currentLevel(at time: Double) -> Double {

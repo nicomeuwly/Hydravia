@@ -41,6 +41,7 @@ struct LiveWater<Overlay: View>: View {
         }
         .task(id: isActive && !calm) {
             physics.isTiltEnabled = !calm
+            physics.isAmbientEnabled = !calm
             guard isActive, !calm else { return }
             for await tilt in DeviceTilt.shared.samples() {
                 physics.rollTarget = tilt

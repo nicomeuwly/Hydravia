@@ -24,18 +24,31 @@ nonisolated enum WaterRenderer {
         min(size.height * 0.03, 14)
     }
 
-    /// The water body below a travelling, tilted sine surface.
+    /// The surface's ripple displacement at `t` (0 … 1 across), in points.
+    static func ripple(_ ripples: [Double], at t: Double, scale: Double) -> Double {
+        guard ripples.count > 1, scale != 0 else { return 0 }
+        let position = min(max(t, 0), 1) * Double(ripples.count - 1)
+        let index = min(Int(position), ripples.count - 2)
+        let fraction = position - Double(index)
+        return (ripples[index] + (ripples[index + 1] - ripples[index]) * fraction) * scale
+    }
+
+    /// The water body below a travelling, tilted wave surface.
     ///
     /// The surface is a diagonal baseline — higher on the side the device
-    /// tilts toward, like water in a tilted glass — with the sine wave added
-    /// on top.
+    /// tilts toward, like water in a tilted glass — with the waves added on
+    /// top: a main sine (`cycles` crests across), a faint faster harmonic so
+    /// crests don't look machined, and the ripples sloshing back and forth.
     static func waterPath(
         in size: CGSize,
         level: Double,
         amplitude: Double,
         phase: Double,
         roll: Double,
-        phaseShift: Double = 0
+        phaseShift: Double = 0,
+        cycles: Double = 1,
+        ripples: [Double] = [],
+        rippleScale: Double = 0
     ) -> Path {
         let width = size.width
         let height = size.height
@@ -49,7 +62,9 @@ nonisolated enum WaterRenderer {
             let t = Double(i) / Double(points)
             let x = width * t
             let baseline = yLeft + (yRight - yLeft) * t
-            let y = baseline + sin((t + phase + phaseShift) * 2 * .pi) * amplitude
+            let swell = sin((t * cycles + phase + phaseShift) * 2 * .pi)
+            let chop = sin((t * cycles * 2.3 + phase * 2 + phaseShift + 0.3) * 2 * .pi) * 0.18
+            let y = baseline + (swell + chop) * amplitude - ripple(ripples, at: t, scale: rippleScale)
             if i == 0 {
                 path.move(to: CGPoint(x: x, y: y))
             } else {
@@ -66,7 +81,21 @@ nonisolated enum WaterRenderer {
     static func frontPath(_ snapshot: WaterPhysics.Snapshot, in size: CGSize, calm: Bool) -> Path {
         let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2)
         return waterPath(in: size, level: snapshot.level, amplitude: amplitude,
-                         phase: snapshot.frontPhase, roll: snapshot.roll)
+                         phase: snapshot.frontPhase, roll: snapshot.roll,
+                         ripples: snapshot.ripples, rippleScale: waveHeight(for: size))
+    }
+
+    /// The front surface's height at `t` (0 … 1 across), for bubbles to know
+    /// where the air begins. Same formula as `waterPath`, one point only.
+    static func frontSurfaceY(_ snapshot: WaterPhysics.Snapshot, at t: Double, in size: CGSize, calm: Bool) -> Double {
+        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2)
+        let center = size.height * (1 - snapshot.level)
+        let tilt = snapshot.roll * size.height * maxTiltFraction
+        let baseline = (center + tilt) + (-2 * tilt) * t
+        let phase = snapshot.frontPhase
+        let swell = sin((t + phase) * 2 * .pi)
+        let chop = sin((t * 2.3 + phase * 2 + 0.3) * 2 * .pi) * 0.18
+        return baseline + (swell + chop) * amplitude - ripple(snapshot.ripples, at: t, scale: waveHeight(for: size))
     }
 
     /// Vertical extent the front surface can occupy this frame (top … bottom),
@@ -74,8 +103,9 @@ nonisolated enum WaterRenderer {
     static func surfaceBounds(_ snapshot: WaterPhysics.Snapshot, in size: CGSize, calm: Bool) -> ClosedRange<Double> {
         let center = size.height * (1 - snapshot.level)
         let tilt = abs(snapshot.roll) * size.height * maxTiltFraction
-        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2)
-        return (center - tilt - amplitude)...(center + tilt + amplitude)
+        let amplitude = waveHeight(for: size) * (calm ? 0.5 : 1) * (1 + snapshot.disturbance * 2.2) * 1.18
+        let ripple = (snapshot.ripples.map(abs).max() ?? 0) * waveHeight(for: size)
+        return (center - tilt - amplitude - ripple)...(center + tilt + amplitude + ripple)
     }
 
     static func draw(
@@ -85,11 +115,21 @@ nonisolated enum WaterRenderer {
         style: WaterStyle,
         calm: Bool
     ) {
-        // Back layer: slightly higher, wider swell, translucent — the depth cue.
-        let backAmplitude = waveHeight(for: size) * (calm ? 0.5 : 1.5) * (1 + snapshot.disturbance * 1.6)
-        let back = waterPath(in: size, level: snapshot.level + 0.014, amplitude: backAmplitude,
-                             phase: snapshot.backPhase, roll: snapshot.roll, phaseShift: 0.45)
-        context.fill(back, with: .color(style.surface.opacity(0.38)))
+        let base = waveHeight(for: size)
+        // Back layer: highest, widest swell, faintest — the far side of the
+        // glass. It follows tilt and ripples less than the front (parallax).
+        let backAmplitude = base * (calm ? 0.5 : 1.5) * (1 + snapshot.disturbance * 1.6)
+        let back = waterPath(in: size, level: snapshot.level + 0.016, amplitude: backAmplitude,
+                             phase: snapshot.backPhase, roll: snapshot.roll * 0.7, phaseShift: 0.45,
+                             cycles: 0.8, ripples: snapshot.ripples, rippleScale: base * 0.35)
+        context.fill(back, with: .color(style.surface.opacity(0.3)))
+
+        // Middle layer: between the two in height, speed and opacity.
+        let middleAmplitude = base * (calm ? 0.45 : 1.15) * (1 + snapshot.disturbance * 1.9)
+        let middle = waterPath(in: size, level: snapshot.level + 0.008, amplitude: middleAmplitude,
+                               phase: snapshot.middlePhase, roll: snapshot.roll * 0.85, phaseShift: 0.2,
+                               cycles: 1.3, ripples: snapshot.ripples, rippleScale: base * 0.65)
+        context.fill(middle, with: .color(style.surface.opacity(0.55)))
 
         // Front layer: the main surface, darkening with depth across the
         // whole screen (so shallow water reads deep, a full screen reads lit).
@@ -100,8 +140,45 @@ nonisolated enum WaterRenderer {
             endPoint: CGPoint(x: 0, y: size.height)
         ))
 
+        if !calm, !snapshot.ambient.isEmpty {
+            drawAmbient(snapshot, in: &context, size: size, calm: calm)
+        }
+
         if let age = snapshot.celebrationAge {
             drawBubbles(snapshot.bubbles, age: age, in: &context, size: size)
+        }
+    }
+
+    /// Lone bubbles rising under the front surface: they wobble on the way
+    /// up and fade out over the last stretch, popping silently before the air.
+    private static func drawAmbient(_ snapshot: WaterPhysics.Snapshot, in context: inout GraphicsContext, size: CGSize, calm: Bool) {
+        let fill = Color.white.opacity(0.22)
+        let rim = Color.white.opacity(0.4)
+        let highlight = Color.white.opacity(0.55)
+        let fadeDistance = 46.0
+
+        for bubble in snapshot.ambient {
+            let wobble = sin(bubble.age * bubble.wobbleFrequency * 2 * .pi / 2 + bubble.seed) * bubble.wobbleAmplitude
+            let x = bubble.x * size.width + wobble
+            let y = bubble.y * size.height
+            let surface = frontSurfaceY(snapshot, at: x / size.width, in: size, calm: calm)
+            let depth = y - surface
+            guard depth > 0 else { continue }
+            let fadeOut = min(1, depth / fadeDistance)
+            let fadeIn = min(1, bubble.age / 0.6)
+            let opacity = fadeOut * fadeOut * fadeIn
+            guard opacity > 0.01 else { continue }
+
+            let d = bubble.size
+            let rect = CGRect(x: x - d / 2, y: y - d / 2, width: d, height: d)
+            context.opacity = opacity
+            context.fill(Path(ellipseIn: rect), with: .color(fill))
+            context.stroke(Path(ellipseIn: rect), with: .color(rim), lineWidth: 0.8)
+            // A glint, top-left, so it reads as a sphere of air.
+            let glint = d * 0.28
+            context.fill(Path(ellipseIn: CGRect(x: x - d * 0.28, y: y - d * 0.3, width: glint, height: glint)),
+                         with: .color(highlight))
+            context.opacity = 1
         }
     }
 
