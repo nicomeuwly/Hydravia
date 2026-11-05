@@ -35,8 +35,15 @@ struct HydrationProvider: TimelineProvider {
         completion(context.isPreview ? .preview : Self.entries(from: .now).first ?? .preview)
     }
 
+    /// How stale a widget may get. A pour from one widget reloads that one
+    /// at once; the others only get a reload request, which iOS is free to
+    /// postpone (it often does on a device). Re-reading the store this often
+    /// bounds the gap without spending the whole daily reload budget.
+    static let refreshInterval: TimeInterval = 20 * 60
+
     func getTimeline(in context: Context, completion: @escaping (Timeline<HydrationEntry>) -> Void) {
-        completion(Timeline(entries: Self.entries(from: .now), policy: .atEnd))
+        let now = Date.now
+        completion(Timeline(entries: Self.entries(from: now), policy: .after(now.addingTimeInterval(Self.refreshInterval))))
     }
 
     static func entries(from now: Date, calendar: Calendar = .autoupdatingCurrent) -> [HydrationEntry] {

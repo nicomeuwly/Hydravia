@@ -26,7 +26,9 @@ struct AddWaterIntent: AppIntent {
         let context = ModelContext(container)
         context.insert(WaterEntry(amountMl: amountMl, createdAt: .now, source: .widget))
         try context.save()
-        // Every widget shows today's total, not just the one tapped.
+        // Every widget shows today's total, not just the one tapped. Only the
+        // tapped one is sure to reload now; the rest is a request iOS may
+        // postpone (the timelines' refresh interval catches up).
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }
