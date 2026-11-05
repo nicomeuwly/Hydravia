@@ -12,8 +12,9 @@ diffère, cherche l'équivalent le plus proche.
 | App Group | `group.com.nicomeuwly.hydravia.blocker` |
 | Extensions Screen Time (phase 7) | `com.nicomeuwly.hydravia.ShieldConfiguration`, `.ShieldAction`, `.DeviceActivityMonitor` |
 | Groupe d'abonnements | `Hydravia Pro` |
-| Abonnement mensuel | `com.nicomeuwly.hydravia.pro.monthly` — 1,99 $/mois, essai 7 jours |
-| Abonnement annuel | `com.nicomeuwly.hydravia.pro.yearly` — 17,99 $/an, essai 7 jours |
+| Abonnement mensuel | `com.nicomeuwly.hydravia.pro.monthly` — 2,99 €/mois, essai 7 jours |
+| Abonnement annuel | `com.nicomeuwly.hydravia.pro.yearly` — 19,99 €/an, essai 7 jours |
+| Achat à vie (non consommable) | `com.nicomeuwly.hydravia.pro.lifetime` — 39,99 €, sans essai |
 | Team ID | `WLUNP8LN7D` |
 
 > ⚠️ Un identifiant de produit ne peut **jamais** être réutilisé, même après
@@ -146,7 +147,7 @@ Bon à savoir :
    | Reference Name | Hydravia Pro Monthly | Hydravia Pro Yearly |
    | Product ID | `com.nicomeuwly.hydravia.pro.monthly` | `com.nicomeuwly.hydravia.pro.yearly` |
    | Durée | 1 mois | 1 an |
-   | Prix | 1,99 $ (laisse Apple calculer les autres pays) | 17,99 $ |
+   | Prix | 2,99 € (pays de référence France, laisse Apple calculer les autres) | 19,99 € |
    | Niveau (level) | 2 | 1 (le plus haut = annuel) |
 
 3. Pour **chaque** abonnement :
@@ -157,7 +158,12 @@ Bon à savoir :
      essai par groupe d'abonnements — l'app le vérifie déjà avec StoreKit 2.)
    - **Review Information** : capture d'écran du paywall (je te la fournirai) +
      note : « Abonnement qui active les rappels et le verrou Screen Time. »
-4. Les produits restent en état *Ready to Submit* : ils partent en revue **avec
+4. **Achat à vie** : App → **Monetization → In-App Purchases** → `+` →
+   **Non-Consumable**. Reference Name `Hydravia Pro Lifetime`, Product ID
+   `com.nicomeuwly.hydravia.pro.lifetime`, prix 39,99 € (France), localisations
+   fr/en/de/es (« Hydravia Pro à vie »), même capture et note de revue.
+   *Family Sharing* désactivé, comme les abonnements.
+5. Les produits restent en état *Ready to Submit* : ils partent en revue **avec
    la première version** de l'app (il faut les cocher dans la page de version).
 
 ---

@@ -69,7 +69,9 @@ node Scripts/generate-strings.mjs
 - Light-only UI for now, but every colour goes through `Palette`.
 - Identifiers that must never drift: bundle `com.nicomeuwly.hydravia`, App
   Group `group.com.nicomeuwly.hydravia.blocker`, StoreKit products
-  `com.nicomeuwly.hydravia.pro.monthly` / `.yearly` (group "Hydravia Pro").
+  `com.nicomeuwly.hydravia.pro.monthly` / `.yearly` (group "Hydravia Pro")
+  and the non-consumable `com.nicomeuwly.hydravia.pro.lifetime` (no end:
+  `Blocker.proUntil` stays nil).
 - Privacy: `PrivacyInfo.xcprivacy` in the app (`Resources/`) and in each
   extension. Any new data sent off the device, or new required-reason API,
   must be declared there AND in the landing page's privacy policy.

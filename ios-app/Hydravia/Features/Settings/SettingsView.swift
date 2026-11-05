@@ -134,11 +134,14 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent {
-                        Text(store.hasPro ? .settingsPlanPremium : .settingsPlanFree)
+                        Text(store.hasLifetime ? .settingsPlanLifetime
+                             : store.hasPro ? .settingsPlanPremium : .settingsPlanFree)
                     } label: {
                         Text(.settingsPlan)
                     }
-                    if store.hasPro {
+                    if store.hasLifetime {
+                        // Bought once: no subscription to manage.
+                    } else if store.hasPro {
                         Button { managesSubscription = true } label: {
                             Text(.settingsManageSubscription).foregroundStyle(Palette.textPrimary)
                         }

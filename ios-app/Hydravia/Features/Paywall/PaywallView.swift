@@ -138,7 +138,11 @@ struct PaywallView: View {
                     .accessibilityAddTraits(.isHeader)
 
                 if offersTrial {
+                    // The trial is the subscriptions': faded, not removed, when
+                    // the lifetime purchase is picked, so the cards don't jump.
                     TrialTimeline(chargeDate: chargeDate)
+                        .opacity(isLifetime ? 0.35 : 1)
+                        .animation(Motion.press, value: isLifetime)
                 }
 
                 plans
@@ -149,7 +153,7 @@ struct PaywallView: View {
                             ProgressView().tint(.white)
                         } else {
                             Label {
-                                Text(offersTrial ? .paywallCta : .paywallSubscribe)
+                                Text(isLifetime ? .paywallBuyLifetime : offersTrial ? .paywallCta : .paywallSubscribe)
                             } icon: { Image(systemName: "chevron.right") }
                                 .labelStyle(TrailingIconLabelStyle())
                         }
@@ -217,6 +221,16 @@ struct PaywallView: View {
                     badge: nil,
                     isSelected: selectedID == monthly.id
                 ) { selectedID = monthly.id }
+
+                if let lifetime = store.lifetime {
+                    PlanCard(
+                        title: .paywallPlanLifetime,
+                        price: lifetime.displayPrice,
+                        detail: String(localized: .paywallLifetimeDetail),
+                        badge: nil,
+                        isSelected: selectedID == lifetime.id
+                    ) { selectedID = lifetime.id }
+                }
             }
         } else {
             ProgressView().frame(maxWidth: .infinity, minHeight: 160)
@@ -279,8 +293,14 @@ struct PaywallView: View {
     // MARK: Logic
 
     private var selectedProduct: Product? {
-        selectedID == StoreService.yearlyID ? store.yearly : store.monthly
+        switch selectedID {
+        case StoreService.yearlyID: store.yearly
+        case StoreService.lifetimeID: store.lifetime
+        default: store.monthly
+        }
     }
+
+    private var isLifetime: Bool { selectedID == StoreService.lifetimeID }
 
     /// A trial is promised only when the App Store confirmed it.
     private var offersTrial: Bool { store.isEligibleForTrial == true }
@@ -299,9 +319,10 @@ struct PaywallView: View {
         return calendar.date(byAdding: component, value: period.value, to: .now) ?? .now
     }
 
-    /// "7 days free, then $17.99 per year. Renews automatically…"
+    /// "7 days free, then €19.99 per year. Renews automatically…"
     private var billing: String? {
         guard let product = selectedProduct else { return nil }
+        if isLifetime { return String(localized: .paywallBilledOnce(product.displayPrice)) }
         let price = String(localized: product.id == StoreService.yearlyID
                            ? .paywallBilledYearly(product.displayPrice)
                            : .paywallBilledMonthly(product.displayPrice))

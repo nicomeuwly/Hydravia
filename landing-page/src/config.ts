@@ -48,5 +48,6 @@ export const LEGAL_UPDATED = '2026-11-05';
 export const PRODUCTS = {
   monthly: 'com.nicomeuwly.hydravia.pro.monthly',
   yearly: 'com.nicomeuwly.hydravia.pro.yearly',
+  lifetime: 'com.nicomeuwly.hydravia.pro.lifetime',
   trialDays: 7,
 } as const;

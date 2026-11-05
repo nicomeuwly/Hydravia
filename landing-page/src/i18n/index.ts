@@ -115,7 +115,7 @@ export const fr = {
 
   'faq.q5': 'Combien ça coûte ?',
   'faq.a5':
-    'Sept jours d’essai gratuit, puis un abonnement mensuel ou annuel. Tu peux annuler à tout moment depuis les réglages de ton téléphone. On te prévient avant la fin de l’essai.',
+    'Le suivi, les rappels, le widget et le rituel sur une app sont gratuits. Hydravia Pro débloque le reste : abonnement mensuel ou annuel avec sept jours d’essai, annulable à tout moment depuis les réglages de ton téléphone (on te prévient avant la fin de l’essai), ou achat à vie en un seul paiement.',
 
   // ── Final CTA ─────────────────────────────────────────────────────────────
   'final.title': 'Commence ce soir.',
@@ -228,7 +228,7 @@ export const en: Catalogue = {
 
   'faq.q5': 'What does it cost?',
   'faq.a5':
-    'Seven days free, then a monthly or yearly subscription. You can cancel at any time from your phone’s settings, and we let you know before the trial ends.',
+    'Tracking, reminders, the widget and the ritual on one app are free. Hydravia Pro unlocks the rest: a monthly or yearly subscription with a seven-day free trial, cancellable at any time from your phone’s settings (we let you know before the trial ends), or a one-time lifetime purchase.',
 
   'final.title': 'Start tonight.',
   'final.body':

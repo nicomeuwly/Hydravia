@@ -15,13 +15,18 @@ final class StoreService {
     // A product ID can never be reused once created there.
     static let yearlyID = "com.nicomeuwly.hydravia.pro.yearly"
     static let monthlyID = "com.nicomeuwly.hydravia.pro.monthly"
-    static let productIDs: Set<String> = [yearlyID, monthlyID]
+    /// A one-time purchase (non-consumable): Pro for good, no subscription.
+    static let lifetimeID = "com.nicomeuwly.hydravia.pro.lifetime"
+    static let productIDs: Set<String> = [yearlyID, monthlyID, lifetimeID]
 
     enum Outcome { case success, cancelled, pending, failed }
 
     private(set) var yearly: Product?
     private(set) var monthly: Product?
+    private(set) var lifetime: Product?
     private(set) var isPremium = false
+    /// Pro bought once: nothing to manage or renew.
+    private(set) var hasLifetime = false
 
     /// What the app unlocks: the subscription, or in a dev build Pro unless
     /// the dev section simulates the free plan (which wins over a sandbox
@@ -73,6 +78,7 @@ final class StoreService {
             let products = try await Product.products(for: Self.productIDs)
             yearly = products.first { $0.id == Self.yearlyID }
             monthly = products.first { $0.id == Self.monthlyID }
+            lifetime = products.first { $0.id == Self.lifetimeID }
             productsFailedToLoad = yearly == nil && monthly == nil
         } catch {
             productsFailedToLoad = true
@@ -116,12 +122,14 @@ final class StoreService {
         var sawUnverified = false
         var trial: Transaction?
         var expiresAt: Date?
+        var lifetime = false
 
         for await result in Transaction.currentEntitlements {
             switch result {
             case .verified(let transaction):
                 guard Self.productIDs.contains(transaction.productID), transaction.revocationDate == nil else { continue }
                 active = true
+                if transaction.productID == Self.lifetimeID { lifetime = true }
                 if transaction.offer?.type == .introductory { trial = transaction }
                 if let date = transaction.expirationDate { expiresAt = max(expiresAt ?? date, date) }
             case .unverified(let transaction, let error):
@@ -136,12 +144,16 @@ final class StoreService {
         // last verified state rather than wipe their reminders.
         if active || !sawUnverified || !hasLoadedEntitlements {
             isPremium = active || (sawUnverified && isPremium)
+            hasLifetime = lifetime || (sawUnverified && hasLifetime)
         }
         hasLoadedEntitlements = true
         // The Screen Time extensions can't ask the App Store: tell them how
         // long the lock may run, so a lapse while the app is closed doesn't
-        // keep shielding a non-subscriber's apps.
-        if active { Blocker.proUntil = expiresAt.map { $0.addingTimeInterval(Self.renewalGrace) } }
+        // keep shielding a non-subscriber's apps. Bought for life: no end,
+        // even if a subscription taken before still runs out.
+        if active {
+            Blocker.proUntil = lifetime ? nil : expiresAt.map { $0.addingTimeInterval(Self.renewalGrace) }
+        }
 
         await syncTrialEndReminder(trial: trial)
         await updateTrialEligibility()

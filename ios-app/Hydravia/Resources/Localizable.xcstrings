@@ -3973,30 +3973,31 @@
       }
     },
     "settings.goPremiumSub" : {
+      "comment" : "Settings: under \"Go Pro\", what Pro adds.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das ganze Ritual: Entsperren und angepasste Mengen"
+            "value" : "Alle deine Apps gesperrt, angepasste Mengen und Widgets"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The full ritual: unlock and adapted doses"
+            "value" : "All your apps locked, adapted doses and widgets"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El ritual completo: desbloqueo y dosis adaptadas"
+            "value" : "Todas tus apps bloqueadas, cantidades adaptadas y widgets"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le rituel complet : déblocage et quantités adaptées"
+            "value" : "Toutes tes apps verrouillées, les quantités adaptées et les widgets"
           }
         }
       }
@@ -6996,6 +6997,156 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les widgets pour boire en un geste, même écran verrouillé"
+          }
+        }
+      }
+    },
+    "paywall.planLifetime" : {
+      "comment" : "Paywall plan card: the one-time purchase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lebenslang"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De por vida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vie"
+          }
+        }
+      }
+    },
+    "paywall.lifetimeDetail" : {
+      "comment" : "Paywall: under the lifetime plan's title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmalzahlung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-time payment"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago único"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement unique"
+          }
+        }
+      }
+    },
+    "paywall.billedOnce" : {
+      "comment" : "Paywall billing line for the lifetime purchase. %@ = price.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ einmalig. Kein Abo, nichts zu verlängern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ once. No subscription, nothing to renew."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ una sola vez. Sin suscripción, nada que renovar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ en une fois. Pas d'abonnement, rien à renouveler."
+          }
+        }
+      }
+    },
+    "paywall.buyLifetime" : {
+      "comment" : "Paywall CTA when the lifetime plan is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro für immer freischalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock Pro for life"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear Pro para siempre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débloquer Pro à vie"
+          }
+        }
+      }
+    },
+    "settings.planLifetime" : {
+      "comment" : "Settings plan row value for a lifetime purchase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro auf Lebenszeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro for life"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro de por vida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro à vie"
           }
         }
       }
