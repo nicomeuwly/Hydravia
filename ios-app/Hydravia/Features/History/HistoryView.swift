@@ -1,4 +1,4 @@
-import Charts
+
 import HydraviaCore
 import HydraviaData
 import SwiftUI
@@ -38,7 +38,7 @@ struct HistoryView: View {
                              suffix: "/\(HydrationStore.recentWindowDays)")
                 }
 
-                WeekChartCard(totals: totals, goalMl: goal, today: today)
+                WeekChartCard(totals: streakTotals, goalMl: goal, today: today)
 
                 let best = Streak.best(streakTotals, goalMl: goal, today: today)
                 HStack {
@@ -96,7 +96,7 @@ struct HistoryView: View {
 
 // MARK: - Cards
 
-private extension View {
+extension View {
     func card() -> some View {
         background(.white, in: .rect(cornerRadius: Radius.xl, style: .continuous))
             .shadow(color: Palette.primaryDark.opacity(0.06), radius: 8, y: 4)
@@ -145,170 +145,6 @@ private struct StatCard: View {
         .accessibilityValue(suffix.map { "\(value)\($0)" } ?? "\(value)")
         .onAppear { withAnimation(reduceMotion ? nil : Motion.count.delay(0.1)) { shown = value } }
         .onChange(of: value) { _, new in withAnimation(reduceMotion ? nil : Motion.count) { shown = new } }
-    }
-}
-
-// MARK: - Week chart
-
-private struct WeekChartCard: View {
-    let totals: [DayTotal]
-    let goalMl: Int
-    let today: LocalDay
-
-    /// Bars grow from zero the first time the card appears.
-    @State private var grown = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private struct Day: Identifiable {
-        let day: LocalDay
-        let date: Date
-        let totalMl: Int
-        var id: LocalDay { day }
-    }
-
-    /// The calendar week containing today (first weekday per the user's
-    /// locale); days after today simply stay empty.
-    private var week: [Day] {
-        let calendar = Calendar.autoupdatingCurrent
-        let byDay = Dictionary(totals.map { ($0.day, $0.totalMl) }, uniquingKeysWith: +)
-        guard let todayDate = today.startDate(in: calendar),
-              let interval = calendar.dateInterval(of: .weekOfYear, for: todayDate)
-        else { return [] }
-        let first = LocalDay(interval.start, calendar: calendar)
-        return (0..<7).compactMap { offset in
-            let day = first.adding(days: offset)
-            guard let date = day.startDate(in: calendar) else { return nil }
-            return Day(day: day, date: date, totalMl: byDay[day] ?? 0)
-        }
-    }
-
-    static func amount(_ ml: Int) -> String {
-        "\(ml.formatted()) \(String(localized: .commonMl))"
-    }
-
-    /// Top of the chart: room above the goal line for over-achieving days.
-    private var ceiling: Double { Double(goalMl) * 1.4 }
-
-    /// A day with any intake shows at least a capsule's worth of fill — an
-    /// honest mark instead of a stray sliver.
-    private func barHeight(_ totalMl: Int) -> Double {
-        min(ceiling, max(Double(totalMl), ceiling * 0.1))
-    }
-
-    var body: some View {
-        let week = week
-        let drunk = week.filter { $0.totalMl > 0 }
-        let averageLiters = drunk.isEmpty ? 0 : Double(drunk.map(\.totalMl).reduce(0, +)) / Double(drunk.count) / 1000
-
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(.historyThisWeek)
-                    .font(.brand(.bold, size: 15, relativeTo: .headline))
-                    .foregroundStyle(Palette.textPrimary)
-                Spacer()
-                Text(.historyAverage(averageLiters.formatted(.number.precision(.fractionLength(1)))))
-                    .font(.brand(.regular, size: 13.5, relativeTo: .subheadline))
-                    .foregroundStyle(Palette.textSecondary)
-            }
-
-            Chart {
-                ForEach(week) { day in
-                    // The empty rail every day sits in, even future ones.
-                    BarMark(
-                        x: .value("Day", day.date, unit: .day),
-                        yStart: .value("ml", 0),
-                        yEnd: .value("ml", ceiling),
-                        width: .fixed(18)
-                    )
-                    .clipShape(.capsule)
-                    .foregroundStyle(Palette.backgroundElement)
-                    // VoiceOver reads a dry past day as "0 ml" rather than
-                    // skipping it; days to come and filled days stay silent.
-                    .accessibilityHidden(day.totalMl > 0 || day.day > today)
-                    .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
-                    .accessibilityValue(Self.amount(0))
-
-                    if day.totalMl > 0 {
-                        BarMark(
-                            x: .value("Day", day.date, unit: .day),
-                            yStart: .value("ml", 0),
-                            yEnd: .value("ml", grown ? barHeight(day.totalMl) : 0),
-                            width: .fixed(18)
-                        )
-                        .clipShape(.capsule)
-                        .foregroundStyle(day.day == today ? Palette.primaryDark : Palette.secondaryBlue)
-                        .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
-                        .accessibilityValue(Self.amount(day.totalMl))
-                    }
-                }
-
-                RuleMark(y: .value("Goal", goalMl))
-                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-                    .foregroundStyle(Palette.amber.opacity(0.8))
-                    .accessibilityLabel(Text(.settingsDailyGoal))
-                    .accessibilityValue(Self.amount(goalMl))
-                    .annotation(position: .top, alignment: .trailing) {
-                        Image(systemName: "flag.fill")
-                            .font(.system(size: 9))
-                            .foregroundStyle(Palette.amber)
-                    }
-            }
-            .chartYScale(domain: 0...ceiling)
-            .chartYAxis(.hidden)
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { value in
-                    AxisValueLabel(centered: true, anchor: .top) {
-                        if let date = value.as(Date.self) {
-                            let isToday = LocalDay(date, calendar: .autoupdatingCurrent) == today
-                            Text(date, format: .dateTime.weekday(.narrow))
-                                .font(.brand(isToday ? .bold : .semiBold, size: 12, relativeTo: .caption))
-                                .foregroundStyle(isToday ? Palette.primaryDark : Palette.textSecondary)
-                        }
-                    }
-                }
-            }
-            .frame(height: 140)
-            // Audio Graphs: VoiceOver can play the week as tones.
-            .accessibilityChartDescriptor(WeekChartDescriptor(
-                title: String(localized: .historyThisWeek),
-                unit: String(localized: .commonMl),
-                days: week.filter { $0.day <= today }.map {
-                    ($0.date.formatted(.dateTime.weekday(.wide)), $0.totalMl)
-                },
-                goalMl: goalMl
-            ))
-        }
-        .padding(.vertical, 22)
-        .padding(.horizontal, Spacing.xl)
-        .card()
-        .onAppear {
-            guard !grown else { return }
-            withAnimation(reduceMotion ? nil : .spring(duration: 0.7, bounce: 0.25).delay(0.15)) { grown = true }
-        }
-    }
-}
-
-/// The week as data for Audio Graphs. Plain strings only, built by the view,
-/// so the descriptor needs nothing from the main actor.
-private nonisolated struct WeekChartDescriptor: AXChartDescriptorRepresentable {
-    let title: String
-    let unit: String
-    let days: [(name: String, ml: Int)]
-    let goalMl: Int
-
-    func makeChartDescriptor() -> AXChartDescriptor {
-        let unit = unit
-        let top = Double(max(goalMl, days.map(\.ml).max() ?? 0, 1))
-        let xAxis = AXCategoricalDataAxisDescriptor(title: title, categoryOrder: days.map(\.name))
-        let yAxis = AXNumericDataAxisDescriptor(
-            title: unit, range: 0...top, gridlinePositions: [Double(goalMl)]
-        ) { "\(Int($0).formatted()) \(unit)" }
-        let series = AXDataSeriesDescriptor(
-            name: title, isContinuous: false,
-            dataPoints: days.map { AXDataPoint(x: $0.name, y: Double($0.ml)) }
-        )
-        return AXChartDescriptor(title: title, summary: nil, xAxis: xAxis, yAxis: yAxis,
-                                 additionalAxes: [], series: [series])
     }
 }
 

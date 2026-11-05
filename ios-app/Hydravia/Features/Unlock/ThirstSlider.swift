@@ -8,7 +8,8 @@ import SwiftUI
 /// one adjustable element.
 ///
 /// Only the chosen level's label shows, above the track: a thumb coming up
-/// from below never covers it.
+/// from below never covers it. The drag works across the screen's full
+/// width, level with the column.
 struct ThirstSlider: View {
     @Binding var feeling: Feeling
 
@@ -18,7 +19,7 @@ struct ThirstSlider: View {
     @ScaledMetric(relativeTo: .body) private var trackHeight: CGFloat = 240
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let trackWidth: CGFloat = 84
+    private let trackWidth: CGFloat = 104
 
     var body: some View {
         let index = Self.index(of: feeling)
@@ -75,6 +76,9 @@ struct ThirstSlider: View {
         .frame(width: trackWidth, height: trackHeight)
         .clipShape(.rect(cornerRadius: trackWidth / 2.4, style: .continuous))
         .glassEffect(.clear.tint(.white.opacity(0.06)), in: .rect(cornerRadius: trackWidth / 2.4, style: .continuous))
+        // The whole row answers the thumb, not just the column: easier to
+        // grab, and a thumb resting on the side still drives it.
+        .frame(maxWidth: .infinity)
         .contentShape(.rect)
         .gesture(
             DragGesture(minimumDistance: 0)

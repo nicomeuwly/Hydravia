@@ -35,6 +35,29 @@ struct SettingsView: View {
     @State private var deleteFailed = false
     @State private var deleted = false
 
+    #if DEBUG
+    /// Past days with varied intake, for testing the week pager and for
+    /// screenshots. Today is left alone.
+    private func seedSampleHistory() {
+        let calendar = Calendar.autoupdatingCurrent
+        let goal = settings.dailyGoalMl
+        for daysAgo in 1...35 {
+            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: .now) else { continue }
+            let target = Int(Double(goal) * Double.random(in: 0.45...1.25))
+            var poured = 0
+            var hour = 8
+            while poured < target, hour < 22 {
+                let ml = [200, 250, 330, 500].randomElement() ?? 250
+                if let time = calendar.date(bySettingHour: hour, minute: Int.random(in: 0...59), second: 0, of: day) {
+                    try? hydration.restore(amountMl: ml, createdAt: time, source: .manual)
+                }
+                poured += ml
+                hour += Int.random(in: 1...2)
+            }
+        }
+    }
+    #endif
+
     var body: some View {
         let current = settings.settings
 
@@ -199,6 +222,7 @@ struct SettingsView: View {
                     Button("Real reminder in 10 s") { Task { await reminders?.scheduleTestReminder() } }
                     Button("Relock apps now") { blocker.relockNow() }
                     Button("Restart onboarding") { settings.settings.onboardingDone = false }
+                    Button("Add 5 weeks of sample history") { seedSampleHistory() }
                 }
                 #endif
             }

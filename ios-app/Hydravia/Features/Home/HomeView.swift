@@ -94,14 +94,8 @@ struct HomeView: View {
                 onUnlock: router.presentUnlock
             )
 
-            Button {
-                router.sheet = .addWater
-            } label: {
-                Label { Text(.homeAddWater) } icon: { Image(systemName: "plus").fontWeight(.bold) }
-            }
-            .buttonStyle(.primaryLight)
-            .sensoryFeedback(.impact(weight: .light), trigger: router.sheet == .addWater) { _, new in new }
-            .padding(.top, 14)
+            QuickAddBar()
+                .padding(.top, 14)
         }
         .padding(.horizontal, Spacing.screen)
         .padding(.top, Spacing.lg)

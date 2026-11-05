@@ -66,10 +66,14 @@ public final class HydrationStore {
         revision += 1
     }
 
-    public func add(_ amountMl: Int, source: EntrySource) throws {
+    /// Returns the new entry, so a quick add can be undone.
+    @discardableResult
+    public func add(_ amountMl: Int, source: EntrySource) throws -> WaterEntry {
         guard amountMl > 0 else { throw HydrationStoreError.invalidAmount(amountMl) }
-        context.insert(WaterEntry(amountMl: amountMl, createdAt: now(), source: source))
+        let entry = WaterEntry(amountMl: amountMl, createdAt: now(), source: source)
+        context.insert(entry)
         try save()
+        return entry
     }
 
     /// Puts back an entry exactly as it was (amount, time, source): the undo
