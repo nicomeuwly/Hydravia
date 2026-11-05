@@ -1,3 +1,5 @@
+import Foundation
+import HydraviaData
 import Observation
 
 /// App-level navigation state: the selected tab and the modal routes that can
@@ -24,6 +26,15 @@ final class AppRouter {
     /// A hydration reminder fired and hasn't been answered yet: the home
     /// screen's ritual card turns into the way into the unlock.
     var reminderFired = false
+
+    /// Water just logged by hand (quick add or sheet): the home screen shows
+    /// it for a few seconds with an undo. A new id per add restarts the timer.
+    struct ManualAdd: Equatable {
+        let id = UUID()
+        let entry: WaterEntry
+        let ml: Int
+    }
+    var lastManualAdd: ManualAdd?
 
     /// Set when the unlock is requested while a sheet is up: SwiftUI drops a
     /// full-screen cover presented while a sheet is still dismissing, so the

@@ -15,6 +15,7 @@ enum WaterLog {
         // Drinking answers the reminder. The apps stay locked, though (only
         // the ritual lifts the shield): while it's up the ritual card stays lit.
         router.reminderFired = blocker.isShieldUp
+        router.lastManualAdd = AppRouter.ManualAdd(entry: entry, ml: ml)
         Task { await reminders?.clearDeliveredReminders() }
         return entry
     }

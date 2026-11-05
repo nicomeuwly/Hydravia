@@ -4,8 +4,9 @@ import SwiftUI
 /// The bottom of the home screen: one tap pours the usual amount straight
 /// into the screen's water, "+" opens the sheet for anything else.
 ///
-/// After a quick add the button turns into a short confirmation with an
-/// undo, in place: a tap that came too fast costs nothing.
+/// After any manual add (here or from the sheet) the button turns into a
+/// short confirmation with an undo, in place: a tap that came too fast costs
+/// nothing.
 struct QuickAddBar: View {
     @Environment(HydrationStore.self) private var hydration
     @Environment(SettingsStore.self) private var settings
@@ -16,14 +17,7 @@ struct QuickAddBar: View {
 
     @AppStorage(QuickAdd.storageKey) private var lastAmountMl = 0
 
-    @State private var justAdded: Added?
-    @State private var dismissTask: Task<Void, Never>?
     @State private var pours = 0
-
-    private struct Added: Equatable {
-        let entry: WaterEntry
-        let ml: Int
-    }
 
     private static let confirmationSeconds = 4
 
@@ -34,7 +28,7 @@ struct QuickAddBar: View {
     var body: some View {
         HStack(spacing: Spacing.md) {
             ZStack {
-                if let justAdded {
+                if let justAdded = router.lastManualAdd {
                     confirmation(justAdded)
                         .transition(.blurReplace)
                 } else {
@@ -42,7 +36,7 @@ struct QuickAddBar: View {
                         .transition(.blurReplace)
                 }
             }
-            .animation(reduceMotion ? nil : Motion.gentle, value: justAdded)
+            .animation(reduceMotion ? nil : Motion.gentle, value: router.lastManualAdd)
 
             Button {
                 router.sheet = .addWater
@@ -59,7 +53,15 @@ struct QuickAddBar: View {
             .sensoryFeedback(.impact(weight: .light), trigger: router.sheet == .addWater) { _, new in new }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: pours)
-        .onDisappear { dismissTask?.cancel() }
+        // Restarted by every new add; cancelled with the view, which is why
+        // leaving the tab also clears the confirmation (it would be stale).
+        .task(id: router.lastManualAdd?.id) {
+            guard router.lastManualAdd != nil else { return }
+            try? await Task.sleep(for: .seconds(Self.confirmationSeconds))
+            guard !Task.isCancelled else { return }
+            router.lastManualAdd = nil
+        }
+        .onDisappear { router.lastManualAdd = nil }
     }
 
     private var quickAddButton: some View {
@@ -75,7 +77,7 @@ struct QuickAddBar: View {
         .buttonStyle(.primaryLight)
     }
 
-    private func confirmation(_ added: Added) -> some View {
+    private func confirmation(_ added: AppRouter.ManualAdd) -> some View {
         HStack(spacing: Spacing.md) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 20, weight: .semibold))
@@ -107,23 +109,16 @@ struct QuickAddBar: View {
 
     private func pour() {
         let ml = amount
-        guard let entry = try? WaterLog.addManual(ml, hydration: hydration, router: router,
-                                                  blocker: blocker, reminders: reminders)
-        else { return } // the store logged and rolled back
+        // The store logs and rolls back on failure.
+        guard (try? WaterLog.addManual(ml, hydration: hydration, router: router,
+                                       blocker: blocker, reminders: reminders)) != nil
+        else { return }
         pours += 1
-        justAdded = Added(entry: entry, ml: ml)
         AccessibilityNotification.Announcement(String(localized: .homeAdded(ml.formatted()))).post()
-        dismissTask?.cancel()
-        dismissTask = Task {
-            try? await Task.sleep(for: .seconds(Self.confirmationSeconds))
-            guard !Task.isCancelled else { return }
-            justAdded = nil
-        }
     }
 
-    private func undo(_ added: Added) {
-        dismissTask?.cancel()
-        justAdded = nil
+    private func undo(_ added: AppRouter.ManualAdd) {
+        router.lastManualAdd = nil
         try? hydration.delete(added.entry)
     }
 }
