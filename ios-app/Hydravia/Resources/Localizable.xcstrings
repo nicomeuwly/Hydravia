@@ -2458,30 +2458,31 @@
       }
     },
     "paywall.feature1" : {
+      "comment" : "Paywall feature: Pro lifts the free plan's one-app limit.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Entsperr-Ritual: Du trinkst, deine Apps öffnen sich wieder"
+            "value" : "Das Ritual für beliebig viele Apps und Websites"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The unlock ritual: you drink, your apps open again"
+            "value" : "The ritual on as many apps and websites as you like"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El ritual de desbloqueo: bebes y tus apps vuelven a abrirse"
+            "value" : "El ritual en todas las apps y webs que quieras"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le rituel de déblocage : tu bois, tes apps se rouvrent"
+            "value" : "Le rituel sur autant d'apps et de sites que tu veux"
           }
         }
       }
@@ -2516,30 +2517,31 @@
       }
     },
     "paywall.introSub" : {
+      "comment" : "Paywall subtitle with a trial.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine Gratis-Testphase, um das Ritual aufzubauen. Ohne Verpflichtung."
+            "value" : "Eine Gratis-Testphase, um alles freizuschalten. Ohne Verpflichtung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A free trial to build the ritual. No commitment."
+            "value" : "A free trial to unlock everything. No commitment."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Una prueba gratis para crear el ritual. Sin compromiso."
+            "value" : "Una prueba gratis para desbloquearlo todo. Sin compromiso."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un essai gratuit pour installer le rituel. Sans engagement."
+            "value" : "Un essai gratuit pour tout débloquer. Sans engagement."
           }
         }
       }
@@ -2574,30 +2576,31 @@
       }
     },
     "paywall.noTrialTitle" : {
+      "comment" : "Paywall title without a trial.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hol dir das Ritual zurück"
+            "value" : "Hol dir Hydravia Pro"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bring back the ritual"
+            "value" : "Go Hydravia Pro"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recupera el ritual"
+            "value" : "Pásate a Hydravia Pro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retrouve le rituel"
+            "value" : "Passe à Hydravia Pro"
           }
         }
       }
@@ -3069,30 +3072,31 @@
       }
     },
     "paywall.timelineTodayText" : {
+      "comment" : "Paywall trial timeline, today.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voller Zugriff: das Entsperr-Ritual und angepasste Mengen."
+            "value" : "Voller Zugriff: alle deine Apps gesperrt und angepasste Mengen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full access: the unlock ritual and adapted doses."
+            "value" : "Full access: all your apps locked and adapted doses."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acceso completo: el ritual de desbloqueo y las dosis adaptadas."
+            "value" : "Acceso completo: todas tus apps bloqueadas y las dosis adaptadas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accès complet : le rituel de déblocage et les quantités adaptées."
+            "value" : "Accès complet : toutes tes apps verrouillées et les quantités adaptées."
           }
         }
       }
@@ -6782,6 +6786,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quantité à ajouter"
+          }
+        }
+      }
+    },
+    "blocker.freeLimitTitle" : {
+      "comment" : "Alert title (and Settings hint) when more apps, a category or a website were picked than the free plan covers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gratis-Version sperrt 1 App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The free plan locks 1 app"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La versión gratuita bloquea 1 app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La version gratuite bloque 1 app"
+          }
+        }
+      }
+    },
+    "blocker.freeLimitBody" : {
+      "comment" : "Alert body when the pick is past the free limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine einzige App zum Sperren, oder hol dir Pro, um beliebig viele Apps, Kategorien und Websites zu sperren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a single app to lock, or go Pro to lock as many apps, categories and websites as you like."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una sola app para bloquear, o pásate a Pro para bloquear todas las apps, categorías y webs que quieras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis une seule app à bloquer, ou passe à Pro pour bloquer autant d'apps, de catégories et de sites que tu veux."
+          }
+        }
+      }
+    },
+    "blocker.chooseOneApp" : {
+      "comment" : "Alert button: reopens the app picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 App wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick 1 app"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir 1 app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir 1 app"
+          }
+        }
+      }
+    },
+    "blocker.goPro" : {
+      "comment" : "Alert button: opens the paywall.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro holen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasarme a Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à Pro"
+          }
+        }
+      }
+    },
+    "home.chooseApp" : {
+      "comment" : "Home ritual card when the saved pick is past the free limit (e.g. a trial ended).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle die App zum Sperren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the app to lock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige la app que bloquear"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis l'app à bloquer"
+          }
+        }
+      }
+    },
+    "settings.blockedAppsFreeFooter" : {
+      "comment" : "Footer under the Screen Time section on the free plan.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis: 1 App. Mit Pro beliebig viele Apps, Kategorien und Websites."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free: 1 app. With Pro, as many apps, categories and websites as you like."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis: 1 app. Con Pro, todas las apps, categorías y webs que quieras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit : 1 app. Avec Pro, autant d'apps, de catégories et de sites que tu veux."
           }
         }
       }

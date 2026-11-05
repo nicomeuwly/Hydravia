@@ -79,7 +79,8 @@ nonisolated enum Blocker {
         set { defaults?.set(try? JSONEncoder().encode(newValue), forKey: Key.selection) }
     }
 
-    /// The lock is wanted (ritual on, Hydravia Pro active, access granted).
+    /// The lock is wanted (reminders on, access granted, and a selection
+    /// the plan covers).
     static var isEnabled: Bool {
         get { defaults?.bool(forKey: Key.enabled) ?? false }
         set { defaults?.set(newValue, forKey: Key.enabled) }
@@ -115,6 +116,16 @@ nonisolated enum Blocker {
         selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
 
+    /// The free plan locks one app: no category (a whole family of apps),
+    /// no website. Hydravia Pro locks any selection.
+    static let freeAppLimit = 1
+
+    static func isWithinFreeLimit(_ selection: FamilyActivitySelection) -> Bool {
+        selection.categoryTokens.isEmpty
+            && selection.webDomainTokens.isEmpty
+            && selection.applicationTokens.count <= freeAppLimit
+    }
+
     static func isWithinWindow(_ date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
         guard let window else { return false }
         let parts = calendar.dateComponents([.hour, .minute], from: date)
@@ -127,10 +138,13 @@ nonisolated enum Blocker {
         return date < until
     }
 
-    /// Whether the selected apps should be shielded right now.
+    /// Whether the selected apps should be shielded right now. A selection
+    /// past the free limit needs Pro: a lapse while the app is closed stops
+    /// the lock rather than keep shielding more than the free plan covers.
     static func shouldShield(at date: Date = .now) -> Bool {
-        isEnabled
-            && (proUntil.map { date < $0 } ?? true)
+        let selection = selection
+        return isEnabled
+            && (isWithinFreeLimit(selection) || (proUntil.map { date < $0 } ?? true))
             && selectionCount(selection) > 0
             && isWithinWindow(date)
             && !isUnlocked(at: date)

@@ -24,6 +24,22 @@ final class BlockerService {
 
     var selectionCount: Int { Blocker.selectionCount(selection) }
 
+    /// Hydravia Pro (or a dev build), as last handed over by `RootView`.
+    private(set) var isPro = false
+
+    /// Whether the plan covers `selection`: one app on the free plan,
+    /// anything with Pro.
+    func covers(_ selection: FamilyActivitySelection) -> Bool {
+        isPro || Blocker.isWithinFreeLimit(selection)
+    }
+
+    /// The saved selection is past the free limit (picked during a trial, or
+    /// before onboarding's paywall): the lock waits for the user to pick the
+    /// one app the free plan locks, or for Pro.
+    var needsAppChoice: Bool {
+        authorization == .granted && selectionCount > 0 && !covers(selection)
+    }
+
     /// The last schedule handed over by `RootView`, re-applied when the
     /// selection changes.
     @ObservationIgnored private var window: ActiveWindow?
@@ -83,9 +99,10 @@ final class BlockerService {
     /// and only while the ritual is on.
     /// `force` re-registers the schedule even if nothing it depends on
     /// changed (a new time zone).
-    func sync(window: ActiveWindow, enabled: Bool, force: Bool = false) {
+    func sync(window: ActiveWindow, enabled: Bool, isPro: Bool, force: Bool = false) {
         self.window = window
         wanted = enabled
+        self.isPro = isPro
         // Permission can be revoked in iOS Settings while the app is away.
         authorization = Self.read(AuthorizationCenter.shared.authorizationStatus)
         if force { scheduled = nil }
@@ -123,7 +140,7 @@ final class BlockerService {
         if let window {
             Blocker.window = (window.wake.value, window.sleep.value)
         }
-        Blocker.isEnabled = wanted && authorization == .granted
+        Blocker.isEnabled = wanted && authorization == .granted && covers(selection)
         // Re-registering a running schedule restarts it, so only touch it
         // when what it depends on changed.
         let schedule = "\(Blocker.isEnabled)-\(selectionCount > 0)-\(window?.wake.value ?? -1)-\(window?.sleep.value ?? -1)"

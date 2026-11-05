@@ -9,13 +9,14 @@ struct HomeView: View {
     @Environment(HydrationStore.self) private var hydration
     @Environment(SettingsStore.self) private var settings
     @Environment(AppRouter.self) private var router
-    @Environment(StoreService.self) private var store
+    @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var physics = WaterPhysics()
     @State private var headerFrameGlobal: CGRect = .zero
     @State private var celebrations = 0
+    @State private var isPickingApps = false
 
     /// The water only runs while it can be seen: home tab selected, app in the
     /// foreground, no unlock ritual covering it. (`onDisappear` doesn't fire
@@ -47,6 +48,7 @@ struct HomeView: View {
             foreground
         }
         .background(Palette.background)
+        .blockedAppsPicker(isPresented: $isPickingApps)
         .onAppear {
             // The first appearance rises from empty: a quiet "pour" intro.
             physics.setLevel(waterLevel, splash: false)
@@ -86,11 +88,11 @@ struct HomeView: View {
             Spacer()
 
             RitualCard(
-                isLocked: store.hasLoadedEntitlements && !store.isPremium && !AppConfig.isDevMode,
+                needsAppChoice: blocker.needsAppChoice,
                 notificationsEnabled: settings.settings.notificationsEnabled,
                 reminderFired: router.reminderFired,
                 window: settings.settings.window,
-                onActivate: { router.sheet = .paywall },
+                onChooseApp: { isPickingApps = true },
                 onUnlock: router.presentUnlock
             )
 

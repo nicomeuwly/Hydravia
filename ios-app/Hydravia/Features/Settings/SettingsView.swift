@@ -8,6 +8,8 @@ import SwiftUI
 ///
 struct SettingsView: View {
     @Environment(SettingsStore.self) private var settings
+    /// Dev builds count as Pro; this tries the free plan's limits.
+    @AppStorage(AppConfig.simulatesFreePlanKey) private var simulatesFreePlan = false
     @Environment(HydrationStore.self) private var hydration
     @Environment(AppRouter.self) private var router
     @Environment(\.reminders) private var reminders
@@ -218,6 +220,7 @@ struct SettingsView: View {
 
                 #if DEBUG
                 Section("Dev") {
+                    Toggle("Simulate the free plan", isOn: $simulatesFreePlan)
                     Button("Simulate a reminder") { router.reminderFired = true }
                     Button("Real reminder in 10 s") { Task { await reminders?.scheduleTestReminder() } }
                     Button("Relock apps now") { blocker.relockNow() }

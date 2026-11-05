@@ -7,7 +7,6 @@ struct ScreenTimeSection: View {
     @Environment(BlockerService.self) private var blocker
     @Environment(\.openURL) private var openURL
     @State private var isPicking = false
-    @State private var picked = FamilyActivitySelection()
     @State private var showsDenied = false
 
     var body: some View {
@@ -24,7 +23,6 @@ struct ScreenTimeSection: View {
 
             if blocker.authorization == .granted {
                 Button {
-                    picked = blocker.selection
                     isPicking = true
                 } label: {
                     LabeledContent {
@@ -37,6 +35,8 @@ struct ScreenTimeSection: View {
                         Text(.settingsBlockedApps)
                         if blocker.selectionCount == 0 {
                             Text(.settingsNoAppsSelected)
+                        } else if blocker.needsAppChoice {
+                            Text(.blockerFreeLimitTitle)
                         }
                     }
                 }
@@ -46,11 +46,12 @@ struct ScreenTimeSection: View {
             // The other headers' strings are uppercase already; this one is
             // shared with a sentence-case label.
             Text(.settingsScreenTime).textCase(.uppercase)
+        } footer: {
+            if blocker.authorization == .granted && !blocker.isPro {
+                Text(.settingsBlockedAppsFreeFooter)
+            }
         }
-        .familyActivityPicker(isPresented: $isPicking, selection: $picked)
-        .onChange(of: isPicking) { _, open in
-            if !open { blocker.setSelection(picked) }
-        }
+        .blockedAppsPicker(isPresented: $isPicking)
         .alert(Text(.settingsBlockerDeniedTitle), isPresented: $showsDenied) {
             Button(role: .cancel) {} label: { Text(.commonOk) }
         } message: {

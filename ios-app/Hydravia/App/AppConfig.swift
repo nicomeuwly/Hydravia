@@ -10,6 +10,10 @@ enum AppConfig {
     static let isDevMode = false
     #endif
 
+    /// Dev builds count as Pro, unless the dev section asks to try the free
+    /// plan.
+    static let simulatesFreePlanKey = "dev.simulatesFreePlan"
+
     /// Legal pages on the landing site (also given to App Store Connect).
     static let termsURL = URL(string: "https://hydravia.app/terms")!
     static let privacyURL = URL(string: "https://hydravia.app/privacy")!

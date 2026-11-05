@@ -3,27 +3,26 @@ import SwiftUI
 
 /// The ritual's status on the home screen.
 ///
-/// - Locked (free user): "Ritual paused" — the way into the paywall, at the
-///   moment the user can see what they're missing.
+/// - More apps picked than the free plan locks (a trial ended): the way to
+///   pick the one app it covers. The lock waits until then.
 /// - A reminder fired: "Drink your dose →", the way into the unlock.
 /// - Otherwise: when the next reminder fires (dimmed, not tappable).
 struct RitualCard: View {
-    let isLocked: Bool
+    let needsAppChoice: Bool
     let notificationsEnabled: Bool
     let reminderFired: Bool
     let window: ActiveWindow
-    let onActivate: () -> Void
+    let onChooseApp: () -> Void
     let onUnlock: () -> Void
 
     var body: some View {
-        if isLocked {
-            Button(action: onActivate) {
-                row(icon: "sparkles", iconBackground: Palette.primaryDark,
-                    caption: Text(.homeRitualPaused), title: Text(.homeRitualUnlock), chevron: true)
+        if needsAppChoice {
+            Button(action: onChooseApp) {
+                row(icon: "lock.app.dashed", iconBackground: Palette.primaryDark,
+                    caption: Text(.homeRitualPaused), title: Text(.homeChooseApp), chevron: true)
             }
             .buttonStyle(.pressable)
             .accessibilityElement(children: .combine)
-            .accessibilityHint(Text(.homeA11YActivateRitual))
         } else {
             let canOpen = reminderFired || AppConfig.isDevMode
             Button(action: onUnlock) {

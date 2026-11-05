@@ -14,12 +14,14 @@ struct RootView: View {
     @Environment(StoreService.self) private var store
     @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
+    /// Dev builds only: try the free plan without signing out of Pro.
+    @AppStorage(AppConfig.simulatesFreePlanKey) private var simulatesFreePlan = false
 
     /// What the reminder schedule depends on: any change reschedules.
     private struct Schedule: Equatable {
         let window: ActiveWindow
         let enabled: Bool
-        let ritual: Bool
+        let isPro: Bool
         /// Every return to the foreground re-applies the schedule: permission
         /// re-granted in iOS Settings or a language change catch up at once.
         let active: Bool
@@ -41,10 +43,10 @@ struct RootView: View {
         settings.settings.onboardingDone && settings.settings.notificationsEnabled
     }
 
-    /// The ritual — the app lock and the unlock it leads to — is Hydravia Pro
-    /// (dev builds bypass the entitlement to test without a purchase).
-    private var hasRitual: Bool {
-        store.isPremium || AppConfig.isDevMode
+    /// The ritual is free on one app; Hydravia Pro locks any selection (dev
+    /// builds count as Pro to test without a purchase).
+    private var isPro: Bool {
+        store.isPremium || (AppConfig.isDevMode && !simulatesFreePlan)
     }
 
     /// A banner seen but not tapped still means "time to drink" — and so
@@ -89,15 +91,14 @@ struct RootView: View {
         }
         // Launch, and every change of window, cadence or switch: the system
         // schedule always mirrors the settings.
-        .task(id: Schedule(window: settings.settings.window, enabled: areRemindersEnabled, ritual: hasRitual, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements)) {
+        .task(id: Schedule(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements)) {
             // Wait for the App Store's answer: rescheduling on a not-yet-known
             // entitlement would wipe a subscriber's reminders at every launch.
             guard scenePhase == .active, store.hasLoadedEntitlements else { return }
-            // The Screen Time lock follows the same window and switch, for
-            // Pro only.
-            blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled && hasRitual)
+            // The Screen Time lock follows the same window and switch.
+            blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro)
             await reminders?.reschedule(window: settings.settings.window, enabled: areRemindersEnabled,
-                                        ritual: hasRitual)
+                                        ritual: true)
         }
         .onReceive(Self.dayOrZoneChanges) { _ in
             hydration.refresh()
@@ -105,7 +106,7 @@ struct RootView: View {
             // zone (DeviceActivity schedules otherwise keep the old offsets).
             if store.hasLoadedEntitlements {
                 blocker.sync(window: settings.settings.window,
-                             enabled: areRemindersEnabled && hasRitual, force: true)
+                             enabled: areRemindersEnabled, isPro: isPro, force: true)
             }
         }
         // The shield shows today's progress; every drink, goal change or new
