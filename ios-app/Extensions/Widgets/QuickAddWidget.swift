@@ -20,6 +20,9 @@ struct QuickAddWidget: Widget {
 struct QuickAddWidgetView: View {
     let entry: HydrationEntry
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var mode
+
+    private var ink: PlateInk { PlateInk(mode: mode) }
 
     private var amounts: [Int] {
         family == .systemSmall ? [entry.state.quickAddMl] : Array(entry.state.favoritesMl.prefix(3))
@@ -41,20 +44,15 @@ struct QuickAddWidgetView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) {
-            ZStack {
-                WidgetPalette.background
-                WaterFill(level: entry.progress)
-            }
-        }
+        .containerBackground(for: .widget) { WaterBackground(level: entry.progress) }
         .widgetURL(entry.hasPro ? nil : WidgetLink.paywall)
     }
 
     private var summary: some View {
         VStack(alignment: .leading, spacing: 0) {
-            WidgetHeader(entry: entry, tint: WidgetPalette.primaryDark)
+            WidgetHeader(entry: entry, tint: ink.primary)
             Spacer(minLength: 0)
-            AmountLabel(entry: entry, tint: WidgetPalette.primaryDark, secondary: WidgetPalette.textSecondary,
+            AmountLabel(entry: entry, tint: ink.primary, secondary: ink.secondary,
                         size: family == .systemSmall ? 24 : 30)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -63,7 +61,7 @@ struct QuickAddWidgetView: View {
         .padding(family == .systemSmall ? 0 : 10)
         .background {
             if family == .systemMedium {
-                RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.white)
+                Plate(shape: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
     }
@@ -80,9 +78,9 @@ struct QuickAddWidgetView: View {
                             Image(systemName: "drop.fill")
                         }
                         .font(.brand(.bold, size: 15, relativeTo: .body))
-                        .foregroundStyle(WidgetPalette.primaryDark)
+                        .foregroundStyle(ink.primary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.white, in: .capsule)
+                        .background { Plate(shape: Capsule()) }
                     }
                     .buttonStyle(.plain)
                 }
@@ -96,6 +94,8 @@ struct QuickAddWidgetView: View {
 /// Where a Pro widget's content would be without Pro. The whole widget opens
 /// the paywall.
 struct ProBadge: View {
+    @Environment(\.widgetRenderingMode) private var mode
+
     var body: some View {
         VStack(spacing: 2) {
             Label { Text(.widgetPro) } icon: { Image(systemName: "lock.fill") }
@@ -106,10 +106,10 @@ struct ProBadge: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
         }
-        .foregroundStyle(WidgetPalette.primaryDark)
+        .foregroundStyle(PlateInk(mode: mode).primary)
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.white, in: .rect(cornerRadius: 16, style: .continuous))
+        .background { Plate(shape: RoundedRectangle(cornerRadius: 16, style: .continuous)) }
     }
 }
 

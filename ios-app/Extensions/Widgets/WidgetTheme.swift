@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 
 // The few tokens the widgets need, mirroring the app's `Palette` and brand
 // font (Hydravia/Design/Theme.swift): the extension doesn't compile the
@@ -64,27 +65,75 @@ struct WaterShape: Shape {
     }
 }
 
+/// The water. In full colour, a deep gradient over the widget's light
+/// background; tinted or clear (the Home Screen recolours everything and
+/// drops the background), a translucent swell in the accent colour, so it
+/// still reads as water without hiding the numbers.
 struct WaterFill: View {
     var level: Double
+    @Environment(\.widgetRenderingMode) private var mode
 
     var body: some View {
-        WaterShape(level: level)
-            .fill(LinearGradient(colors: [WidgetPalette.waterSurface, WidgetPalette.waterDeep],
-                                 startPoint: .top, endPoint: .bottom))
+        if mode == .fullColor {
+            WaterShape(level: level)
+                .fill(LinearGradient(colors: [WidgetPalette.waterSurface, WidgetPalette.waterDeep],
+                                     startPoint: .top, endPoint: .bottom))
+        } else {
+            WaterShape(level: level)
+                .fill(.white.opacity(0.28))
+                .widgetAccentable()
+        }
+    }
+}
+
+/// The widget's background: the light page and its water.
+struct WaterBackground: View {
+    var level: Double
+    @Environment(\.widgetRenderingMode) private var mode
+
+    var body: some View {
+        ZStack {
+            if mode == .fullColor { WidgetPalette.background }
+            WaterFill(level: level)
+        }
     }
 }
 
 /// Text that turns white where the water covers it, like the app's header:
-/// readable at any level.
+/// readable at any level. Tinted or clear, everything is drawn in one
+/// colour anyway: a single copy.
 struct Waterline<Content: View>: View {
     var level: Double
     @ViewBuilder var content: (_ tint: Color, _ secondary: Color) -> Content
+    @Environment(\.widgetRenderingMode) private var mode
 
     var body: some View {
-        ZStack {
-            content(WidgetPalette.primaryDark, WidgetPalette.textSecondary)
-            content(.white, .white.opacity(0.8))
-                .mask { WaterShape(level: level) }
+        if mode == .fullColor {
+            ZStack {
+                content(WidgetPalette.primaryDark, WidgetPalette.textSecondary)
+                content(.white, .white.opacity(0.8))
+                    .mask { WaterShape(level: level) }
+            }
+        } else {
+            content(.white, .white.opacity(0.75))
         }
     }
+}
+
+/// A white surface (button, plate) that stays one: tinted or clear, an
+/// opaque white would be drawn over its own label, so it turns into a veil.
+struct Plate<S: Shape>: View {
+    var shape: S
+    @Environment(\.widgetRenderingMode) private var mode
+
+    var body: some View {
+        shape.fill(.white.opacity(mode == .fullColor ? 1 : 0.16))
+    }
+}
+
+/// The ink on a plate: dark blue in full colour, white once recoloured.
+struct PlateInk {
+    let mode: WidgetRenderingMode
+    var primary: Color { mode == .fullColor ? WidgetPalette.primaryDark : .white }
+    var secondary: Color { mode == .fullColor ? WidgetPalette.textSecondary : .white.opacity(0.75) }
 }

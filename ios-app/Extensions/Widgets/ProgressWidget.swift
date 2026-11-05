@@ -34,12 +34,7 @@ struct ProgressWidgetView: View {
             .padding(16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
-        .containerBackground(for: .widget) {
-            ZStack {
-                WidgetPalette.background
-                WaterFill(level: entry.progress)
-            }
-        }
+        .containerBackground(for: .widget) { WaterBackground(level: entry.progress) }
     }
 }
 
@@ -55,6 +50,8 @@ struct WidgetHeader: View {
             Text(entry.isGoalReached ? String(localized: .widgetGoalReached)
                                      : min(entry.progress, 1).formatted(.percent.precision(.fractionLength(0))))
                 .font(.brand(.bold, size: 13, relativeTo: .caption))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .foregroundStyle(tint)
     }
