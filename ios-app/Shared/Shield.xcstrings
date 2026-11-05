@@ -65,25 +65,25 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Meine Portion trinken"
+            "value": "Trinken"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Drink my dose"
+            "value": "Drink now"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beber mi dosis"
+            "value": "A beber"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Boire mon verre"
+            "value": "Je bois"
           }
         }
       }
