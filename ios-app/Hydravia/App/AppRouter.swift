@@ -18,7 +18,8 @@ final class AppRouter {
 
     var tab: Tab = .home
     var sheet: Sheet?
-    /// The unlock ritual is a full-screen cover with no way back but drinking.
+    /// The unlock ritual is a full-screen cover; leaving it without drinking
+    /// unlocks nothing.
     var isUnlockPresented = false
     /// A hydration reminder fired and hasn't been answered yet: the home
     /// screen's ritual card turns into the way into the unlock.

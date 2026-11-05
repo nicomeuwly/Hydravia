@@ -25,9 +25,6 @@ struct PaywallView: View {
     @State private var showsPending = false
     @State private var restoreResult: Bool?
 
-    private static let termsURL = URL(string: "https://hydravia.app/terms")!
-    private static let privacyURL = URL(string: "https://hydravia.app/privacy")!
-
     var body: some View {
         ZStack {
             Palette.background.ignoresSafeArea()
@@ -206,9 +203,9 @@ struct PaywallView: View {
 
     private var footer: some View {
         HStack(spacing: Spacing.lg) {
-            Link(destination: Self.termsURL) { Text(.paywallTerms) }
+            Link(destination: AppConfig.termsURL) { Text(.paywallTerms) }
             Text(verbatim: "·")
-            Link(destination: Self.privacyURL) { Text(.paywallPrivacy) }
+            Link(destination: AppConfig.privacyURL) { Text(.paywallPrivacy) }
             Text(verbatim: "·")
             Button {
                 Task { restoreResult = await store.restore() }

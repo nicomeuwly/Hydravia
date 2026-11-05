@@ -3,6 +3,8 @@ import SwiftUI
 
 /// Screen Time access, then the apps to lock: without a selection there is
 /// nothing to shield, so the picker is the second half of this step.
+/// "Continue" goes straight to the system prompt, where declining happens
+/// (App Review guideline 5.1.1(iv)); the app works without the lock.
 struct ScreenTimeStep: View {
     let onNext: () -> Void
     @Environment(BlockerService.self) private var blocker
@@ -12,9 +14,9 @@ struct ScreenTimeStep: View {
 
     var body: some View {
         OnboardingScaffold(step: .screenTime, title: .screenTimeTitleIos, subtitle: .screenTimeBodyIos,
-                           primary: .screenTimeGrant, secondary: .commonLater,
+                           primary: .commonContinue,
                            primaryEnabled: !isRequesting,
-                           onPrimary: allow, onSecondary: onNext) {
+                           onPrimary: allow) {
             VStack(alignment: .leading, spacing: Spacing.lg) {
                 explainer(1, .screenTimeStep1Ios)
                 explainer(2, .screenTimeStep2Ios)

@@ -149,6 +149,23 @@ struct SettingsView: View {
                     Text(.settingsSectionData)
                 }
 
+                Section {
+                    Link(destination: AppConfig.privacyURL) { linkRow(.settingsPrivacyPolicy) }
+                    Link(destination: AppConfig.termsURL) { linkRow(.settingsTermsOfUse) }
+                    LabeledContent {
+                        Text(verbatim: Self.appVersion)
+                    } label: {
+                        Text(.settingsVersion)
+                    }
+                } header: {
+                    Text(.settingsSectionAbout)
+                } footer: {
+                    // App Review guideline 1.4.1: the goal is guidance, not medicine.
+                    Text(.healthDisclaimer)
+                        .font(.brandFootnote)
+                        .foregroundStyle(Palette.textSecondary)
+                }
+
                 #if DEBUG
                 Section("Dev") {
                     Button("Simulate a reminder") { router.reminderFired = true }
@@ -276,6 +293,26 @@ struct SettingsView: View {
                 Text(label).foregroundStyle(Palette.textPrimary)
             }
         }
+    }
+
+    /// A page that opens in Safari.
+    private func linkRow(_ label: LocalizedStringResource) -> some View {
+        LabeledContent {
+            Image(systemName: "arrow.up.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Palette.textTertiary)
+                .accessibilityHidden(true)
+        } label: {
+            Text(label).foregroundStyle(Palette.textPrimary)
+        }
+    }
+
+    /// "1.0 (1)": marketing version and build, for support requests.
+    private static var appVersion: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
     }
 }
 

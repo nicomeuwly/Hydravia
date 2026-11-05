@@ -47,11 +47,16 @@ struct UnlockView: View {
             Palette.nightOverlay.ignoresSafeArea()
 
             VStack(spacing: 0) {
+                // Its own row, so it never overlaps the header at large text
+                // sizes; hidden (not removed) once poured, so nothing jumps.
+                notNowButton
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .opacity(stage == .poured ? 0 : 1)
+                    .disabled(stage == .poured)
                 header
-                    .padding(.top, Spacing.lg)
+                    .padding(.top, Spacing.sm)
 
-                // Scrolls only when it must (AX text sizes on small phones):
-                // the release build has no way out but the buttons below.
+                // Scrolls only when it must (AX text sizes on small phones).
                 ScrollView {
                     ZStack {
                         switch stage {
@@ -71,9 +76,6 @@ struct UnlockView: View {
             .padding(.bottom, Spacing.xxl)
             .animation(Motion.slow, value: stage)
 
-            #if DEBUG
-            devCloseButton
-            #endif
         }
         .preferredColorScheme(.dark)
         .onAppear { physics.setLevel(level, splash: false) }
@@ -265,19 +267,21 @@ struct UnlockView: View {
         .accessibilityFocused($stageFocused)
     }
 
-    #if DEBUG
-    /// Dev only: the real ritual has no way out but drinking.
-    private var devCloseButton: some View {
+    /// Leaves without logging anything. Nothing is unlocked: the shield stays
+    /// up and the reminder stays unanswered, so the ritual card on Home still
+    /// leads back here. Never trapping someone on a full-screen cover is also
+    /// what App Review expects.
+    private var notNowButton: some View {
         Button {
             router.isUnlockPresented = false
         } label: {
-            Image(systemName: "xmark").font(.system(size: 14, weight: .bold))
+            Text(.unlockNotNow)
+                .font(.brand(.semiBold, size: 15, relativeTo: .subheadline))
+                .padding(.horizontal, Spacing.sm)
+                .frame(minHeight: 44)
         }
         .buttonStyle(.glass)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-        .padding(.trailing, Spacing.lg)
     }
-    #endif
 
     // MARK: Actions
 

@@ -1,3 +1,5 @@
+import Foundation
+
 /// Build-time switches.
 enum AppConfig {
     /// Dev escape hatches (open the unlock ritual without a reminder, skip the
@@ -7,4 +9,8 @@ enum AppConfig {
     #else
     static let isDevMode = false
     #endif
+
+    /// Legal pages on the landing site (also given to App Store Connect).
+    static let termsURL = URL(string: "https://hydravia.app/terms")!
+    static let privacyURL = URL(string: "https://hydravia.app/privacy")!
 }

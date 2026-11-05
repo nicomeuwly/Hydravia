@@ -4,14 +4,14 @@ import SwiftUI
 
 /// The ordered first-run flow:
 /// welcome → weight → schedule → interval → location → Screen Time →
-/// notifications (→ recover if declined) → goal reveal → paywall. Every
+/// notifications → goal reveal → paywall. Permission steps never offer a way
+/// to skip their system prompt: declining happens in the prompt itself. Every
 /// answer is saved as soon as it's given.
 struct OnboardingFlowView: View {
     enum Step: Hashable {
-        case weight, schedule, interval, location, screenTime, notifications, notificationsRecover, goalReveal, paywall
+        case weight, schedule, interval, location, screenTime, notifications, goalReveal, paywall
 
-        /// Position in the progress bar (the recover screen shares its
-        /// parent's slot; the goal reveal has no bar).
+        /// Position in the progress bar (the goal reveal has no bar).
         var progressIndex: Int? {
             switch self {
             case .weight: 1
@@ -19,7 +19,7 @@ struct OnboardingFlowView: View {
             case .interval: 3
             case .location: 4
             case .screenTime: 5
-            case .notifications, .notificationsRecover: 6
+            case .notifications: 6
             case .goalReveal, .paywall: nil
             }
         }
@@ -55,10 +55,7 @@ struct OnboardingFlowView: View {
         case .screenTime:
             ScreenTimeStep { path.append(.notifications) }
         case .notifications:
-            NotificationsStep(onGranted: { path.append(.goalReveal) },
-                              onDeclined: { path.append(.notificationsRecover) })
-        case .notificationsRecover:
-            NotificationsRecoverStep { path.append(.goalReveal) }
+            NotificationsStep { path.append(.goalReveal) }
         case .goalReveal:
             GoalRevealStep { path.append(.paywall) }
         case .paywall:

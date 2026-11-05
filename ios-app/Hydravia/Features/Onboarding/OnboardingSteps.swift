@@ -133,8 +133,7 @@ struct LocationStep: View {
 
     var body: some View {
         OnboardingScaffold(step: .location, title: .locationTitle, subtitle: .locationBody,
-                           primary: .locationAllow, secondary: .commonLater,
-                           onPrimary: allow, onSecondary: onNext) {
+                           primary: .commonContinue, onPrimary: allow) {
             HStack(spacing: Spacing.md) {
                 Image(systemName: "sun.max.fill")
                     .font(.system(size: 20))
@@ -176,18 +175,16 @@ struct LocationStep: View {
 
 // MARK: - Notifications
 
-/// Asks for notifications only on an explicit tap: iOS shows its prompt once,
-/// so burning it on a low-intent screen would lose it for good.
+/// Explains reminders, then "Continue" shows the system prompt: declining
+/// happens there, never on our screen (App Review guideline 5.1.1(iv)).
 struct NotificationsStep: View {
-    let onGranted: () -> Void
-    let onDeclined: () -> Void
+    let onNext: () -> Void
     @Environment(SettingsStore.self) private var settings
     @Environment(\.reminders) private var reminders
 
     var body: some View {
         OnboardingScaffold(step: .notifications, title: .notifPrimeTitle, subtitle: .notifPrimeBody,
-                           primary: .notifPrimeActivate, secondary: .commonLater,
-                           onPrimary: activate, onSecondary: onDeclined) {
+                           primary: .commonContinue, onPrimary: activate) {
             NotificationPreview()
         }
     }
@@ -201,7 +198,7 @@ struct NotificationsStep: View {
             case .denied: granted = false
             }
             settings.settings.notificationsEnabled = granted
-            granted ? onGranted() : onDeclined()
+            onNext()
         }
     }
 }
@@ -227,91 +224,6 @@ private struct NotificationPreview: View {
         .padding(Spacing.md)
         .glassEffect(.regular, in: .rect(cornerRadius: 22, style: .continuous))
         .accessibilityElement(children: .combine)
-    }
-}
-
-struct NotificationsRecoverStep: View {
-    let onNext: () -> Void
-    @Environment(SettingsStore.self) private var settings
-    @Environment(\.reminders) private var reminders
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var sentToSettings = false
-
-    var body: some View {
-        OnboardingScaffold(step: .notificationsRecover, title: .notifRecoverTitle, subtitle: .notifRecoverBody,
-                           primary: .notifRecoverActivate, secondary: .notifRecoverSkip,
-                           onPrimary: activate, onSecondary: onNext) {
-            HStack(spacing: 14) {
-                comparison(level: 0.86, title: .notifRecoverWithReminders, days: 6, muted: false)
-                comparison(level: 0.22, title: .notifRecoverWithoutReminders, days: 2, muted: true)
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active { recheckAfterSettings() }
-        }
-    }
-
-    private func comparison(level: Double, title: LocalizedStringResource, days: Int, muted: Bool) -> some View {
-        VStack(spacing: Spacing.sm) {
-            RoundedRectangle(cornerRadius: Radius.sm, style: .continuous)
-                .fill(Palette.backgroundElement)
-                .frame(width: 46, height: 62)
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .fill(LinearGradient(colors: [Palette.waterSurface, Palette.waterDeep],
-                                             startPoint: .top, endPoint: .bottom))
-                        .frame(height: 62 * level)
-                }
-                .clipShape(.rect(cornerRadius: Radius.sm, style: .continuous))
-            Text(title)
-                .font(.brandCaption)
-                .foregroundStyle(Palette.textSecondary)
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
-                Text(days, format: .number)
-                    .font(.brand(.bold, size: 30, relativeTo: .title))
-                    .foregroundStyle(muted ? Palette.textTertiary : Palette.primaryDark)
-                Text(.notifRecoverOutOfSevenDays)
-                    .font(.brand(.medium, size: 14, relativeTo: .footnote))
-                    .foregroundStyle(Palette.textTertiary)
-            }
-            Text(.notifRecoverGoalHit)
-                .font(.brandFootnote)
-                .foregroundStyle(Palette.textTertiary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Spacing.xl)
-        .background(.white, in: .rect(cornerRadius: 22, style: .continuous))
-        .accessibilityElement(children: .combine)
-    }
-
-    private func activate() {
-        Task {
-            switch await reminders?.permission() ?? .denied {
-            case .granted:
-                settings.settings.notificationsEnabled = true
-                onNext()
-            case .notDetermined:
-                let granted = await reminders?.requestPermission() ?? false
-                settings.settings.notificationsEnabled = granted
-                onNext()
-            case .denied:
-                // iOS won't ask again: the switch lives in Settings now.
-                sentToSettings = true
-                LocationPermission.openSettings()
-            }
-        }
-    }
-
-    /// Back from iOS Settings with notifications turned on: carry on.
-    private func recheckAfterSettings() {
-        guard sentToSettings else { return }
-        Task {
-            if await reminders?.permission() == .granted {
-                sentToSettings = false
-                settings.settings.notificationsEnabled = true
-                onNext()
-            }
-        }
     }
 }
 
@@ -382,6 +294,12 @@ struct GoalRevealStep: View {
                 metric(ReminderInterval(rawValue: window.intervalMin)?.shortLabel ?? "—", label: .goalRevealPace)
                 metric(window.wake.formatted, label: .goalRevealStart)
             }
+
+            // App Review guideline 1.4.1: the goal is guidance, not medicine.
+            Text(.healthDisclaimerShort)
+                .font(.brandFootnote)
+                .foregroundStyle(Palette.textSecondary)
+                .frame(maxWidth: .infinity)
 
             Spacer()
 
