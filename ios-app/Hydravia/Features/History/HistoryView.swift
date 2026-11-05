@@ -8,6 +8,7 @@ import SwiftUI
 struct HistoryView: View {
     @Environment(HydrationStore.self) private var hydration
     @Environment(SettingsStore.self) private var settings
+    @State private var showsEntries = false
 
     var body: some View {
         let totals = hydration.recentTotals
@@ -58,12 +59,38 @@ struct HistoryView: View {
                 .padding(.horizontal, Spacing.xl)
                 .card()
                 .accessibilityElement(children: .combine)
+
+                Button { showsEntries = true } label: {
+                    HStack(spacing: Spacing.md) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(Palette.secondaryBlue)
+                            .accessibilityHidden(true)
+                        Text(.historyAllEntries)
+                            .font(.bodyEmphasis)
+                            .foregroundStyle(Palette.primaryDark)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Palette.textTertiary)
+                            .accessibilityHidden(true)
+                    }
+                    .padding(.vertical, 18)
+                    .padding(.horizontal, Spacing.xl)
+                    .card()
+                    .contentShape(.rect(cornerRadius: Radius.xl, style: .continuous))
+                }
+                .buttonStyle(.pressable)
             }
             .padding(.horizontal, Spacing.screen)
             .padding(.vertical, Spacing.lg)
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(Palette.background)
+        .sheet(isPresented: $showsEntries) {
+            EntryLogSheet()
+                .presentationDetents([.large])
+        }
     }
 }
 

@@ -72,6 +72,20 @@ public final class HydrationStore {
         try save()
     }
 
+    /// Puts back an entry exactly as it was (amount, time, source): the undo
+    /// of a deletion from the history list.
+    public func restore(amountMl: Int, createdAt: Date, source: EntrySource) throws {
+        guard amountMl > 0 else { throw HydrationStoreError.invalidAmount(amountMl) }
+        context.insert(WaterEntry(amountMl: amountMl, createdAt: createdAt, source: source))
+        try save()
+    }
+
+    /// Every entry, newest first, for the history list. A few thousand rows
+    /// at most after a year of use.
+    public func allEntries() -> [WaterEntry] {
+        fetch(FetchDescriptor<WaterEntry>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)]))
+    }
+
     public func delete(_ entry: WaterEntry) throws {
         context.delete(entry)
         try save()

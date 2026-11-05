@@ -116,4 +116,27 @@ struct HydrationStoreTests {
         try store.deleteAll()
         #expect(store.todayEntries.isEmpty)
     }
+
+    @Test func deletingAnOldEntryAndUndoingItRestoresTheStreak() throws {
+        let clock = Clock(date(12, 10))
+        let store = try makeStore(at: clock)
+        try store.add(2000, source: .unlock)
+        clock.date = date(13, 9)
+        try store.add(300, source: .manual)
+
+        let all = store.allEntries()
+        #expect(all.map(\.amountMl) == [300, 2000])
+
+        let old = all[1]
+        let (amount, createdAt, source) = (old.amountMl, old.createdAt, old.source)
+        try store.delete(old)
+        #expect(store.streakTotals.map(\.totalMl) == [300])
+
+        try store.restore(amountMl: amount, createdAt: createdAt, source: source)
+        #expect(store.streakTotals.map(\.totalMl) == [2000, 300])
+        #expect(store.allEntries().last?.source == .unlock)
+        #expect(throws: HydrationStoreError.invalidAmount(0)) {
+            try store.restore(amountMl: 0, createdAt: createdAt, source: .manual)
+        }
+    }
 }
