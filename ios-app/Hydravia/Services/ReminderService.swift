@@ -26,8 +26,13 @@ final class ReminderService: NSObject {
     private let logger = Logger(subsystem: "com.nicomeuwly.hydravia", category: "Reminders")
 
     /// Bodies rotate across the day's slots so reminders never go stale.
+    /// With the ritual (Pro) they talk about the paused apps…
     private static let bodies: [LocalizedStringResource] = [
         .notifReminderBody1, .notifReminderBody2, .notifReminderBody3, .notifReminderBody4,
+    ]
+    /// …without it there's no lock, so they just say it's time to drink.
+    private static let freeBodies: [LocalizedStringResource] = [
+        .notifFreeBody1, .notifFreeBody2, .notifFreeBody3,
     ]
 
     init(router: AppRouter) {
@@ -61,25 +66,26 @@ final class ReminderService: NSObject {
 
     /// Makes the hydration reminders match `window`: one daily repeating
     /// notification per slot. `enabled == false` (user choice, no
-    /// entitlement, no permission) just clears them.
+    /// permission) just clears them. `ritual` (Hydravia Pro) picks the copy
+    /// and makes a tap open the unlock ritual; free reminders open the app.
     ///
     /// Serialised: a newer call cancels the one in flight and waits for it,
     /// so the latest settings always win.
-    func reschedule(window: ActiveWindow, enabled: Bool) async {
+    func reschedule(window: ActiveWindow, enabled: Bool, ritual: Bool) async {
         let previous = rescheduleTask
         previous?.cancel()
         let task = Task {
             await previous?.value
             guard !Task.isCancelled else { return }
-            await self.apply(window: window, enabled: enabled)
+            await self.apply(window: window, enabled: enabled, ritual: ritual)
         }
         rescheduleTask = task
         await task.value
     }
 
-    private func apply(window: ActiveWindow, enabled: Bool) async {
+    private func apply(window: ActiveWindow, enabled: Bool, ritual: Bool) async {
         let granted = enabled ? await permission() == .granted : false
-        let wanted = granted ? requests(for: window) : []
+        let wanted = granted ? requests(for: window, ritual: ritual) : []
         guard !Task.isCancelled else { return }
 
         // Remove only what is no longer wanted; `add` replaces same-id
@@ -104,13 +110,14 @@ final class ReminderService: NSObject {
     /// every return to the foreground, so a language change catches up.
     /// Triggers carry no time zone: they follow the device's, so 08:00 stays
     /// 08:00 wall-clock after travelling.
-    private func requests(for window: ActiveWindow) -> [UNNotificationRequest] {
-        window.reminderSlots.enumerated().map { index, slot in
+    private func requests(for window: ActiveWindow, ritual: Bool) -> [UNNotificationRequest] {
+        let bodies = ritual ? Self.bodies : Self.freeBodies
+        return window.reminderSlots.enumerated().map { index, slot in
             let content = UNMutableNotificationContent()
             content.title = String(localized: .notifReminderTitle)
-            content.body = String(localized: Self.bodies[index % Self.bodies.count])
+            content.body = String(localized: bodies[index % bodies.count])
             content.sound = .default
-            content.userInfo = ["route": Self.unlockRoute]
+            if ritual { content.userInfo = ["route": Self.unlockRoute] }
             content.threadIdentifier = "hydration"
 
             let trigger = UNCalendarNotificationTrigger(

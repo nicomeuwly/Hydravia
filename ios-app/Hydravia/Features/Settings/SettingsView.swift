@@ -256,11 +256,6 @@ struct SettingsView: View {
                 settings.settings.notificationsEnabled = false
                 return
             }
-            // Reminders are the premium ritual: free users get the offer.
-            guard store.isPremium || AppConfig.isDevMode else {
-                router.sheet = .paywall
-                return
-            }
             pendingNotificationsToggle = true
             Task {
                 defer { pendingNotificationsToggle = nil }

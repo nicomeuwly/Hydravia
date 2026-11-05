@@ -19,6 +19,7 @@ struct RootView: View {
     private struct Schedule: Equatable {
         let window: ActiveWindow
         let enabled: Bool
+        let ritual: Bool
         /// Every return to the foreground re-applies the schedule: permission
         /// re-granted in iOS Settings or a language change catch up at once.
         let active: Bool
@@ -33,13 +34,17 @@ struct RootView: View {
     )
     .receive(on: RunLoop.main)
 
-    /// Reminders fire only once onboarding is done, the user turned them on,
-    /// and Hydravia Pro is active — the ritual is the premium feature (dev
-    /// builds bypass the entitlement to test without a purchase).
-    private var isRitualEnabled: Bool {
-        settings.settings.onboardingDone
-            && settings.settings.notificationsEnabled
-            && (store.isPremium || AppConfig.isDevMode)
+    /// Reminders are free: they fire once onboarding is done and the user
+    /// turned them on. (App Review guideline 4.10: notifications themselves
+    /// can't be what the subscription sells.)
+    private var areRemindersEnabled: Bool {
+        settings.settings.onboardingDone && settings.settings.notificationsEnabled
+    }
+
+    /// The ritual — the app lock and the unlock it leads to — is Hydravia Pro
+    /// (dev builds bypass the entitlement to test without a purchase).
+    private var hasRitual: Bool {
+        store.isPremium || AppConfig.isDevMode
     }
 
     /// A banner seen but not tapped still means "time to drink" — and so
@@ -71,13 +76,15 @@ struct RootView: View {
         }
         // Launch, and every change of window, cadence or switch: the system
         // schedule always mirrors the settings.
-        .task(id: Schedule(window: settings.settings.window, enabled: isRitualEnabled, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements)) {
+        .task(id: Schedule(window: settings.settings.window, enabled: areRemindersEnabled, ritual: hasRitual, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements)) {
             // Wait for the App Store's answer: rescheduling on a not-yet-known
             // entitlement would wipe a subscriber's reminders at every launch.
             guard scenePhase == .active, store.hasLoadedEntitlements else { return }
-            // The Screen Time lock follows the same window and switch.
-            blocker.sync(window: settings.settings.window, enabled: isRitualEnabled)
-            await reminders?.reschedule(window: settings.settings.window, enabled: isRitualEnabled)
+            // The Screen Time lock follows the same window and switch, for
+            // Pro only.
+            blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled && hasRitual)
+            await reminders?.reschedule(window: settings.settings.window, enabled: areRemindersEnabled,
+                                        ritual: hasRitual)
         }
         .onReceive(Self.dayOrZoneChanges) { _ in
             hydration.refresh()

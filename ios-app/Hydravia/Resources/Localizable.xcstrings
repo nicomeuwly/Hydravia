@@ -1202,25 +1202,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sperre und Erinnerungen aktivieren"
+            "value" : "Ritual aktivieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turn on the lock and reminders"
+            "value" : "Turn on the ritual"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activa el bloqueo y los recordatorios"
+            "value" : "Activa el ritual"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activer le verrou et les rappels"
+            "value" : "Activer le rituel"
           }
         }
       }
@@ -1468,25 +1468,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In festen Abständen sperrt sich dein Handy, bis du trinkst."
+            "value" : "In festen Abständen machen die Apps, die du ausgewählt hast, Pause, bis du trinkst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "At a steady beat, your phone locks until you drink."
+            "value" : "At a steady beat, the apps you picked take a break until you drink."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A intervalos regulares, tu teléfono se bloquea hasta que bebas."
+            "value" : "A intervalos regulares, las apps que elegiste se ponen en pausa hasta que bebas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "À intervalle régulier, ton téléphone se verrouille jusqu'à ce que tu boives."
+            "value" : "À intervalle régulier, les apps que tu as choisies se mettent en pause jusqu’à ce que tu boives."
           }
         }
       }
@@ -1735,25 +1735,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schluss mit Scrollen. Eine Portion Wasser und dein Handy gehört dir."
+            "value" : "Schluss mit Scrollen. Eine Portion Wasser und deine Apps gehören dir."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stop scrolling. One dose of water and your phone is yours."
+            "value" : "Stop scrolling. One dose of water and your apps are yours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deja de hacer scroll. Una dosis de agua y tu teléfono es tuyo."
+            "value" : "Deja de hacer scroll. Una dosis de agua y tus apps son tuyas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stop le scroll. Une dose d’eau et ton tel est à toi."
+            "value" : "Stop le scroll. Une dose d’eau et tes apps sont à toi."
           }
         }
       }
@@ -1764,25 +1764,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Handy macht Pause. Trink deine Portion, um es zu wecken."
+            "value" : "Deine Apps machen Pause. Trink deine Portion, um sie zu wecken."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your phone is taking a break. Drink your dose to wake it up."
+            "value" : "Your apps are taking a break. Drink your dose to wake them up."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu teléfono está en pausa. Bebe tu dosis para despertarlo."
+            "value" : "Tus apps están en pausa. Bebe tu dosis para despertarlas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ton téléphone fait une pause. Bois ta dose pour le réveiller."
+            "value" : "Tes apps font une pause. Bois ta dose pour les réveiller."
           }
         }
       }
@@ -1822,25 +1822,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Portion wartet. Dein Handy auch."
+            "value" : "Deine Portion wartet. Deine Apps auch."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your dose is waiting. So is your phone."
+            "value" : "Your dose is waiting. So are your apps."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu dosis te espera. Tu teléfono también."
+            "value" : "Tu dosis te espera. Tus apps también."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta dose t’attend. Ton téléphone aussi."
+            "value" : "Ta dose t’attend. Tes apps aussi."
           }
         }
       }
@@ -1967,25 +1967,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Erinnerung, keine Sperre. Hydravia sperrt dein Handy im richtigen Moment. Zum Entsperren trinkst du genau so viel, wie du brauchst — nicht mehr, nicht weniger."
+            "value" : "Bei jeder Erinnerung pausiert Hydravia die Apps, die du ausgewählt hast. Zum Öffnen trinkst du genau so viel, wie du brauchst — nicht mehr, nicht weniger."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No reminder, no lock. Hydravia locks your phone at the right moment. To reopen it, you drink just what you need — no more, no less."
+            "value" : "At every reminder, Hydravia pauses the apps you picked. To open them again, you drink just what you need — no more, no less."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sin recordatorio no hay bloqueo. Hydravia bloquea tu teléfono en el momento justo. Para reabrirlo, bebes justo lo que necesitas, ni más ni menos."
+            "value" : "En cada recordatorio, Hydravia pone en pausa las apps que elegiste. Para volver a abrirlas, bebes justo lo que necesitas, ni más ni menos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans rappel, pas de verrou. Hydravia verrouille ton téléphone au bon moment. Pour le rouvrir, tu bois juste ce qu'il te faut, ni trop ni trop peu."
+            "value" : "À chaque rappel, Hydravia met en pause les apps que tu as choisies. Pour les rouvrir, tu bois juste ce qu’il te faut, ni trop ni trop peu."
           }
         }
       }
@@ -1996,25 +1996,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sperre ist das Herz des Rituals."
+            "value" : "Die Erinnerung gibt das Signal für das Ritual."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The lock is the heart of the ritual."
+            "value" : "The reminder is the ritual's cue."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El bloqueo es el corazón del ritual."
+            "value" : "El recordatorio da la señal del ritual."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le verrou, c'est le cœur du rituel."
+            "value" : "Le rappel donne le signal du rituel."
           }
         }
       }
@@ -2490,25 +2490,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Handy sperrt sich bei jeder Erinnerung"
+            "value" : "Das Entsperr-Ritual: Du trinkst, deine Apps öffnen sich wieder"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your phone locks at every reminder"
+            "value" : "The unlock ritual: you drink, your apps open again"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu teléfono se bloquea en cada recordatorio"
+            "value" : "El ritual de desbloqueo: bebes y tus apps vuelven a abrirse"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ton téléphone se verrouille à chaque rappel"
+            "value" : "Le rituel de déblocage : tu bois, tes apps se rouvrent"
           }
         }
       }
@@ -3247,25 +3247,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voller Zugriff: Sperre, Mengen und Ritual."
+            "value" : "Voller Zugriff: das Entsperr-Ritual und angepasste Mengen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full access unlocked: the lock, the doses, the ritual."
+            "value" : "Full access: the unlock ritual and adapted doses."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acceso completo: bloqueo, dosis y ritual."
+            "value" : "Acceso completo: el ritual de desbloqueo y las dosis adaptadas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accès complet débloqué : verrou, doses et rituel."
+            "value" : "Accès complet : le rituel de déblocage et les doses adaptées."
           }
         }
       }
@@ -4147,25 +4147,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schaltet Sperre und Erinnerungen frei"
+            "value" : "Das ganze Ritual: Entsperren und angepasste Mengen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlock the lock and the reminders"
+            "value" : "The full ritual: unlock and adapted doses"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquea el bloqueo y los recordatorios"
+            "value" : "El ritual completo: desbloqueo y dosis adaptadas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Débloque le verrou et les rappels"
+            "value" : "Le rituel complet : déblocage et doses adaptées"
           }
         }
       }
@@ -5250,25 +5250,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "HANDY GESPERRT"
+            "value" : "APPS PAUSIERT"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PHONE LOCKED"
+            "value" : "APPS ON PAUSE"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TELÉFONO BLOQUEADO"
+            "value" : "APPS EN PAUSA"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TÉLÉPHONE VERROUILLÉ"
+            "value" : "APPS EN PAUSE"
           }
         }
       }
@@ -5308,25 +5308,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prost! Dein Handy ist zurück."
+            "value" : "Prost! Deine Apps sind zurück."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cheers! Your phone is back."
+            "value" : "Cheers! Your apps are back."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Salud! Tu teléfono ha vuelto."
+            "value" : "¡Salud! Tus apps han vuelto."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Santé ! Ton téléphone est de retour."
+            "value" : "Santé ! Tes apps sont de retour."
           }
         }
       }
@@ -5686,25 +5686,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Trinkritual, kein Zähler. Bei jeder Erinnerung sperrt sich dein Handy. Trink deine Portion Wasser und es entsperrt sich. Ganz einfach."
+            "value" : "Ein Trinkritual, kein Zähler. Bei jeder Erinnerung machen die Apps, die du ausgewählt hast, Pause. Trink deine Portion Wasser und sie öffnen sich wieder. Ganz einfach."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A hydration ritual, not a tracker. Every reminder locks your phone. Drink your dose of water and it unlocks. That's it."
+            "value" : "A hydration ritual, not a tracker. At every reminder, the apps you picked take a break. Drink your dose of water and they open again. That's it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un ritual de hidratación, no un contador. Cada recordatorio bloquea tu teléfono. Bebe tu dosis de agua y se desbloquea. Así de simple."
+            "value" : "Un ritual de hidratación, no un contador. En cada recordatorio, las apps que elegiste se ponen en pausa. Bebe tu dosis de agua y vuelven a abrirse. Así de simple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un rituel d'hydratation, pas un compteur. À chaque rappel, ton téléphone se verrouille. Bois ta dose d'eau et il se déverrouille, tout simplement."
+            "value" : "Un rituel d’hydratation, pas un compteur. À chaque rappel, les apps que tu as choisies se mettent en pause. Bois ta dose d’eau et elles se rouvrent, tout simplement."
           }
         }
       }
@@ -5969,6 +5969,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plus tard"
+          }
+        }
+      }
+    },
+    "notif.freeBody1" : {
+      "comment" : "Reminder body without Hydravia Pro (no app lock).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit für deine Portion Wasser."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time for your dose of water."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es la hora de tu dosis de agua."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’est l’heure de ta dose d’eau."
+          }
+        }
+      }
+    },
+    "notif.freeBody2" : {
+      "comment" : "Reminder body without Hydravia Pro (no app lock).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurze Trinkpause?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A quick break to drink?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Una pausa rápida para beber?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une petite pause pour boire ?"
+          }
+        }
+      }
+    },
+    "notif.freeBody3" : {
+      "comment" : "Reminder body without Hydravia Pro (no app lock).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Glas wartet. Ein Schluck hält dich im Rhythmus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your glass is waiting. One sip keeps you on pace."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu vaso te espera. Un sorbo y mantienes el ritmo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton verre t’attend. Une gorgée et tu gardes le rythme."
           }
         }
       }
