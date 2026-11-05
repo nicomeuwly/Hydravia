@@ -15,6 +15,7 @@ diffère, cherche l'équivalent le plus proche.
 | Abonnement mensuel | `com.nicomeuwly.hydravia.pro.monthly` — 2,99 €/mois, essai 7 jours |
 | Abonnement annuel | `com.nicomeuwly.hydravia.pro.yearly` — 19,99 €/an, essai 7 jours |
 | Achat à vie (non consommable) | `com.nicomeuwly.hydravia.pro.lifetime` — 39,99 €, sans essai |
+| Prix en Suisse (fixés à la main) | 3,00 CHF/mois, 20,00 CHF/an, 40,00 CHF à vie (le reste est calculé par Apple depuis la France) |
 | Team ID | `WLUNP8LN7D` |
 
 > ⚠️ Un identifiant de produit ne peut **jamais** être réutilisé, même après
