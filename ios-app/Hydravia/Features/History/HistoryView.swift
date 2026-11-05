@@ -33,6 +33,8 @@ struct HistoryView: View {
                              value: Streak.daysReached(hydration.allTotals, goalMl: goal, today: today),
                              suffix: nil)
                 }
+                // Both cards as tall as the taller one (large text sizes).
+                .fixedSize(horizontal: false, vertical: true)
 
                 WeekChartCard(totals: streakTotals, goalMl: goal, today: today)
 
@@ -113,9 +115,13 @@ private struct StatCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Label {
+                // One line where it fits (it shrinks a little first), so the
+                // two cards keep the same height.
                 Text(label)
                     .font(.brand(.regular, size: 13, relativeTo: .caption))
                     .foregroundStyle(Palette.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             } icon: {
                 Image(systemName: icon)
                     .font(.system(size: 13, weight: .bold))
@@ -133,7 +139,7 @@ private struct StatCard: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(18)
         .card()
         .accessibilityElement(children: .ignore)
