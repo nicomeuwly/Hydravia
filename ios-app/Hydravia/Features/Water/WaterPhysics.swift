@@ -53,7 +53,7 @@ final class WaterPhysics {
     private static let rippleViscosity = 0.12
 
     // Ambient bubbles: a handful, never a fizz.
-    private static let ambientRange = 3...6
+    private static let ambientRange = 4...7
 
     nonisolated struct Snapshot: Sendable {
         var level: Double
@@ -88,12 +88,12 @@ final class WaterPhysics {
         var age: Double
 
         static func random(startY: Double = 1.03) -> AmbientBubble {
-            let size = Double.random(in: 4...13)
+            let size = Double.random(in: 5...16)
             return AmbientBubble(
                 x: .random(in: 0.06...0.94),
                 y: startY,
                 size: size,
-                speed: 0.035 + size * 0.005 + .random(in: 0...0.02),
+                speed: 0.035 + size * 0.004 + .random(in: 0...0.02),
                 wobbleAmplitude: .random(in: 2...7),
                 wobbleFrequency: .random(in: 1.2...2.6),
                 opacity: .random(in: 0.12...0.36),
@@ -307,7 +307,7 @@ final class WaterPhysics {
         } else {
             ambientTarget = Int.random(in: Self.ambientRange)
         }
-        nextBubbleIn = .random(in: 0.7...2.8)
+        nextBubbleIn = .random(in: 0.5...2.2)
     }
 
     private func currentLevel(at time: Double) -> Double {

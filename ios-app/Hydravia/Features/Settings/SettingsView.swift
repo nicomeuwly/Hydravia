@@ -62,7 +62,7 @@ struct SettingsView: View {
                 Section {
                     Toggle(isOn: notificationsBinding) {
                         Text(.settingsNotifications)
-                        if notificationPermission == .denied {
+                        if !notificationsBinding.wrappedValue {
                             Text(.settingsNotificationsDenied)
                         }
                     }
@@ -74,21 +74,19 @@ struct SettingsView: View {
                 ScreenTimeSection()
 
                 Section {
-                    Button {
+                    // Shows the real permission; flipping it asks once, then
+                    // opens iOS Settings, where the switch actually lives.
+                    Toggle(isOn: Binding {
+                        location.status == .granted
+                    } set: { _ in
                         location.requestOrOpenSettings()
-                    } label: {
-                        LabeledContent {
-                            Image(systemName: location.status == .granted ? "checkmark.circle.fill" : "chevron.right")
-                                .foregroundStyle(location.status == .granted ? Palette.success : Palette.textTertiary)
-                                .accessibilityLabel(Text(location.status == .granted ? .settingsPermissionGranted : .settingsLocationDenied))
-                        } label: {
-                            Text(.settingsLocationAccess)
-                            if location.status == .denied {
-                                Text(.settingsLocationDenied)
-                            }
+                    }) {
+                        Text(.settingsLocationAccess)
+                        if location.status != .granted {
+                            Text(.settingsLocationDenied)
                         }
                     }
-                    .tint(Palette.textPrimary)
+                    .tint(Palette.accentCyan)
 
                     if location.status == .granted {
                         LabeledContent {

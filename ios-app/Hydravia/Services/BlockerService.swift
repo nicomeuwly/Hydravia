@@ -57,6 +57,22 @@ final class BlockerService {
         return authorization == .granted
     }
 
+    /// Turns the lock off from the app (iOS Settings has no switch for it
+    /// on the app's page). Screen Time lowers any shield itself.
+    func revokeAuthorization() async {
+        await withCheckedContinuation { (done: CheckedContinuation<Void, Never>) in
+            AuthorizationCenter.shared.revokeAuthorization { result in
+                if case .failure(let error) = result {
+                    Logger(subsystem: "com.nicomeuwly.hydravia", category: "Blocker")
+                        .error("Screen Time revoke failed: \(error.localizedDescription, privacy: .public)")
+                }
+                done.resume()
+            }
+        }
+        authorization = Self.read(AuthorizationCenter.shared.authorizationStatus)
+        apply()
+    }
+
     func setSelection(_ newValue: FamilyActivitySelection) {
         selection = newValue
         Blocker.selection = newValue

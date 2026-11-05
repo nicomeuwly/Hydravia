@@ -12,20 +12,15 @@ struct ScreenTimeSection: View {
 
     var body: some View {
         Section {
-            Button(action: access) {
-                LabeledContent {
-                    Image(systemName: blocker.authorization == .granted ? "checkmark.circle.fill" : "chevron.right")
-                        .foregroundStyle(blocker.authorization == .granted ? Palette.success : Palette.textTertiary)
-                        .accessibilityLabel(Text(blocker.authorization == .granted
-                                                 ? .settingsPermissionGranted : .settingsPermissionNeeded))
-                } label: {
-                    Text(.settingsAppBlocking)
-                    if blocker.authorization != .granted {
-                        Text(.settingsPermissionNeeded)
-                    }
+            // Same shape as the notifications switch: it shows the real
+            // permission, and flipping it asks iOS (or revokes).
+            Toggle(isOn: accessBinding) {
+                Text(.settingsAppBlocking)
+                if blocker.authorization != .granted {
+                    Text(.settingsPermissionNeeded)
                 }
             }
-            .tint(Palette.textPrimary)
+            .tint(Palette.accentCyan)
 
             if blocker.authorization == .granted {
                 Button {
@@ -63,7 +58,19 @@ struct ScreenTimeSection: View {
         }
     }
 
-    /// Asks once; after that the switch lives in iOS Settings.
+    private var accessBinding: Binding<Bool> {
+        Binding {
+            blocker.authorization == .granted
+        } set: { wantsOn in
+            if wantsOn {
+                access()
+            } else {
+                Task { await blocker.revokeAuthorization() }
+            }
+        }
+    }
+
+    /// Asks for Screen Time access (Face ID / passcode prompt).
     private func access() {
         switch blocker.authorization {
         case .notDetermined:

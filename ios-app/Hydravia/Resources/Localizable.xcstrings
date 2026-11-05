@@ -1880,7 +1880,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kurze Erinnerung vor dem Ende deiner Testphase. Mit zwei Tipps kündigen — oder einfach weitermachen."
+            "value" : "Kurze Erinnerung vor dem Ende deiner Testphase. Mit zwei Tipps kündigen oder einfach weitermachen."
           }
         },
         "en" : {
@@ -1967,13 +1967,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bei jeder Erinnerung pausiert Hydravia die Apps, die du ausgewählt hast. Zum Öffnen trinkst du genau so viel, wie du brauchst — nicht mehr, nicht weniger."
+            "value" : "Bei jeder Erinnerung pausiert Hydravia die Apps, die du ausgewählt hast. Zum Öffnen trinkst du genau so viel, wie du brauchst: nicht mehr, nicht weniger."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "At every reminder, Hydravia pauses the apps you picked. To open them again, you drink just what you need — no more, no less."
+            "value" : "At every reminder, Hydravia pauses the apps you picked. To open them again, you drink just what you need: no more, no less."
           }
         },
         "es" : {
@@ -3335,7 +3335,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Für das Sperren deiner Apps bei Erinnerungen ist eine Systemberechtigung nötig. Ohne sie funktioniert die App weiterhin — nur ohne Sperre."
+            "value" : "Für das Sperren deiner Apps bei Erinnerungen ist eine Systemberechtigung nötig. Ohne sie funktioniert die App weiterhin, nur ohne Sperre."
           }
         },
         "en" : {
@@ -4055,30 +4055,31 @@
       }
     },
     "settings.locationDenied" : {
+      "comment" : "Under the Location access switch while it is off: the glass size adapts to the weather. Keep it to one line. No dashes.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abgelehnt — Wetter fließt nicht ein"
+            "value" : "Nötig für die Wetteranpassung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denied — the dose ignores the weather"
+            "value" : "Needed to adjust for the weather"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denegado — la dosis ignora el clima"
+            "value" : "Necesario para ajustar al clima"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refusé — la quantité ignore la météo"
+            "value" : "Requis pour adapter à la météo"
           }
         }
       }
@@ -4113,30 +4114,31 @@
       }
     },
     "settings.noAppsSelected" : {
+      "comment" : "Under Blocked apps when none is picked. No dashes.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine App gewählt — die Sperre ist inaktiv"
+            "value" : "Wähle Apps, um die Sperre zu aktivieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No app selected — the lock is inactive"
+            "value" : "Pick apps to turn the lock on"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ninguna app seleccionada — el bloqueo está inactivo"
+            "value" : "Elige apps para activar el bloqueo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucune app sélectionnée — le verrou est inactif"
+            "value" : "Choisis des apps pour activer le verrou"
           }
         }
       }
@@ -4229,30 +4231,31 @@
       }
     },
     "settings.notificationsDenied" : {
+      "comment" : "Under the Notifications switch while it is off. No dashes.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In den iOS-Einstellungen deaktiviert – tippe, um sie zu öffnen"
+            "value" : "Für Erinnerungen nötig"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turned off in iOS Settings — tap to open them"
+            "value" : "Needed for reminders"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desactivadas en Ajustes de iOS: toca para abrirlos"
+            "value" : "Necesarias para los recordatorios"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Désactivées dans les Réglages iOS — touche pour les ouvrir"
+            "value" : "Requises pour les rappels"
           }
         }
       }
