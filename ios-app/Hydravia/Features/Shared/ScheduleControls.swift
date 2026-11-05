@@ -21,34 +21,38 @@ struct TimeStepperCard: View {
             Label { Text(title) } icon: { Image(systemName: icon) }
                 .font(.brandCaption)
                 .foregroundStyle(Palette.textSecondary)
+                .accessibilityHidden(true) // carried by the time's label
 
             HStack(spacing: Spacing.lg) {
-                stepButton("minus", delta: -Self.step)
+                stepButton("minus", delta: -Self.step, label: .scheduleA11YEarlier)
                 Text(minute.formatted)
                     .font(.brand(.bold, size: 32, relativeTo: .title))
                     .monospacedDigit()
                     .foregroundStyle(Palette.textPrimary)
                     .contentTransition(.numericText(value: Double(minute.value)))
                     .frame(minWidth: 96)
-                stepButton("plus", delta: Self.step)
+                    // VoiceOver: one adjustable element (swipe up / down).
+                    .accessibilityLabel(Text(title))
+                    .accessibilityValue(minute.formatted)
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: nudge(Self.step)
+                        case .decrement: nudge(-Self.step)
+                        @unknown default: break
+                        }
+                    }
+                stepButton("plus", delta: Self.step, label: .scheduleA11YLater)
             }
         }
         .padding(.vertical, Spacing.xl)
         .frame(maxWidth: .infinity)
         .background(.white, in: .rect(cornerRadius: Radius.xl, style: .continuous))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(title))
-        .accessibilityValue(minute.formatted)
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: nudge(Self.step)
-            case .decrement: nudge(-Self.step)
-            @unknown default: break
-            }
-        }
+        // The buttons stay in the tree, named, so Voice Control and Switch
+        // Control can reach them too.
+        .accessibilityElement(children: .contain)
     }
 
-    private func stepButton(_ symbol: String, delta: Int) -> some View {
+    private func stepButton(_ symbol: String, delta: Int, label: LocalizedStringResource) -> some View {
         let next = minute.value + delta
         return Button {
             nudge(delta)
@@ -60,6 +64,7 @@ struct TimeStepperCard: View {
                 .background(Palette.backgroundElement, in: .circle)
         }
         .buttonStyle(PressableStyle(scale: 0.9))
+        .accessibilityLabel(Text(label))
         .disabled(!range.contains(next))
         .opacity(range.contains(next) ? 1 : 0.35)
         .buttonRepeatBehavior(.enabled)

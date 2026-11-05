@@ -66,13 +66,26 @@ struct GlassCardModifier: ViewModifier {
     var legibility: Double
     var interactive: Bool
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     func body(content: Content) -> some View {
-        content.glassEffect(
-            interactive
-                ? .regular.tint(.white.opacity(legibility)).interactive()
-                : .regular.tint(.white.opacity(legibility)),
-            in: .rect(cornerRadius: radius, style: .continuous)
-        )
+        if reduceTransparency {
+            // Reduce Transparency: an opaque card, so text never sits on
+            // whatever moves behind it (the water, mostly).
+            content
+                .background(.white, in: .rect(cornerRadius: radius, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .strokeBorder(Palette.border, lineWidth: 1)
+                }
+        } else {
+            content.glassEffect(
+                interactive
+                    ? .regular.tint(.white.opacity(legibility)).interactive()
+                    : .regular.tint(.white.opacity(legibility)),
+                in: .rect(cornerRadius: radius, style: .continuous)
+            )
+        }
     }
 }
 

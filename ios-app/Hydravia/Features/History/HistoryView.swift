@@ -155,6 +155,10 @@ private struct WeekChartCard: View {
         }
     }
 
+    static func amount(_ ml: Int) -> String {
+        "\(ml.formatted()) \(String(localized: .commonMl))"
+    }
+
     /// Top of the chart: room above the goal line for over-achieving days.
     private var ceiling: Double { Double(goalMl) * 1.4 }
 
@@ -191,7 +195,11 @@ private struct WeekChartCard: View {
                     )
                     .clipShape(.capsule)
                     .foregroundStyle(Palette.backgroundElement)
-                    .accessibilityHidden(true)
+                    // VoiceOver reads a dry past day as "0 ml" rather than
+                    // skipping it; days to come and filled days stay silent.
+                    .accessibilityHidden(day.totalMl > 0 || day.day > today)
+                    .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
+                    .accessibilityValue(Self.amount(0))
 
                     if day.totalMl > 0 {
                         BarMark(
@@ -203,13 +211,15 @@ private struct WeekChartCard: View {
                         .clipShape(.capsule)
                         .foregroundStyle(day.day == today ? Palette.primaryDark : Palette.secondaryBlue)
                         .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
-                        .accessibilityValue("\(day.totalMl.formatted()) \(String(localized: .commonMl))")
+                        .accessibilityValue(Self.amount(day.totalMl))
                     }
                 }
 
                 RuleMark(y: .value("Goal", goalMl))
                     .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
                     .foregroundStyle(Palette.amber.opacity(0.8))
+                    .accessibilityLabel(Text(.settingsDailyGoal))
+                    .accessibilityValue(Self.amount(goalMl))
                     .annotation(position: .top, alignment: .trailing) {
                         Image(systemName: "flag.fill")
                             .font(.system(size: 9))
@@ -231,6 +241,15 @@ private struct WeekChartCard: View {
                 }
             }
             .frame(height: 140)
+            // Audio Graphs: VoiceOver can play the week as tones.
+            .accessibilityChartDescriptor(WeekChartDescriptor(
+                title: String(localized: .historyThisWeek),
+                unit: String(localized: .commonMl),
+                days: week.filter { $0.day <= today }.map {
+                    ($0.date.formatted(.dateTime.weekday(.wide)), $0.totalMl)
+                },
+                goalMl: goalMl
+            ))
         }
         .padding(.vertical, 22)
         .padding(.horizontal, Spacing.xl)
@@ -239,6 +258,30 @@ private struct WeekChartCard: View {
             guard !grown else { return }
             withAnimation(reduceMotion ? nil : .spring(duration: 0.7, bounce: 0.25).delay(0.15)) { grown = true }
         }
+    }
+}
+
+/// The week as data for Audio Graphs. Plain strings only, built by the view,
+/// so the descriptor needs nothing from the main actor.
+private nonisolated struct WeekChartDescriptor: AXChartDescriptorRepresentable {
+    let title: String
+    let unit: String
+    let days: [(name: String, ml: Int)]
+    let goalMl: Int
+
+    func makeChartDescriptor() -> AXChartDescriptor {
+        let unit = unit
+        let top = Double(max(goalMl, days.map(\.ml).max() ?? 0, 1))
+        let xAxis = AXCategoricalDataAxisDescriptor(title: title, categoryOrder: days.map(\.name))
+        let yAxis = AXNumericDataAxisDescriptor(
+            title: unit, range: 0...top, gridlinePositions: [Double(goalMl)]
+        ) { "\(Int($0).formatted()) \(unit)" }
+        let series = AXDataSeriesDescriptor(
+            name: title, isContinuous: false,
+            dataPoints: days.map { AXDataPoint(x: $0.name, y: Double($0.ml)) }
+        )
+        return AXChartDescriptor(title: title, summary: nil, xAxis: xAxis, yAxis: yAxis,
+                                 additionalAxes: [], series: [series])
     }
 }
 
