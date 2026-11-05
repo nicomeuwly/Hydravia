@@ -43,22 +43,25 @@ const lang = 'fr' as const;
     <li><strong>Tes préférences</strong> : notifications activées, apps sélectionnées pour le verrou.</li>
   </ul>
   <p>
-    Tu peux effacer l’intégralité de cet historique à tout moment depuis
+    Tu peux effacer ton historique de consommation à tout moment depuis
     <strong>Réglages → Données → Supprimer l’historique</strong>. La suppression est
-    immédiate et définitive. Désinstaller l’application efface également ces données.
+    immédiate et définitive. Désinstaller l’application efface l’ensemble de ces
+    données, réglages compris.
   </p>
 
   <h2>3. Position et météo</h2>
   <p>
-    Si tu accordes l’accès à ta position, et seulement dans ce cas, Hydravia relève tes
-    coordonnées approximatives pour connaître la température extérieure, qui ajuste
-    légèrement la dose recommandée quand il fait chaud.
+    Si tu accordes l’accès à ta position (uniquement pendant l’utilisation de l’app),
+    et seulement dans ce cas, Hydravia relève ta position pour connaître la
+    température extérieure, qui ajuste légèrement la dose recommandée quand il fait
+    chaud. Avant tout envoi, les coordonnées sont arrondies à environ 1 km.
   </p>
   <p>
-    Ces coordonnées sont transmises à <strong>Open-Meteo</strong>
+    Ces coordonnées arrondies sont transmises à <strong>Open-Meteo</strong>
     (<a href="https://open-meteo.com/en/terms" rel="noopener noreferrer" target="_blank">open-meteo.com</a>),
     un service météo qui ne requiert aucune clé d’identification et n’associe la
-    requête à aucun profil. La position n’est pas conservée par Hydravia : elle sert
+    requête à aucun profil. Comme pour toute connexion internet, Open-Meteo reçoit
+    aussi l’adresse IP de ton appareil. La position n’est pas conservée par Hydravia : elle sert
     à la requête, puis seule la température est gardée en mémoire pendant 30 minutes.
   </p>
   <p>
@@ -87,12 +90,9 @@ const lang = 'fr' as const;
     moyens de paiement.
   </p>
   <p>
-    Pour savoir si ton abonnement est actif, l’application utilise
-    <strong>RevenueCat</strong>
-    (<a href="https://www.revenuecat.com/privacy" rel="noopener noreferrer" target="_blank">revenuecat.com/privacy</a>),
-    qui reçoit un identifiant anonyme généré par leur SDK ainsi que le reçu d’achat
-    fourni par Apple. Aucun nom, aucune adresse email et aucune de tes données
-    d’hydratation ne leur sont transmis.
+    L’état de ton abonnement est vérifié directement auprès de l’App Store, sur ton
+    appareil. Aucun reçu, aucun identifiant et aucune de tes données d’hydratation ne
+    nous sont transmis.
   </p>
 
   <h2>6. Ce que nous ne faisons pas</h2>
@@ -115,18 +115,13 @@ const lang = 'fr' as const;
     <tbody>
       <tr>
         <td>Open-Meteo</td>
-        <td>Coordonnées approximatives</td>
+        <td>Coordonnées arrondies (~1 km), adresse IP</td>
         <td>Seulement si tu autorises la position</td>
       </tr>
       <tr>
-        <td>RevenueCat</td>
-        <td>Identifiant anonyme, reçu d’achat</td>
-        <td>Seulement si tu souscris ou restaures un abonnement</td>
-      </tr>
-      <tr>
         <td>Apple</td>
-        <td>Données de paiement</td>
-        <td>Seulement lors d’un achat</td>
+        <td>Données de paiement et d’abonnement</td>
+        <td>Seulement lors d’un achat ou d’une restauration</td>
       </tr>
     </tbody>
   </table>
@@ -140,7 +135,7 @@ const lang = 'fr' as const;
     consulter ou les supprimer à tout moment.
   </p>
   <p>
-    Pour une demande concernant les données détenues par nos sous-traitants, écris à
+    Pour toute demande concernant tes données, écris à
     <ContactEmail />. Tu disposes également du
     droit d’introduire une réclamation auprès de l’autorité de protection des données
     de ton pays.

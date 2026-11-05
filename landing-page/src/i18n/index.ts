@@ -80,7 +80,7 @@ export const fr = {
 
   'feat.privacy.title': 'Tes données restent sur ton téléphone',
   'feat.privacy.body':
-    'Pas de compte, pas de serveur, pas de profil publicitaire. Ton historique reste sur ton téléphone, et tu peux tout effacer d’un geste.',
+    'Pas de compte, pas de serveur, pas de profil publicitaire. Ton historique reste sur ton téléphone, et tu peux l’effacer d’un geste.',
 
   'feat.streakAlt':
     'Écran de régularité de Hydravia : série de 4 jours et graphique de la semaine.',
@@ -88,7 +88,7 @@ export const fr = {
   // ── Privacy strip ─────────────────────────────────────────────────────────
   'privacy.title': 'Local d’abord. Vraiment.',
   'privacy.p1': 'Aucun compte à créer',
-  'privacy.p2': 'Aucune donnée envoyée à un serveur',
+  'privacy.p2': 'Ton historique ne quitte jamais ton téléphone',
   'privacy.p3': 'Aucun traqueur publicitaire',
   'privacy.p4': 'Hydravia ne lit aucune de tes données Temps d’écran',
   'privacy.link': 'Lire la politique de confidentialité',
@@ -195,14 +195,14 @@ export const en: Catalogue = {
 
   'feat.privacy.title': 'Your data stays on your phone',
   'feat.privacy.body':
-    'No account, no server, no advertising profile. Your history stays on your phone, and you can wipe all of it in one tap.',
+    'No account, no server, no advertising profile. Your history stays on your phone, and you can wipe it in one tap.',
 
   'feat.streakAlt':
     'Hydravia consistency screen: a 4-day streak and the week’s chart.',
 
   'privacy.title': 'Local first. Actually.',
   'privacy.p1': 'No account to create',
-  'privacy.p2': 'No data sent to any server',
+  'privacy.p2': 'Your history never leaves your phone',
   'privacy.p3': 'No advertising trackers',
   'privacy.p4': 'Hydravia cannot read any of your Screen Time data',
   'privacy.link': 'Read the privacy policy',

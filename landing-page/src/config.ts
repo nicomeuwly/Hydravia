@@ -42,11 +42,11 @@ export const HAS_CONTACT_EMAIL = !CONTACT_EMAIL.startsWith('[');
 export const APP_STORE_URL = '';
 
 /** Date shown on the legal pages. Update whenever their text changes. */
-export const LEGAL_UPDATED = '2026-08-13';
+export const LEGAL_UPDATED = '2026-11-05';
 
-/** Subscription products, mirroring RevenueCat's configuration. */
+/** Subscription products, mirroring App Store Connect (StoreKit 2). */
 export const PRODUCTS = {
-  monthly: 'monthly_premium',
-  yearly: 'yearly_premium',
+  monthly: 'com.nicomeuwly.hydravia.pro.monthly',
+  yearly: 'com.nicomeuwly.hydravia.pro.yearly',
   trialDays: 7,
 } as const;
