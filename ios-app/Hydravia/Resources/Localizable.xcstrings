@@ -6359,6 +6359,95 @@
           }
         }
       }
+    },
+    "settings.favoriteAmounts" : {
+      "comment" : "Settings row and sheet title: the three amounts offered when adding water.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingsmengen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favourite amounts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidades favoritas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantités favorites"
+          }
+        }
+      }
+    },
+    "settings.favoritesHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die drei Mengen, die beim Hinzufügen von Wasser angeboten werden. Eine andere Menge kannst du weiterhin eingeben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The three amounts offered when you add water. You can still type any other amount."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las tres cantidades que se proponen al añadir agua. Siempre puedes escribir otra cantidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les trois quantités proposées quand tu ajoutes de l’eau. Le champ « Autre quantité » reste toujours là."
+          }
+        }
+      }
+    },
+    "settings.favoriteA11y" : {
+      "comment" : "VoiceOver label of one favourite amount. Argument: its position (1 to 3).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingsmenge %1$lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favourite amount %1$lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad favorita %1$lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantité favorite %1$lld"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -1,12 +1,14 @@
 import HydraviaData
 import SwiftUI
 
-/// Manual intake: three bottles for the usual amounts, or any amount typed in.
-/// The sheet hugs its content and grows with the keyboard.
+/// Manual intake: three bottles for the user's favourite amounts (set in
+/// Settings), or any amount typed in. The sheet hugs its content and grows
+/// with the keyboard.
 struct AddWaterSheet: View {
     @Environment(HydrationStore.self) private var hydration
     @Environment(AppRouter.self) private var router
     @Environment(BlockerService.self) private var blocker
+    @Environment(SettingsStore.self) private var settings
     @Environment(\.reminders) private var reminders
     @Environment(\.dismiss) private var dismiss
 
@@ -17,18 +19,6 @@ struct AddWaterSheet: View {
     @FocusState private var fieldFocused: Bool
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    private struct Preset: Identifiable {
-        let ml: Int
-        /// How full the little bottle looks — a glass, a can, a bottle.
-        let fill: Double
-        var id: Int { ml }
-    }
-
-    private static let presets = [
-        Preset(ml: 200, fill: 0.40),
-        Preset(ml: 330, fill: 0.62),
-        Preset(ml: 500, fill: 0.88),
-    ]
     static let maxCustomMl = 2000
 
     var body: some View {
@@ -40,9 +30,10 @@ struct AddWaterSheet: View {
 
             // Side by side normally; stacked at accessibility text sizes.
             AnyLayout(typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Spacing.md)) : AnyLayout(HStackLayout(spacing: Spacing.md))) {
-                ForEach(Array(Self.presets.enumerated()), id: \.element.id) { index, preset in
-                    PresetBottle(ml: preset.ml, fill: preset.fill, delay: Double(index) * 0.07) {
-                        add(preset.ml)
+                // By position: two favourites may hold the same amount.
+                ForEach(Array(settings.settings.favoriteAmountsMl.enumerated()), id: \.offset) { index, ml in
+                    PresetBottle(ml: ml, delay: Double(index) * 0.07) {
+                        add(ml)
                     }
                 }
             }
@@ -148,8 +139,8 @@ struct AddWaterSheet: View {
 /// A preset as a little bottle that fills up when the sheet appears.
 private struct PresetBottle: View {
     let ml: Int
-    let fill: Double
     let delay: Double
+    private var fill: Double { BottleGlyph.fill(forMl: ml) }
     let action: () -> Void
 
     @State private var shownFill = 0.0
@@ -158,18 +149,7 @@ private struct PresetBottle: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 14) {
-                RoundedRectangle(cornerRadius: Radius.sm, style: .continuous)
-                    .fill(Palette.backgroundElement)
-                    .frame(width: 44, height: 64)
-                    .overlay(alignment: .bottom) {
-                        // A flat surface, rounded only by the bottle's clip:
-                        // it reads as liquid, not as a block.
-                        Rectangle()
-                            .fill(LinearGradient(colors: [Palette.waterSurface, Palette.primaryDark],
-                                                 startPoint: .top, endPoint: .bottom))
-                            .frame(height: 64 * shownFill)
-                    }
-                    .clipShape(.rect(cornerRadius: Radius.sm, style: .continuous))
+                BottleGlyph(fill: shownFill)
 
                 Text("\(ml.formatted()) \(String(localized: .commonMl))")
                     .font(.brand(.bold, size: 15, relativeTo: .subheadline))
@@ -189,6 +169,36 @@ private struct PresetBottle: View {
             }
             withAnimation(Motion.bouncy.delay(0.12 + delay)) { shownFill = fill }
         }
+    }
+}
+
+/// The little bottle of the add-water presets, filled in proportion to the
+/// amount: a glass sits low, a large bottle near the top.
+struct BottleGlyph: View {
+    var fill: Double
+    var width: CGFloat = 44
+    var height: CGFloat = 64
+
+    /// 200 ml about a third full, 500 ml nearly full, never empty nor
+    /// overflowing at the ends of the 50–1000 ml range.
+    static func fill(forMl ml: Int) -> Double {
+        min(max(Double(ml) / 570, 0.12), 0.95)
+    }
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: Radius.sm * height / 64, style: .continuous)
+            .fill(Palette.backgroundElement)
+            .frame(width: width, height: height)
+            .overlay(alignment: .bottom) {
+                // A flat surface, rounded only by the bottle's clip: it reads
+                // as liquid, not as a block.
+                Rectangle()
+                    .fill(LinearGradient(colors: [Palette.waterSurface, Palette.primaryDark],
+                                         startPoint: .top, endPoint: .bottom))
+                    .frame(height: height * fill)
+            }
+            .clipShape(.rect(cornerRadius: Radius.sm * height / 64, style: .continuous))
+            .accessibilityHidden(true)
     }
 }
 

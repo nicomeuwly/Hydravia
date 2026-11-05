@@ -23,7 +23,7 @@ struct SettingsView: View {
     @State private var pendingNotificationsToggle: Bool?
 
     private enum Editor: String, Identifiable {
-        case weight, schedule, interval
+        case weight, schedule, interval, favorites
         var id: String { rawValue }
     }
 
@@ -50,6 +50,10 @@ struct SettingsView: View {
                     row(.settingsReminderInterval,
                         value: ReminderInterval(rawValue: current.window.intervalMin)?.shortLabel ?? "—") {
                         editor = .interval
+                    }
+                    row(.settingsFavoriteAmounts,
+                        value: "\(current.favoriteAmountsMl.map { $0.formatted() }.joined(separator: " · ")) \(String(localized: .commonMl))") {
+                        editor = .favorites
                     }
                 } header: {
                     Text(.settingsSectionHydration)
@@ -219,6 +223,10 @@ struct SettingsView: View {
                     DraftSheet(title: .settingsIntervalModalTitle, value: current.window.intervalMin, detent: .medium) { draft in
                         IntervalPicker(minutes: draft)
                     } onSave: { settings.settings.window.intervalMin = $0 }
+                case .favorites:
+                    DraftSheet(title: .settingsFavoriteAmounts, value: current.favoriteAmountsMl, detent: .fraction(0.62)) { draft in
+                        FavoriteAmountsEditor(amounts: draft)
+                    } onSave: { settings.settings.favoriteAmountsMl = $0 }
                 }
             }
             .confirmationDialog(Text(.settingsDeleteConfirmTitle), isPresented: $confirmDelete, titleVisibility: .visible) {

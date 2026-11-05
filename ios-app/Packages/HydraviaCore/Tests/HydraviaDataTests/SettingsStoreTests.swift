@@ -60,4 +60,30 @@ struct SettingsStoreTests {
         defaults.set(Data("not json".utf8), forKey: SettingsStore.storageKey)
         #expect(SettingsStore(defaults: defaults).settings == .defaults)
     }
+
+    @Test func favoriteAmountsDefaultForExistingUsers() {
+        // Settings saved before favourites existed keep everything else.
+        let defaults = freshDefaults()
+        let json = #"{"weightKg": 80, "onboardingDone": true}"#
+        defaults.set(Data(json.utf8), forKey: SettingsStore.storageKey)
+        let store = SettingsStore(defaults: defaults)
+        #expect(store.settings.weightKg == 80)
+        #expect(store.settings.favoriteAmountsMl == UserSettings.defaultFavoriteAmountsMl)
+    }
+
+    @Test func favoriteAmountsStayThreeInRangeAndSorted() {
+        let store = SettingsStore(defaults: freshDefaults())
+        store.settings.favoriteAmountsMl = [5000, 20, 333]
+        #expect(store.settings.favoriteAmountsMl == [50, 330, 1000])
+        store.settings.favoriteAmountsMl = [250]
+        #expect(store.settings.favoriteAmountsMl == [250, 330, 500])
+        store.settings.favoriteAmountsMl = [100, 200, 300, 400]
+        #expect(store.settings.favoriteAmountsMl == [100, 200, 300])
+    }
+
+    @Test func favoriteAmountsSurviveARelaunch() {
+        let defaults = freshDefaults()
+        SettingsStore(defaults: defaults).settings.favoriteAmountsMl = [150, 250, 750]
+        #expect(SettingsStore(defaults: defaults).settings.favoriteAmountsMl == [150, 250, 750])
+    }
 }

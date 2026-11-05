@@ -10,6 +10,13 @@ public struct UserSettings: Codable, Equatable, Sendable {
     public var window: ActiveWindow
     public var notificationsEnabled: Bool
     public var onboardingDone: Bool
+    /// The three amounts the add-water sheet offers, smallest first.
+    public var favoriteAmountsMl: [Int]
+
+    public static let defaultFavoriteAmountsMl = [200, 330, 500]
+    public static let favoriteCount = 3
+    public static let favoriteRangeMl = 50...1000
+    public static let favoriteStepMl = 10
 
     public static let defaults = UserSettings(
         weightKg: 70,
@@ -19,14 +26,22 @@ public struct UserSettings: Codable, Equatable, Sendable {
             intervalMin: 60
         ),
         notificationsEnabled: false,
-        onboardingDone: false
+        onboardingDone: false,
+        favoriteAmountsMl: defaultFavoriteAmountsMl
     )
 
-    public init(weightKg: Int, window: ActiveWindow, notificationsEnabled: Bool, onboardingDone: Bool) {
+    public init(
+        weightKg: Int,
+        window: ActiveWindow,
+        notificationsEnabled: Bool,
+        onboardingDone: Bool,
+        favoriteAmountsMl: [Int] = UserSettings.defaultFavoriteAmountsMl
+    ) {
         self.weightKg = weightKg
         self.window = window
         self.notificationsEnabled = notificationsEnabled
         self.onboardingDone = onboardingDone
+        self.favoriteAmountsMl = favoriteAmountsMl
     }
 
     public var dailyGoalMl: Int { HydrationGoal.dailyMl(weightKg: weightKg) }
@@ -39,13 +54,27 @@ public struct UserSettings: Codable, Equatable, Sendable {
         var copy = self
         copy.weightKg = min(max(weightKg, Self.weightRangeKg.lowerBound), Self.weightRangeKg.upperBound)
         copy.window = window.sanitized
+        copy.favoriteAmountsMl = Self.sanitizedFavorites(favoriteAmountsMl)
         return copy
+    }
+
+    /// Exactly three amounts, each within range on the 10 ml grid, smallest
+    /// first. Missing ones come from the defaults.
+    static func sanitizedFavorites(_ amounts: [Int]) -> [Int] {
+        var list = Array(amounts.prefix(favoriteCount))
+        if list.count < favoriteCount {
+            list += defaultFavoriteAmountsMl.suffix(favoriteCount - list.count)
+        }
+        let range = favoriteRangeMl, step = favoriteStepMl
+        return list
+            .map { min(max(($0 + step / 2) / step * step, range.lowerBound), range.upperBound) }
+            .sorted()
     }
 
     // Every field falls back to its default when absent, so adding a setting
     // in a later version never wipes the ones a user already chose.
     private enum CodingKeys: String, CodingKey {
-        case weightKg, window, notificationsEnabled, onboardingDone
+        case weightKg, window, notificationsEnabled, onboardingDone, favoriteAmountsMl
     }
 
     public init(from decoder: any Decoder) throws {
@@ -56,6 +85,8 @@ public struct UserSettings: Codable, Equatable, Sendable {
         notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled)
             ?? fallback.notificationsEnabled
         onboardingDone = try container.decodeIfPresent(Bool.self, forKey: .onboardingDone) ?? fallback.onboardingDone
+        favoriteAmountsMl = try container.decodeIfPresent([Int].self, forKey: .favoriteAmountsMl)
+            ?? fallback.favoriteAmountsMl
     }
 }
 
