@@ -47,6 +47,10 @@ final class WaterPhysics {
     /// How hard a change of tilt pushes the water toward one side.
     private static let tiltForcing = 0.018
     private static let rippleLimit = 2.6
+    /// Viscosity: smooths the surface's velocity with its neighbours each
+    /// substep, so short wavelengths die out fast and long swells survive —
+    /// water rolls, it doesn't spike. Per 1/240 s substep; stable below 0.5.
+    private static let rippleViscosity = 0.12
 
     // Ambient bubbles: a handful, never a fizz.
     private static let ambientRange = 3...6
@@ -78,18 +82,21 @@ final class WaterPhysics {
         var speed: Double
         var wobbleAmplitude: Double
         var wobbleFrequency: Double
+        /// Peak opacity: some bubbles are fainter, as if further back.
+        var opacity: Double
         var seed: Double
         var age: Double
 
         static func random(startY: Double = 1.03) -> AmbientBubble {
-            let size = Double.random(in: 3...11)
+            let size = Double.random(in: 4...13)
             return AmbientBubble(
                 x: .random(in: 0.06...0.94),
                 y: startY,
                 size: size,
-                speed: 0.035 + size * 0.006 + .random(in: 0...0.02),
+                speed: 0.035 + size * 0.005 + .random(in: 0...0.02),
                 wobbleAmplitude: .random(in: 2...7),
                 wobbleFrequency: .random(in: 1.2...2.6),
+                opacity: .random(in: 0.12...0.36),
                 seed: .random(in: 0...(2 * .pi)),
                 age: 0
             )
@@ -164,17 +171,18 @@ final class WaterPhysics {
         if splash, target > current {
             splashFrom = disturbance(at: clock)
             splashStart = clock
-            if isAmbientEnabled { kick(at: .random(in: 0.2...0.8), strength: 2.2) }
+            if isAmbientEnabled { kick(at: .random(in: 0.25...0.75), strength: 1) }
         }
     }
 
-    /// Drops a bump into the surface at `x` (0 … 1): it spreads both ways and
-    /// bounces off the sides.
+    /// Drops a broad, gentle swell into the surface at `x` (0 … 1): it
+    /// spreads both ways and bounces off the sides. Wide on purpose — a
+    /// narrow push reads as a spike, not as poured water.
     private func kick(at x: Double, strength: Double) {
         let columns = Self.rippleColumns
         for i in 0..<columns {
-            let d = (Double(i) / Double(columns - 1) - x) / 0.08
-            rippleVelocity[i] -= strength * 6 * exp(-d * d)
+            let d = (Double(i) / Double(columns - 1) - x) / 0.2
+            rippleVelocity[i] -= strength * 3.5 * exp(-d * d)
         }
     }
 
@@ -262,6 +270,13 @@ final class WaterPhysics {
             let laplacian = left + right - 2 * rippleHeight[i]
             let lateral = Double(i) / Double(columns - 1) - 0.5
             rippleVelocity[i] += (c2 * laplacian - Self.rippleDamping * rippleVelocity[i] + force * lateral * 60) * step
+        }
+        // Viscosity (see `rippleViscosity`), on a copy so the pass is symmetric.
+        let velocity = rippleVelocity
+        for i in 0..<columns {
+            let left = velocity[i == 0 ? 1 : i - 1]
+            let right = velocity[i == columns - 1 ? columns - 2 : i + 1]
+            rippleVelocity[i] += Self.rippleViscosity * (left + right - 2 * velocity[i])
         }
         // Volume stays put: the surface tilts and ripples but never rises
         // as a whole (that's the level's job).

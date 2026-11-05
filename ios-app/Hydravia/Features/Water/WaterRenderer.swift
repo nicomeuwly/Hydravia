@@ -25,12 +25,18 @@ nonisolated enum WaterRenderer {
     }
 
     /// The surface's ripple displacement at `t` (0 … 1 across), in points.
+    /// Catmull-Rom between columns: a straight line from one to the next
+    /// would put a corner at every column.
     static func ripple(_ ripples: [Double], at t: Double, scale: Double) -> Double {
-        guard ripples.count > 1, scale != 0 else { return 0 }
-        let position = min(max(t, 0), 1) * Double(ripples.count - 1)
-        let index = min(Int(position), ripples.count - 2)
-        let fraction = position - Double(index)
-        return (ripples[index] + (ripples[index + 1] - ripples[index]) * fraction) * scale
+        let count = ripples.count
+        guard count > 1, scale != 0 else { return 0 }
+        let position = min(max(t, 0), 1) * Double(count - 1)
+        let i = min(Int(position), count - 2)
+        let f = position - Double(i)
+        let p0 = ripples[max(i - 1, 0)], p1 = ripples[i]
+        let p2 = ripples[i + 1], p3 = ripples[min(i + 2, count - 1)]
+        let value = p1 + 0.5 * f * (p2 - p0 + f * (2 * p0 - 5 * p1 + 4 * p2 - p3 + f * (3 * (p1 - p2) + p3 - p0)))
+        return value * scale
     }
 
     /// The water body below a travelling, tilted wave surface.
@@ -149,12 +155,10 @@ nonisolated enum WaterRenderer {
         }
     }
 
-    /// Lone bubbles rising under the front surface: they wobble on the way
-    /// up and fade out over the last stretch, popping silently before the air.
+    /// Lone bubbles rising under the front surface: flat discs that wobble on
+    /// the way up and fade out over the last stretch, popping silently before
+    /// the air. Each has its own opacity, so some read further back.
     private static func drawAmbient(_ snapshot: WaterPhysics.Snapshot, in context: inout GraphicsContext, size: CGSize, calm: Bool) {
-        let fill = Color.white.opacity(0.22)
-        let rim = Color.white.opacity(0.4)
-        let highlight = Color.white.opacity(0.55)
         let fadeDistance = 46.0
 
         for bubble in snapshot.ambient {
@@ -166,19 +170,12 @@ nonisolated enum WaterRenderer {
             guard depth > 0 else { continue }
             let fadeOut = min(1, depth / fadeDistance)
             let fadeIn = min(1, bubble.age / 0.6)
-            let opacity = fadeOut * fadeOut * fadeIn
-            guard opacity > 0.01 else { continue }
+            let opacity = bubble.opacity * fadeOut * fadeOut * fadeIn
+            guard opacity > 0.005 else { continue }
 
             let d = bubble.size
             let rect = CGRect(x: x - d / 2, y: y - d / 2, width: d, height: d)
-            context.opacity = opacity
-            context.fill(Path(ellipseIn: rect), with: .color(fill))
-            context.stroke(Path(ellipseIn: rect), with: .color(rim), lineWidth: 0.8)
-            // A glint, top-left, so it reads as a sphere of air.
-            let glint = d * 0.28
-            context.fill(Path(ellipseIn: CGRect(x: x - d * 0.28, y: y - d * 0.3, width: glint, height: glint)),
-                         with: .color(highlight))
-            context.opacity = 1
+            context.fill(Path(ellipseIn: rect), with: .color(.white.opacity(opacity)))
         }
     }
 

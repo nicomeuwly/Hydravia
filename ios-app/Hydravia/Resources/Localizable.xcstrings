@@ -5187,88 +5187,91 @@
       }
     },
     "unlock.ressentiChaud" : {
+      "comment" : "Thirst slider, middle level. First person, gender-neutral.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mir ist warm, etwas durstig"
+            "value" : "Ich trockne langsam aus"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I'm warm, a bit thirsty"
+            "value" : "I'm starting to dry out"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tengo calor, algo de sed"
+            "value" : "Empiezo a secarme"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "J'ai chaud, un peu soif"
+            "value" : "Je commence à sécher"
           }
         }
       }
     },
     "unlock.ressentiOk" : {
+      "comment" : "Thirst slider, lowest level: the user feels well hydrated. First person, gender-neutral.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passt schon"
+            "value" : "Ich hab noch Reserven"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I'm fine"
+            "value" : "I'm topped up"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estoy bien"
+            "value" : "Tengo reservas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ça va"
+            "value" : "J'ai de la réserve"
           }
         }
       }
     },
     "unlock.ressentiTresSoif" : {
+      "comment" : "Thirst slider, highest level. First person, gender-neutral.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sehr durstig"
+            "value" : "Ich bin völlig ausgetrocknet"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Really thirsty"
+            "value" : "I'm bone dry"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mucha sed"
+            "value" : "Me quedé sin reservas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Très soif"
+            "value" : "Je suis à sec"
           }
         }
       }

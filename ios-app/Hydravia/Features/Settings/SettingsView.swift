@@ -159,6 +159,21 @@ struct SettingsView: View {
                             Text(.settingsDeleteHistory).foregroundStyle(Palette.textPrimary)
                         }
                     }
+                    // On the row itself, so the popover points at it.
+                    .confirmationDialog(Text(.settingsDeleteConfirmTitle), isPresented: $confirmDelete, titleVisibility: .visible) {
+                        Button(role: .destructive) {
+                            do {
+                                try hydration.deleteAll()
+                                deleted = true
+                            } catch {
+                                deleteFailed = true
+                            }
+                        } label: {
+                            Text(.settingsDelete)
+                        }
+                    } message: {
+                        Text(.settingsDeleteConfirmBody)
+                    }
                 } header: {
                     Text(.settingsSectionData)
                 }
@@ -228,20 +243,6 @@ struct SettingsView: View {
                         FavoriteAmountsEditor(amounts: draft)
                     } onSave: { settings.settings.favoriteAmountsMl = $0 }
                 }
-            }
-            .confirmationDialog(Text(.settingsDeleteConfirmTitle), isPresented: $confirmDelete, titleVisibility: .visible) {
-                Button(role: .destructive) {
-                    do {
-                        try hydration.deleteAll()
-                        deleted = true
-                    } catch {
-                        deleteFailed = true
-                    }
-                } label: {
-                    Text(.settingsDelete)
-                }
-            } message: {
-                Text(.settingsDeleteConfirmBody)
             }
             .alert(Text(.settingsDeletedTitle), isPresented: $deleted) {
                 Button(role: .cancel) {} label: { Text(.commonOk) }

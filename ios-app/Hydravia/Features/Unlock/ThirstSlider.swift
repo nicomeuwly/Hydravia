@@ -2,17 +2,20 @@ import HydraviaCore
 import SwiftUI
 
 /// "How thirsty are you?" as a column of water the user raises with a thumb:
-/// three bands, bottom to top — fine, warm, very thirsty. The water follows
+/// three bands, bottom to top — hydrated, drying out, dry. The water follows
 /// the finger, then settles on the band it was released in, with a tick each
-/// time it crosses into another. Tapping a band or its label works too, and
-/// VoiceOver gets one adjustable element.
+/// time it crosses into another. Tapping a band works too, and VoiceOver gets
+/// one adjustable element.
+///
+/// Only the chosen level's label shows, above the track: a thumb coming up
+/// from below never covers it.
 struct ThirstSlider: View {
     @Binding var feeling: Feeling
 
     static let levels: [Feeling] = [.fine, .hot, .veryThirsty]
 
     @State private var dragFraction: Double?
-    @ScaledMetric(relativeTo: .body) private var trackHeight: CGFloat = 270
+    @ScaledMetric(relativeTo: .body) private var trackHeight: CGFloat = 240
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let trackWidth: CGFloat = 84
@@ -21,11 +24,11 @@ struct ThirstSlider: View {
         let index = Self.index(of: feeling)
         let fill = dragFraction ?? Self.fillFraction(index)
 
-        HStack(alignment: .center, spacing: Spacing.xl) {
+        VStack(spacing: Spacing.lg) {
+            label(selected: index)
             track(fill: fill)
-            labels(selected: index)
         }
-        .frame(height: trackHeight)
+        .frame(maxWidth: .infinity)
         .sensoryFeedback(.selection, trigger: feeling)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(.unlockThirstLevel))
@@ -87,23 +90,23 @@ struct ThirstSlider: View {
         )
     }
 
-    // MARK: Labels
+    // MARK: Label
 
-    private func labels(selected: Int) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Top band first.
-            ForEach(Self.levels.indices.reversed(), id: \.self) { band in
-                Button { select(band) } label: {
-                    Text(Self.label(Self.levels[band]))
-                        .font(.brand(band == selected ? .bold : .semiBold, size: 18, relativeTo: .body))
-                        .foregroundStyle(.white.opacity(band == selected ? 1 : 0.5))
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.pressable)
+    /// All three stacked and only the chosen one visible: the height never
+    /// changes, so the track doesn't jump when a longer label comes in.
+    private func label(selected: Int) -> some View {
+        ZStack {
+            ForEach(Self.levels.indices, id: \.self) { band in
+                Text(Self.label(Self.levels[band]))
+                    .font(.brand(.bold, size: 22, relativeTo: .title3))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .opacity(band == selected ? 1 : 0)
+                    .scaleEffect(band == selected ? 1 : 0.94)
+                    .blur(radius: band == selected || reduceMotion ? 0 : 4)
             }
         }
+        .frame(maxWidth: .infinity)
         .animation(reduceMotion ? nil : Motion.base, value: selected)
     }
 
