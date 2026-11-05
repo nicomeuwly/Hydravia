@@ -91,6 +91,7 @@ struct HomeView: View {
                 needsAppChoice: blocker.needsAppChoice,
                 notificationsEnabled: settings.settings.notificationsEnabled,
                 reminderFired: router.reminderFired,
+                goalReached: hydration.todayTotalMl >= settings.dailyGoalMl,
                 window: settings.settings.window,
                 onChooseApp: { isPickingApps = true },
                 onUnlock: router.presentUnlock

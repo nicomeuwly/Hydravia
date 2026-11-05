@@ -6,11 +6,14 @@ import SwiftUI
 /// - More apps picked than the free plan locks (a trial ended): the way to
 ///   pick the one app it covers. The lock waits until then.
 /// - A reminder fired: "Drink your dose →", the way into the unlock.
+/// - Today's goal reached: reminders and lock rest until tomorrow's first
+///   reminder (dimmed, not tappable).
 /// - Otherwise: when the next reminder fires (dimmed, not tappable).
 struct RitualCard: View {
     let needsAppChoice: Bool
     let notificationsEnabled: Bool
     let reminderFired: Bool
+    let goalReached: Bool
     let window: ActiveWindow
     let onChooseApp: () -> Void
     let onUnlock: () -> Void
@@ -31,7 +34,9 @@ struct RitualCard: View {
                     row(
                         icon: notificationsEnabled ? "bell.fill" : "bell.slash.fill",
                         iconBackground: reminderFired ? Palette.primaryDark : Color(hex: 0xB6C2C9),
-                        caption: Text(reminderFired ? .homeReminderFired : .homeNextReminder),
+                        caption: Text(reminderFired ? .homeReminderFired
+                                      : goalReached && notificationsEnabled ? .homeGoalReachedPaused
+                                      : .homeNextReminder),
                         title: Text(title(now: context.date)),
                         chevron: reminderFired,
                         pulsing: notificationsEnabled && reminderFired
@@ -53,6 +58,10 @@ struct RitualCard: View {
         if reminderFired { return String(localized: .homeDrinkYourDose) }
         guard notificationsEnabled else { return String(localized: .homeRemindersOff) }
         let calendar = Calendar.autoupdatingCurrent
+        if goalReached {
+            guard let first = window.reminderSlots.first else { return "—" }
+            return String(localized: .homeTomorrowAt(Self.format(first, calendar: calendar, now: now)))
+        }
         switch window.nextReminder(after: MinuteOfDay(now, calendar: calendar)) {
         case .today(let minute):
             return Self.format(minute, calendar: calendar, now: now)

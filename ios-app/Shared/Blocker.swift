@@ -36,6 +36,9 @@ nonisolated enum Blocker {
         static let unlockedUntil = "blocker.unlockedUntil.v1"
         static let progress = "blocker.progress.v1"
         static let proUntil = "blocker.proUntil.v1"
+        /// Also written by the quick-add widget (which doesn't compile this
+        /// file): keep the two in step.
+        static let goalReachedOn = "blocker.goalReachedOn.v1"
     }
 
     /// Today's numbers, copied from the app so the shield can talk about them.
@@ -112,6 +115,19 @@ nonisolated enum Blocker {
         set { defaults?.set(newValue, forKey: Key.unlockedUntil) }
     }
 
+    /// When today's goal was last seen reached (by the app or a widget
+    /// pour). Nil once a raised goal or a deleted glass puts it out of reach.
+    static var goalReachedOn: Date? {
+        get { defaults?.object(forKey: Key.goalReachedOn) as? Date }
+        set { defaults?.set(newValue, forKey: Key.goalReachedOn) }
+    }
+
+    /// The goal is reached for `date`'s day: the lock rests until tomorrow.
+    static func isGoalReached(at date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
+        guard let reached = goalReachedOn else { return false }
+        return calendar.isDate(reached, inSameDayAs: date)
+    }
+
     static func selectionCount(_ selection: FamilyActivitySelection) -> Int {
         selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
@@ -141,6 +157,7 @@ nonisolated enum Blocker {
     /// Whether the selected apps should be shielded right now. A selection
     /// past the free limit needs Pro: a lapse while the app is closed stops
     /// the lock rather than keep shielding more than the free plan covers.
+    /// Once today's goal is reached the lock rests until the next wake.
     static func shouldShield(at date: Date = .now) -> Bool {
         let selection = selection
         return isEnabled
@@ -148,6 +165,7 @@ nonisolated enum Blocker {
             && selectionCount(selection) > 0
             && isWithinWindow(date)
             && !isUnlocked(at: date)
+            && !isGoalReached(at: date)
     }
 
     static var isShieldUp: Bool {

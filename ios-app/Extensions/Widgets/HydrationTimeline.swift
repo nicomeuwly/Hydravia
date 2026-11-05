@@ -63,10 +63,19 @@ struct HydrationProvider: TimelineProvider {
 
     private static func entry(at date: Date, consumedMl: Int, state: WidgetState, calendar: Calendar) -> HydrationEntry {
         HydrationEntry(date: date, consumedMl: consumedMl, state: state,
-                       nextReminder: state.remindersOn ? nextReminder(after: date, window: state.window, calendar: calendar) : nil)
+                       nextReminder: state.remindersOn
+                           ? nextReminder(after: date, window: state.window, goalReached: consumedMl >= state.goalMl, calendar: calendar)
+                           : nil)
     }
 
-    private static func nextReminder(after date: Date, window: ActiveWindow, calendar: Calendar) -> Date? {
+    /// Goal reached: today's reminders are off, the next is tomorrow's first.
+    private static func nextReminder(after date: Date, window: ActiveWindow, goalReached: Bool, calendar: Calendar) -> Date? {
+        if goalReached {
+            guard let first = window.reminderSlots.first,
+                  let tomorrow = calendar.date(byAdding: .day, value: 1, to: date)
+            else { return nil }
+            return calendar.date(bySettingHour: first.hour, minute: first.minute, second: 0, of: tomorrow)
+        }
         switch window.nextReminder(after: MinuteOfDay(date, calendar: calendar)) {
         case .today(let minute):
             return calendar.date(bySettingHour: minute.hour, minute: minute.minute, second: 0, of: date)

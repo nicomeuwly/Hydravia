@@ -134,6 +134,15 @@ final class BlockerService {
     /// Hands today's numbers to the shield, which can't read the database.
     func shareProgress(consumedMl: Int, goalMl: Int, streak: Int) {
         Blocker.setProgress(.init(consumedMl: consumedMl, goalMl: goalMl, streak: streak, day: .now))
+        // Goal reached: the lock rests for the rest of the day; a raised goal
+        // or a deleted glass brings it back.
+        // Refreshed every time: a widget pour may have reached the goal while
+        // the app was closed, and the widget can't lower a raised shield.
+        let reached = goalMl > 0 && consumedMl >= goalMl
+        if reached != Blocker.isGoalReached(at: .now) {
+            Blocker.goalReachedOn = reached ? .now : nil
+        }
+        Blocker.refreshShield()
     }
 
     private func apply() {

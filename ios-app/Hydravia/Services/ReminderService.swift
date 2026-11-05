@@ -13,7 +13,7 @@ final class ReminderService: NSObject {
 
     /// Reminder identifiers share this prefix, so rescheduling never wipes
     /// unrelated one-shots (like the trial-end heads-up).
-    nonisolated static let identifierPrefix = "hydration-reminder-"
+    nonisolated static let identifierPrefix = ReminderPlan.identifierPrefix
     nonisolated static let trialEndIdentifier = "trial-end-reminder"
     nonisolated static let unlockRoute = "unlock"
 
@@ -22,6 +22,9 @@ final class ReminderService: NSObject {
     /// quick settings changes can never interleave and leave the older one
     /// winning.
     private var rescheduleTask: Task<Void, Never>?
+    /// The copy the pending reminders were written with (nil: not known
+    /// yet this launch, so the first reschedule rewrites them all).
+    private var lastRitual: Bool?
     private let router: AppRouter
     private let logger = Logger(subsystem: "com.nicomeuwly.hydravia", category: "Reminders")
 
@@ -64,39 +67,45 @@ final class ReminderService: NSObject {
 
     // MARK: Scheduling
 
-    /// Makes the hydration reminders match `window`: one daily repeating
-    /// notification per slot. `enabled == false` (user choice, no
-    /// permission) just clears them. `ritual` (Hydravia Pro) picks the copy
-    /// and makes a tap open the unlock ritual; free reminders open the app.
+    /// Makes the hydration reminders match `window`: one dated notification
+    /// per slot for the coming days (`ReminderPlan`), none left today once
+    /// `goalReachedToday`. `enabled == false` (user choice, no permission)
+    /// just clears them. `ritual` (Hydravia Pro) picks the copy and makes a
+    /// tap open the unlock ritual; free reminders open the app.
     ///
     /// Serialised: a newer call cancels the one in flight and waits for it,
     /// so the latest settings always win.
-    func reschedule(window: ActiveWindow, enabled: Bool, ritual: Bool) async {
+    func reschedule(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool) async {
         let previous = rescheduleTask
         previous?.cancel()
         let task = Task {
             await previous?.value
             guard !Task.isCancelled else { return }
-            await self.apply(window: window, enabled: enabled, ritual: ritual)
+            await self.apply(window: window, enabled: enabled, ritual: ritual, goalReachedToday: goalReachedToday)
         }
         rescheduleTask = task
         await task.value
     }
 
-    private func apply(window: ActiveWindow, enabled: Bool, ritual: Bool) async {
+    private func apply(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool) async {
         let granted = enabled ? await permission() == .granted : false
-        let wanted = granted ? requests(for: window, ritual: ritual) : []
+        let wanted = granted ? requests(for: window, ritual: ritual, goalReachedToday: goalReachedToday) : []
         guard !Task.isCancelled else { return }
 
-        // Remove only what is no longer wanted; `add` replaces same-id
+        // Remove only what is no longer wanted (this also drops the daily
+        // repeating reminders of older versions); `add` replaces same-id
         // requests, so there is never a window with no reminders scheduled.
         let wantedIDs = Set(wanted.map(\.identifier))
-        let stale = await center.pendingNotificationRequests()
-            .map(\.identifier)
-            .filter { $0.hasPrefix(Self.identifierPrefix) && !wantedIDs.contains($0) }
+        let pending = await center.pendingNotificationRequests().map(\.identifier)
+        let stale = pending.filter { $0.hasPrefix(Self.identifierPrefix) && !wantedIDs.contains($0) }
         center.removePendingNotificationRequests(withIdentifiers: stale)
 
-        for request in wanted {
+        // Already pending with the same id: same date and time. Rewritten
+        // only when the plan changes the copy (or on the first reschedule of
+        // a launch, which catches a language change), so the reschedule on
+        // every return to the foreground stays cheap.
+        let kept = Set(pending)
+        for request in wanted where !kept.contains(request.identifier) || ritual != lastRitual {
             guard !Task.isCancelled else { return }
             do {
                 try await center.add(request)
@@ -104,15 +113,22 @@ final class ReminderService: NSObject {
                 logger.error("Could not schedule \(request.identifier, privacy: .public): \(error.localizedDescription, privacy: .public)")
             }
         }
+        lastRitual = ritual
     }
 
     /// Copy is resolved now, in the current language; the app reschedules on
     /// every return to the foreground, so a language change catches up.
     /// Triggers carry no time zone: they follow the device's, so 08:00 stays
     /// 08:00 wall-clock after travelling.
-    private func requests(for window: ActiveWindow, ritual: Bool) -> [UNNotificationRequest] {
+    private func requests(for window: ActiveWindow, ritual: Bool, goalReachedToday: Bool) -> [UNNotificationRequest] {
         let bodies = ritual ? Self.bodies : Self.freeBodies
-        return window.reminderSlots.enumerated().map { index, slot in
+        let calendar = Calendar.autoupdatingCurrent
+        let slots = window.reminderSlots.map { $0.hour * 60 + $0.minute }
+        let dates = ReminderPlan.fireDates(window: window, now: .now, goalReachedToday: goalReachedToday, calendar: calendar)
+        return dates.map { date in
+            let parts = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+            // Rotate by slot, so a slot keeps its copy from one day to the next.
+            let index = slots.firstIndex(of: (parts.hour ?? 0) * 60 + (parts.minute ?? 0)) ?? 0
             let content = UNMutableNotificationContent()
             content.title = String(localized: .notifReminderTitle)
             content.body = String(localized: bodies[index % bodies.count])
@@ -120,14 +136,10 @@ final class ReminderService: NSObject {
             if ritual { content.userInfo = ["route": Self.unlockRoute] }
             content.threadIdentifier = "hydration"
 
-            let trigger = UNCalendarNotificationTrigger(
-                dateMatching: DateComponents(hour: slot.hour, minute: slot.minute),
-                repeats: true
-            )
             return UNNotificationRequest(
-                identifier: "\(Self.identifierPrefix)\(slot.hour)-\(slot.minute)",
+                identifier: ReminderPlan.identifier(for: date, calendar: calendar),
                 content: content,
-                trigger: trigger
+                trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)
             )
         }
     }

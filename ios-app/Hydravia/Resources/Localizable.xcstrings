@@ -7150,6 +7150,36 @@
           }
         }
       }
+    },
+    "home.goalReachedPaused" : {
+      "comment" : "Ritual card caption once today's goal is reached: reminders and app lock rest until tomorrow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel erreicht, Erinnerungen pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal reached, reminders paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetivo cumplido, recordatorios en pausa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif atteint, rappels en pause"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

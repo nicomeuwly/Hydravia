@@ -55,6 +55,11 @@ node Scripts/generate-strings.mjs
   `Persistence.makeContainer`); extensions open it only if it exists. The app
   copies what widgets need (goal, amounts, schedule, plan) into
   `WidgetState` and reloads timelines after every change.
+- Reminders are dated one-shots (`ReminderPlan`, up to 60 ahead, ids
+  `hydration-reminder-YYYY-MM-DD-HHMM`), rescheduled on launch, foreground,
+  a new day and the goal being reached or lost. Once today's goal is reached, today's reminders go and
+  the lock rests (`Blocker.goalReachedOn`, also written by `AddWaterIntent`)
+  until the next day; a raised goal or a deleted glass brings both back.
 - `Entitlements/` — App Group for every target, Family Controls for the app
   and the Screen Time extensions.
   Screen Time only works on a real device; on the simulator authorization
