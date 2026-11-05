@@ -69,12 +69,30 @@ private enum TabBarStyle {
             if let bar = tabBar() {
                 // The bar alone isn't enough: its glass platter picks its own
                 // look from what's behind it, so the style goes down the
-                // subtree too (the platter and the item views).
-                setStyle(dark ? .dark : .unspecified, on: bar, depth: 0)
+                // subtree too (the platter and the item views) — and up to
+                // the containers that hold nothing but the bar: with Liquid
+                // Glass set between Clear and Tinted, the platter stayed light
+                // on device even with its own style dark.
+                let style: UIUserInterfaceStyle = dark ? .dark : .unspecified
+                for container in barOnlyContainers(of: bar) { container.overrideUserInterfaceStyle = style }
+                setStyle(style, on: bar, depth: 0)
                 return
             }
             try? await Task.sleep(for: .milliseconds(50))
         }
+    }
+
+    /// The bar's ancestors that contain only it (UIKit wraps the bar in a
+    /// couple of private views); stops at the first one that also holds the
+    /// tab's content, so the screens themselves are never touched.
+    private static func barOnlyContainers(of bar: UITabBar) -> [UIView] {
+        var containers: [UIView] = []
+        var child: UIView = bar
+        while let parent = child.superview, parent.subviews.count == 1, containers.count < 3 {
+            containers.append(parent)
+            child = parent
+        }
+        return containers
     }
 
     private static func setStyle(_ style: UIUserInterfaceStyle, on view: UIView, depth: Int) {
