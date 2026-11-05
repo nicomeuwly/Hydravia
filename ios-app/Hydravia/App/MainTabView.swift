@@ -67,11 +67,20 @@ private enum TabBarStyle {
         // The bar may not exist yet on the very first frame.
         for _ in 0..<10 {
             if let bar = tabBar() {
-                bar.overrideUserInterfaceStyle = dark ? .dark : .unspecified
+                // The bar alone isn't enough: its glass platter picks its own
+                // look from what's behind it, so the style goes down the
+                // subtree too (the platter and the item views).
+                setStyle(dark ? .dark : .unspecified, on: bar, depth: 0)
                 return
             }
             try? await Task.sleep(for: .milliseconds(50))
         }
+    }
+
+    private static func setStyle(_ style: UIUserInterfaceStyle, on view: UIView, depth: Int) {
+        view.overrideUserInterfaceStyle = style
+        guard depth < 4 else { return }
+        for subview in view.subviews { setStyle(style, on: subview, depth: depth + 1) }
     }
 
     private static func tabBar() -> UITabBar? {

@@ -6448,6 +6448,66 @@
           }
         }
       }
+    },
+    "unlock.thirstLevel" : {
+      "comment" : "VoiceOver label of the vertical thirst slider in the ritual.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thirst level"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nivel de sed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niveau de soif"
+          }
+        }
+      }
+    },
+    "unlock.slideHint" : {
+      "comment" : "Hint under the vertical thirst slider.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schieb nach oben, je durstiger du bist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide up the thirstier you feel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desliza hacia arriba según tu sed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glisse vers le haut selon ta soif"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -4,7 +4,7 @@ import SwiftUI
 
 /// The ritual — the product's differentiator. Full screen, dark (the contrast
 /// IS the ritual), no way out but drinking:
-/// one question ("how do you feel?") → a computed dose → "I drank it", and the
+/// one question ("how thirsty?", on a slider) → a computed dose → "I drank it", and the
 /// water visibly rises behind the confirmation before the phone is released.
 struct UnlockView: View {
     @Environment(HydrationStore.self) private var hydration
@@ -18,7 +18,7 @@ struct UnlockView: View {
     private enum Stage { case question, dose, poured }
 
     @State private var stage = Stage.question
-    @State private var feeling: Feeling?
+    @State private var feeling = Feeling.fine
     @State private var dose = 0
     @State private var shownDose = 0
     @State private var temperature: Double?
@@ -47,14 +47,8 @@ struct UnlockView: View {
             Palette.nightOverlay.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Its own row, so it never overlaps the header at large text
-                // sizes; hidden (not removed) once poured, so nothing jumps.
-                notNowButton
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .opacity(stage == .poured ? 0 : 1)
-                    .disabled(stage == .poured)
                 header
-                    .padding(.top, Spacing.sm)
+                    .padding(.top, Spacing.lg)
 
                 // Scrolls only when it must (AX text sizes on small phones).
                 ScrollView {
@@ -85,7 +79,7 @@ struct UnlockView: View {
         .task { temperature = await WeatherService.shared.currentTemperature() }
         .onChange(of: temperature) {
             // The weather can land after the answer: keep the dose honest.
-            guard stage == .dose, let feeling else { return }
+            guard stage == .dose else { return }
             let updated = computeDose(for: feeling)
             if updated != dose {
                 dose = updated
@@ -143,13 +137,13 @@ struct UnlockView: View {
                 .accessibilityFocused($stageFocused)
             Spacer()
 
-            GlassEffectContainer(spacing: Spacing.md) {
-                VStack(spacing: Spacing.md) {
-                    feelingButton(.fine, label: .unlockRessentiOk)
-                    feelingButton(.hot, label: .unlockRessentiChaud)
-                    feelingButton(.veryThirsty, label: .unlockRessentiTresSoif)
-                }
-            }
+            ThirstSlider(feeling: $feeling)
+
+            Text(.unlockSlideHint)
+                .font(.brand(.medium, size: 14, relativeTo: .footnote))
+                .foregroundStyle(.white.opacity(0.6))
+                .multilineTextAlignment(.center)
+                .accessibilityHidden(true) // VoiceOver adjusts the slider instead
 
             if let temperature {
                 Label {
@@ -161,28 +155,15 @@ struct UnlockView: View {
                 .foregroundStyle(Palette.sunlight)
                 .transition(.opacity)
             }
+            Spacer(minLength: Spacing.sm)
+
+            VStack(spacing: Spacing.xs) {
+                Button(action: confirmThirst) { Text(.commonContinue) }
+                    .buttonStyle(.primaryLight)
+                notNowButton
+            }
         }
         .animation(Motion.base, value: temperature != nil)
-    }
-
-    private func feelingButton(_ value: Feeling, label: LocalizedStringResource) -> some View {
-        Button {
-            choose(value)
-        } label: {
-            Text(label)
-                .font(.brand(.semiBold, size: 17, relativeTo: .body))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.xl)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.pressable)
-        .glassEffect(
-            .clear.tint(.white.opacity(feeling == value ? 0.22 : 0.04)).interactive(),
-            in: .rect(cornerRadius: Radius.lg, style: .continuous)
-        )
-        .sensoryFeedback(.selection, trigger: feeling) { _, new in new == value }
-        .accessibilityAddTraits(feeling == value ? .isSelected : [])
     }
 
     private var doseStage: some View {
@@ -225,14 +206,17 @@ struct UnlockView: View {
                 .frame(maxWidth: 260)
             Spacer()
 
-            Button(action: drink) {
-                Label {
-                    Text(.unlockDrank)
-                } icon: {
-                    Image(systemName: "lock.open.fill")
+            VStack(spacing: Spacing.xs) {
+                Button(action: drink) {
+                    Label {
+                        Text(.unlockDrank)
+                    } icon: {
+                        Image(systemName: "lock.open.fill")
+                    }
                 }
+                .buttonStyle(.primaryLight)
+                notNowButton
             }
-            .buttonStyle(.primaryLight)
         }
         .task {
             // The dose counts up from zero — the number lands, it doesn't appear.
@@ -276,19 +260,19 @@ struct UnlockView: View {
             router.isUnlockPresented = false
         } label: {
             Text(.unlockNotNow)
-                .font(.brand(.semiBold, size: 15, relativeTo: .subheadline))
-                .padding(.horizontal, Spacing.sm)
-                .frame(minHeight: 44)
+                .font(.brand(.semiBold, size: 16, relativeTo: .body))
+                .foregroundStyle(.white.opacity(0.75))
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(.rect)
         }
-        .buttonStyle(.glass)
+        .buttonStyle(.pressable)
     }
 
     // MARK: Actions
 
-    private func choose(_ value: Feeling) {
+    private func confirmThirst() {
         guard stage == .question else { return } // a second tap mid-transition
-        feeling = value
-        dose = computeDose(for: value)
+        dose = computeDose(for: feeling)
         stage = .dose
     }
 
