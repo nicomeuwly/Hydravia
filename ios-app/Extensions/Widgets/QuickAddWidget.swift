@@ -34,10 +34,26 @@ struct QuickAddWidgetView: View {
     var body: some View {
         Group {
             if family == .systemSmall {
-                VStack(alignment: .leading, spacing: 8) {
-                    summary
-                    actions
+                // No plate here: the text sits on the water, so it turns
+                // white where the water covers it (drawn over the whole
+                // widget, the mask lines up with the water). The button
+                // stays out of the masked copies: one button, not two.
+                ZStack {
+                    Waterline(level: entry.progress) { tint, secondary in
+                        VStack(alignment: .leading, spacing: 8) {
+                            smallSummary(tint: tint, secondary: secondary)
+                            Color.clear.frame(height: Self.buttonHeight)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                    }
+                    VStack {
+                        Spacer(minLength: 0)
+                        actions
+                    }
+                    .padding(14)
                 }
+                .padding(-14)
             } else {
                 HStack(spacing: 12) {
                     summary
@@ -49,6 +65,15 @@ struct QuickAddWidgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .containerBackground(for: .widget) { WaterBackground(level: entry.progress) }
         .widgetURL(entry.hasPro ? nil : WidgetLink.paywall)
+    }
+
+    private func smallSummary(tint: Color, secondary: Color) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            WidgetHeader(entry: entry, tint: tint)
+            Spacer(minLength: 0)
+            AmountLabel(entry: entry, tint: tint, secondary: secondary, size: 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
     private var summary: some View {
