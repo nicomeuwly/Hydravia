@@ -41,6 +41,20 @@ final class ShieldActionExtension: ShieldActionDelegate {
     }
 
     private func postUnlockNotification(completion: @escaping @Sendable (Bool) -> Void) {
+        Task { completion(await Self.postUnlockNotification()) }
+    }
+
+    /// Everything is created inside the task: the notification types aren't
+    /// Sendable, so none of them crosses into it.
+    private static func postUnlockNotification() async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        // With notifications off nothing would appear: report failure so the
+        // shield closes the app instead of leaving the user on a dead button.
+        let settings = await center.notificationSettings()
+        guard [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus),
+              settings.alertSetting == .enabled
+        else { return false }
+
         let content = UNMutableNotificationContent()
         content.title = Blocker.string("shield.notifTitle")
         content.body = Blocker.string("shield.notifBody")
@@ -48,18 +62,13 @@ final class ShieldActionExtension: ShieldActionDelegate {
         content.userInfo = ["route": Blocker.unlockRoute]
         content.threadIdentifier = "hydration"
 
-        let center = UNUserNotificationCenter.current()
-        // With notifications off nothing would appear: report failure so the
-        // shield closes the app instead of leaving the user on a dead button.
-        center.getNotificationSettings { settings in
-            guard [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus),
-                  settings.alertSetting == .enabled
-            else { return completion(false) }
-            center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
-            center.add(UNNotificationRequest(identifier: Blocker.shieldNotificationIdentifier,
-                                             content: content, trigger: nil)) { error in
-                completion(error == nil)
-            }
+        center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
+        do {
+            try await center.add(UNNotificationRequest(identifier: Blocker.shieldNotificationIdentifier,
+                                                       content: content, trigger: nil))
+            return true
+        } catch {
+            return false
         }
     }
 }

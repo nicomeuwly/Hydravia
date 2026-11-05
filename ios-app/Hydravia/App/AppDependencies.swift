@@ -48,7 +48,7 @@ final class AppDependencies {
         // swiftlint:disable:next force_try
         let dependencies = AppDependencies(container: try! Persistence.makeContainer(inMemory: true), settings: settings)
         for amount in todayMl {
-            try? dependencies.hydration.add(amount, source: .manual)
+            _ = try? dependencies.hydration.add(amount, source: .manual)
         }
         return dependencies
     }
