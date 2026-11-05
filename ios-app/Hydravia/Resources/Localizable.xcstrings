@@ -2543,35 +2543,6 @@
         }
       }
     },
-    "paywall.feature3" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Serie, ganz ohne Aufwand"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your streak, tracked without the fuss"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu racha, sin complicaciones"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ta série de jours, sans prise de tête"
-          }
-        }
-      }
-    },
     "paywall.introSub" : {
       "extractionState" : "manual",
       "localizations" : {
