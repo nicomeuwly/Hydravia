@@ -8,7 +8,8 @@ import UIKit
 final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     /// Only tints the system's own blur: it ends up a deep slate blue.
     private static let background = UIColor(red: 0.035, green: 0.231, blue: 0.525, alpha: 1)
-    private static let button = UIColor(red: 0.20, green: 0.56, blue: 0.86, alpha: 1)
+    /// White text on it stays above 4.5:1 (WCAG AA).
+    private static let button = UIColor(red: 0.10, green: 0.42, blue: 0.70, alpha: 1)
     private static let subtitle = UIColor(red: 0.765, green: 0.890, blue: 0.965, alpha: 1)
 
     private func configuration(name: String?) -> ShieldConfiguration {

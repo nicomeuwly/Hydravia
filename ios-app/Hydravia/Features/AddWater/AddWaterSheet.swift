@@ -36,6 +36,7 @@ struct AddWaterSheet: View {
             Text(.addWaterTitle)
                 .font(.brand(.bold, size: 22, relativeTo: .title2))
                 .foregroundStyle(Palette.textPrimary)
+                .accessibilityAddTraits(.isHeader)
 
             // Side by side normally; stacked at accessibility text sizes.
             AnyLayout(typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Spacing.md)) : AnyLayout(HStackLayout(spacing: Spacing.md))) {
@@ -120,6 +121,8 @@ struct AddWaterSheet: View {
     private func addCustom() {
         guard let ml = Int(custom), (1...Self.maxCustomMl).contains(ml) else {
             showsRangeError = true
+            // VoiceOver users don't see the red text appear.
+            AccessibilityNotification.Announcement(String(localized: .addWaterOutOfRange(Self.maxCustomMl))).post()
             return
         }
         add(ml)

@@ -137,7 +137,7 @@ struct OnboardingScaffold<Content: View>: View {
             Button { dismiss() } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 16, weight: .semibold))
-                    .frame(width: 40, height: 40)
+                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
             .accessibilityLabel(Text(.onboardingBack))

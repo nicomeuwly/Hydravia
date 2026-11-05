@@ -69,6 +69,9 @@ struct PaywallView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: Spacing.xxl) {
+          // Scrolls only at large text sizes; the buttons stay on screen.
+          ScrollView {
+           VStack(alignment: .leading, spacing: Spacing.xxl) {
             brand.padding(.top, Spacing.xxl)
 
             VStack(alignment: .leading, spacing: Spacing.md) {
@@ -76,6 +79,9 @@ struct PaywallView: View {
                     .font(.brand(.bold, size: 34, relativeTo: .largeTitle))
                     .kerning(-0.8)
                     .foregroundStyle(Palette.textPrimary)
+                    // Shrink rather than break "gratuitement" mid-word.
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.5)
                     .accessibilityAddTraits(.isHeader)
                 Text(.paywallIntroSub)
                     .font(.bodyRegular)
@@ -87,8 +93,11 @@ struct PaywallView: View {
                 feature(.paywallFeature2, icon: "sun.max.fill")
                 feature(.paywallFeature3, icon: "flame.fill")
             }
-
-            Spacer()
+           }
+           .frame(maxWidth: .infinity, alignment: .leading)
+          }
+          .scrollBounceBehavior(.basedOnSize)
+          .scrollIndicators(.hidden)
 
             VStack(spacing: Spacing.sm) {
                 Button { stage = .offer } label: {
@@ -220,26 +229,36 @@ struct PaywallView: View {
     }
 
     private var footer: some View {
-        HStack(spacing: Spacing.lg) {
-            Link(destination: AppConfig.termsURL) { Text(.paywallTerms) }
-            Text(verbatim: "·")
-            Link(destination: AppConfig.privacyURL) { Text(.paywallPrivacy) }
-            Text(verbatim: "·")
-            Button {
-                isRestoring = true
-                Task {
-                    restoreResult = await store.restore()
-                    isRestoring = false
-                }
-            } label: {
-                if isRestoring { ProgressView().controlSize(.small) } else { Text(.paywallRestore) }
-            }
-            .disabled(isRestoring)
+        // One line when it fits, stacked otherwise (large text sizes).
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Spacing.lg) { footerItems(separators: true) }
+            VStack(spacing: Spacing.xs) { footerItems(separators: false) }
         }
         .font(.brandCaption)
         .foregroundStyle(Palette.textSecondary)
         .tint(Palette.primaryDark)
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private func footerItems(separators: Bool) -> some View {
+        Link(destination: AppConfig.termsURL) { Text(.paywallTerms) }
+            .frame(minHeight: 44)
+        if separators { Text(verbatim: "·").accessibilityHidden(true) }
+        Link(destination: AppConfig.privacyURL) { Text(.paywallPrivacy) }
+            .frame(minHeight: 44)
+        if separators { Text(verbatim: "·").accessibilityHidden(true) }
+        Button {
+            isRestoring = true
+            Task {
+                restoreResult = await store.restore()
+                isRestoring = false
+            }
+        } label: {
+            if isRestoring { ProgressView().controlSize(.small) } else { Text(.paywallRestore) }
+        }
+        .frame(minHeight: 44)
+        .disabled(isRestoring)
     }
 
     private var skipButton: some View {
@@ -291,7 +310,7 @@ struct PaywallView: View {
 
     private var legal: String {
         offersTrial
-            ? String(localized: .paywallPlanLegal(chargeDate.formatted(.dateTime.day().month(.abbreviated))))
+            ? String(localized: .paywallPlanLegal(chargeDate.formatted(.dateTime.day().month(.wide))))
             : String(localized: .paywallNoTrialLegal)
     }
 
@@ -302,10 +321,26 @@ struct PaywallView: View {
                            ? .paywallBilledYearly(product.displayPrice)
                            : .paywallBilledMonthly(product.displayPrice))
         if offersTrial, let period = store.trialPeriod {
-            let free = period.formatted(product.subscriptionPeriodFormatStyle.locale(.autoupdatingCurrent))
-            return String(localized: .paywallTrialThen(free, price))
+            return String(localized: .paywallTrialThen(Self.trialLength(period), price))
         }
         return String(localized: .paywallRenewsAt(price))
+    }
+
+    /// "7 jours", "7 days"… StoreKit's own period style reads "un semaine"
+    /// in French, so a week is spelled out in days.
+    private static func trialLength(_ period: Product.SubscriptionPeriod) -> String {
+        var components = DateComponents()
+        switch period.unit {
+        case .week: components.day = period.value * 7
+        case .month: components.month = period.value
+        case .year: components.year = period.value
+        default: components.day = period.value
+        }
+        let formatter = DateComponentsFormatter()
+        formatter.calendar = .autoupdatingCurrent
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.day, .month, .year]
+        return formatter.string(from: components) ?? ""
     }
 
     private func perMonth(_ yearly: Product) -> String {
@@ -357,11 +392,16 @@ private struct PlanCard: View {
     let legal: String
     let isSelected: Bool
     let onSelect: () -> Void
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
+        let stacked = typeSize.isAccessibilitySize
         Button(action: onSelect) {
             VStack(alignment: .leading, spacing: Spacing.md) {
-                HStack(alignment: .center) {
+                // One row normally; at accessibility sizes the badge and price
+                // drop below the title instead of truncating it.
+                AnyLayout(stacked ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.sm))
+                                  : AnyLayout(HStackLayout(alignment: .center))) {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 22))
                         .foregroundStyle(isSelected ? Palette.primaryDark : Palette.textTertiary)
@@ -376,7 +416,7 @@ private struct PlanCard: View {
                                 .foregroundStyle(Palette.textSecondary)
                         }
                     }
-                    Spacer()
+                    if !stacked { Spacer() }
                     if let badge {
                         Text(badge)
                             .font(.brand(.bold, size: 12, relativeTo: .caption))
@@ -397,6 +437,8 @@ private struct PlanCard: View {
                         .transition(.opacity)
                 }
             }
+            // Both cards span the width, whatever their content.
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(Spacing.lg)
             .background(.white, in: .rect(cornerRadius: Radius.lg, style: .continuous))
             .overlay {
@@ -420,7 +462,7 @@ private struct TrialTimeline: View {
             step(icon: "lock.open.fill", title: .paywallTimelineToday, text: Text(.paywallTimelineTodayText), isLast: false)
             step(icon: "bell.fill", title: .paywallTimelineDay5, text: Text(.paywallTimelineDay5Text), isLast: false)
             step(icon: "star.fill", title: .paywallTimelineDay7,
-                 text: Text(.paywallTimelineDay7Text(chargeDate.formatted(.dateTime.day().month(.abbreviated)))),
+                 text: Text(.paywallTimelineDay7Text(chargeDate.formatted(.dateTime.day().month(.wide)))),
                  isLast: true)
         }
     }

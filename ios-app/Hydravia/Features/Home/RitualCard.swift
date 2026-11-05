@@ -22,7 +22,8 @@ struct RitualCard: View {
                     caption: Text(.homeRitualPaused), title: Text(.homeRitualUnlock), chevron: true)
             }
             .buttonStyle(.pressable)
-            .accessibilityLabel(Text(.homeA11YActivateRitual))
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(Text(.homeA11YActivateRitual))
         } else {
             let canOpen = reminderFired || AppConfig.isDevMode
             Button(action: onUnlock) {
@@ -43,7 +44,9 @@ struct RitualCard: View {
             }
             .buttonStyle(.pressable)
             .disabled(!canOpen)
-            .accessibilityLabel(Text(.homeA11YNextReminder))
+            // The caption and title are the content ("Next reminder, 14:00",
+            // "Reminder fired, Drink your dose"); read them as one element.
+            .accessibilityElement(children: .combine)
         }
     }
 

@@ -10,6 +10,11 @@ struct WelcomeStep: View {
 
     @State private var physics = WaterPhysics()
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Lower at accessibility sizes, where the text runs further down and
+    /// grey on dark water would be unreadable.
+    private var waterLevel: Double { typeSize.isAccessibilitySize ? 0.16 : 0.42 }
 
     var body: some View {
         ZStack {
@@ -18,24 +23,36 @@ struct WelcomeStep: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: Spacing.xl) {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 30, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 64, height: 64)
-                    .background(Palette.primaryDark, in: .rect(cornerRadius: Radius.lg, style: .continuous))
-                    .padding(.top, Spacing.xxxl)
-                    .accessibilityHidden(true)
+                // Scrolls only at large text sizes, so the button below can
+                // never be pushed off screen.
+                ScrollView {
+                    VStack(alignment: .leading, spacing: Spacing.xl) {
+                        Image(systemName: "drop.fill")
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 64, height: 64)
+                            .background(Palette.primaryDark, in: .rect(cornerRadius: Radius.lg, style: .continuous))
+                            .padding(.top, Spacing.xxxl)
+                            .accessibilityHidden(true)
 
-                Text(.welcomeHeadline)
-                    .font(.brand(.bold, size: 44, relativeTo: .largeTitle))
-                    .kerning(-1)
-                    .foregroundStyle(Palette.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
-                Text(.welcomeBody)
-                    .font(.bodyRegular)
-                    .foregroundStyle(Palette.textSecondary)
-
-                Spacer()
+                        Text(.welcomeHeadline)
+                            .font(.brand(.bold, size: 44, relativeTo: .largeTitle))
+                            .kerning(-1)
+                            .foregroundStyle(Palette.textPrimary)
+                            // Three one-word lines: shrink rather than break a word.
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.5)
+                            .accessibilityAddTraits(.isHeader)
+                        Text(.welcomeBody)
+                            .font(.bodyRegular)
+                            .foregroundStyle(Palette.textSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    // Lets the last line scroll clear of the wave.
+                    .padding(.bottom, typeSize.isAccessibilitySize ? 80 : 0)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.hidden)
 
                 Button(action: onStart) { Text(.welcomeCta) }
                     .buttonStyle(.primaryLight)
@@ -43,7 +60,8 @@ struct WelcomeStep: View {
             .padding(.horizontal, Spacing.xxl)
             .padding(.bottom, Spacing.lg)
         }
-        .onAppear { physics.setLevel(0.42, splash: false) }
+        .onAppear { physics.setLevel(waterLevel, splash: false) }
+        .onChange(of: waterLevel) { _, level in physics.setLevel(level, splash: false) }
     }
 }
 
@@ -236,6 +254,7 @@ struct GoalRevealStep: View {
     @Environment(SettingsStore.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     @State private var physics = WaterPhysics()
     @State private var shownGoal = 0
@@ -245,11 +264,14 @@ struct GoalRevealStep: View {
         let window = settings.settings.window
 
         VStack(alignment: .leading, spacing: Spacing.xl) {
+          // Scrolls only at large text sizes; Continue stays on screen.
+          ScrollView {
+           VStack(alignment: .leading, spacing: Spacing.xl) {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text(.goalRevealEyebrow)
                     .font(.eyebrow)
                     .kerning(1.5)
-                    .foregroundStyle(Palette.accentCyan)
+                    .foregroundStyle(Palette.secondaryBlue)
                 Text(.goalRevealTitle)
                     .font(.brand(.bold, size: 30, relativeTo: .largeTitle))
                     .kerning(-0.7)
@@ -289,7 +311,9 @@ struct GoalRevealStep: View {
             .scaleEffect(revealed ? 1 : 0.9)
             .opacity(revealed ? 1 : 0)
 
-            HStack(spacing: Spacing.md) {
+            // Side by side normally; stacked at accessibility text sizes.
+            AnyLayout(typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Spacing.md))
+                                                    : AnyLayout(HStackLayout(spacing: Spacing.md))) {
                 metric("\(window.reminderSlots.count)", label: .goalRevealRemindersPerDay)
                 metric(ReminderInterval(rawValue: window.intervalMin)?.shortLabel ?? "—", label: .goalRevealPace)
                 metric(window.wake.formatted, label: .goalRevealStart)
@@ -300,8 +324,10 @@ struct GoalRevealStep: View {
                 .font(.brandFootnote)
                 .foregroundStyle(Palette.textSecondary)
                 .frame(maxWidth: .infinity)
-
-            Spacer()
+           }
+          }
+          .scrollBounceBehavior(.basedOnSize)
+          .scrollIndicators(.hidden)
 
             Button(action: onNext) {
                 Text(.commonContinue)

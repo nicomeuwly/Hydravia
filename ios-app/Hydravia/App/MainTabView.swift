@@ -28,9 +28,10 @@ struct MainTabView: View {
                 Label { Text(.tabsSettings) } icon: { Image(systemName: "gearshape.fill") }
             }
         }
-        // Cyan, not the dark brand blue: the bar turns dark over the home screen's
-        // water, where a dark selected tint disappeared.
-        .tint(Palette.accentCyan)
+        // Cyan over the home screen's water, where the bar turns dark and a
+        // dark tint disappears; a darker blue on the light screens, where
+        // cyan is too faint (contrast).
+        .tint(router.tab == .home ? Palette.accentCyan : Palette.secondaryBlue)
         .sensoryFeedback(.selection, trigger: router.tab)
         .sheet(item: $router.sheet, onDismiss: router.sheetDidDismiss) { sheet in
             switch sheet {

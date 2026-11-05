@@ -120,11 +120,11 @@ struct UnlockView: View {
             }
             .font(.brand(.bold, size: 13, relativeTo: .caption))
             .kerning(1.5)
-            .foregroundStyle(.white.opacity(0.55))
+            .foregroundStyle(.white.opacity(0.78))
 
             Text(.unlockLockedSub)
                 .font(.brandFootnote)
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(.white.opacity(0.75))
         }
         .multilineTextAlignment(.center)
     }
@@ -191,7 +191,7 @@ struct UnlockView: View {
             Text(.unlockDoseLabel)
                 .font(.eyebrow)
                 .kerning(1.8)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.white.opacity(0.75))
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(shownDose, format: .number)
@@ -201,7 +201,7 @@ struct UnlockView: View {
                     .contentTransition(.numericText(value: Double(shownDose)))
                 Text(.commonMl)
                     .font(.brand(.regular, size: 30, relativeTo: .title))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.white.opacity(0.78))
             }
             .lineLimit(1)
             .minimumScaleFactor(0.4)
@@ -221,7 +221,7 @@ struct UnlockView: View {
             Text(.unlockDoseSub)
                 .font(.brand(.regular, size: 15, relativeTo: .body))
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.white.opacity(0.75))
                 .frame(maxWidth: 260)
             Spacer()
 
@@ -260,7 +260,7 @@ struct UnlockView: View {
             Text(.unlockPouredSub)
                 .font(.brand(.regular, size: 15, relativeTo: .body))
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.white.opacity(0.78))
         }
         .frame(maxHeight: .infinity)
         .accessibilityElement(children: .combine)

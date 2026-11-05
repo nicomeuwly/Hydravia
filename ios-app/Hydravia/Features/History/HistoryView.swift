@@ -25,7 +25,7 @@ struct HistoryView: View {
                         .accessibilityAddTraits(.isHeader)
                     Text(.historySubtitle)
                         .font(.brandFootnote)
-                        .foregroundStyle(Palette.textTertiary)
+                        .foregroundStyle(Palette.textSecondary)
                 }
                 .padding(.bottom, Spacing.xs)
 
@@ -106,7 +106,7 @@ private struct StatCard: View {
                 if let suffix {
                     Text(suffix)
                         .font(.brand(.medium, size: 18, relativeTo: .headline))
-                        .foregroundStyle(Palette.textTertiary)
+                        .foregroundStyle(Palette.textSecondary)
                 }
             }
         }
@@ -225,7 +225,7 @@ private struct WeekChartCard: View {
                             let isToday = LocalDay(date, calendar: .autoupdatingCurrent) == today
                             Text(date, format: .dateTime.weekday(.narrow))
                                 .font(.brand(isToday ? .bold : .semiBold, size: 12, relativeTo: .caption))
-                                .foregroundStyle(isToday ? Palette.primaryDark : Palette.textTertiary)
+                                .foregroundStyle(isToday ? Palette.primaryDark : Palette.textSecondary)
                         }
                     }
                 }

@@ -173,7 +173,7 @@ struct HomeHeaderText: View {
             Text(today.startDate(in: .autoupdatingCurrent) ?? .now,
                  format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                 .font(.brandFootnote)
-                .foregroundStyle(tone == .dark ? Palette.textTertiary : .white.opacity(0.72))
+                .foregroundStyle(tone == .dark ? Palette.textSecondary : .white.opacity(0.72))
         }
         .lineLimit(1)
         .minimumScaleFactor(0.7)

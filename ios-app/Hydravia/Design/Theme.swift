@@ -17,11 +17,13 @@ nonisolated enum Palette {
     static let backgroundElement = Color(hex: 0xEAF1F4)
     static let textPrimary = Color(hex: 0x0C1C26)
     static let textSecondary = Color(hex: 0x5C6F7A)
-    static let textTertiary = Color(hex: 0x9DAAB2)
+    /// Icons, chevrons, unselected controls (≥ 3:1). Not for text: small text
+    /// uses `textSecondary` (≥ 4.5:1, WCAG AA).
+    static let textTertiary = Color(hex: 0x74848E)
     static let border = Color(hex: 0xEBF0F2)
     static let amber = Color(hex: 0xDE9A2F)
-    static let amberDeep = Color(hex: 0xBC6418)
-    static let error = Color(hex: 0xD93025)
+    static let amberDeep = Color(hex: 0xA0520F)
+    static let error = Color(hex: 0xC62A1F)
     static let success = Color(hex: 0x2E7D32)
     static let sunlight = Color(hex: 0xFFD27A)
 
