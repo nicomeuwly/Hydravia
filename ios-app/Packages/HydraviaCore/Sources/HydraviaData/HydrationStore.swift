@@ -34,6 +34,10 @@ public final class HydrationStore {
     /// Totals of the last `streakWindowDays` days, for streaks: the 7-day
     /// window would cap them at 6.
     public private(set) var streakTotals: [DayTotal] = []
+    /// Every day with any intake, since the first entry: for lifetime counts
+    /// (goals reached in all). Ten drinks a day for years is still only a
+    /// few tens of thousands of rows, totalled once per refresh.
+    public private(set) var allTotals: [DayTotal] = []
     /// Bumped on every refresh (writes included), for screens showing
     /// derived data that want one cheap value to observe.
     public private(set) var revision = 0
@@ -60,7 +64,9 @@ public final class HydrationStore {
         today = LocalDay(now(), calendar: calendar)
         todayEntries = entries(on: today)
         todayTotalMl = todayEntries.reduce(0) { $0 + $1.amountMl }
-        streakTotals = dailyTotals(lastDays: Self.streakWindowDays)
+        allTotals = totals(of: fetch(FetchDescriptor<WaterEntry>()))
+        let firstStreakDay = today.adding(days: -(Self.streakWindowDays - 1))
+        streakTotals = allTotals.filter { $0.day >= firstStreakDay }
         let firstRecent = today.adding(days: -(Self.recentWindowDays - 1))
         recentTotals = streakTotals.filter { $0.day >= firstRecent }
         revision += 1
@@ -127,9 +133,13 @@ public final class HydrationStore {
         let firstDay = today.adding(days: -(max(1, count) - 1))
         guard let start = firstDay.startDate(in: calendar) else { return [] }
         let descriptor = FetchDescriptor<WaterEntry>(predicate: #Predicate { $0.createdAt >= start })
+        return totals(of: fetch(descriptor))
+    }
 
+    /// One total per local day, oldest first.
+    private func totals(of entries: [WaterEntry]) -> [DayTotal] {
         var totals: [LocalDay: Int] = [:]
-        for entry in fetch(descriptor) {
+        for entry in entries {
             totals[LocalDay(entry.createdAt, calendar: calendar), default: 0] += entry.amountMl
         }
         return totals

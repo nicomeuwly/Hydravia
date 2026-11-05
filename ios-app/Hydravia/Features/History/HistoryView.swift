@@ -11,31 +11,27 @@ struct HistoryView: View {
     @State private var showsEntries = false
 
     var body: some View {
-        let totals = hydration.recentTotals
         let streakTotals = hydration.streakTotals
         let goal = settings.dailyGoalMl
         let today = hydration.today
 
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.lg) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(.historyTitle)
-                        .font(.screenTitle)
-                        .kerning(-0.5)
-                        .foregroundStyle(Palette.textPrimary)
-                        .accessibilityAddTraits(.isHeader)
-                    Text(.historySubtitle)
-                        .font(.brandFootnote)
-                        .foregroundStyle(Palette.textSecondary)
-                }
-                .padding(.bottom, Spacing.xs)
+                Text(.historyTitle)
+                    .font(.screenTitle)
+                    .kerning(-0.5)
+                    .foregroundStyle(Palette.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, Spacing.xs)
 
                 HStack(spacing: Spacing.md) {
                     StatCard(icon: "flame.fill", tint: Palette.amber, label: .historyCurrentStreak,
                              value: Streak.current(streakTotals, goalMl: goal, today: today), suffix: nil)
-                    StatCard(icon: "calendar.badge.checkmark", tint: Palette.secondaryBlue, label: .historyDaysReached,
-                             value: Streak.daysReached(totals, goalMl: goal, today: today),
-                             suffix: "/\(HydrationStore.recentWindowDays)")
+                    // Every goal ever reached: it only ever grows, so it
+                    // still rewards someone whose streak just broke.
+                    StatCard(icon: "checkmark.seal.fill", tint: Palette.secondaryBlue, label: .historyDaysReached,
+                             value: Streak.daysReached(hydration.allTotals, goalMl: goal, today: today),
+                             suffix: nil)
                 }
 
                 WeekChartCard(totals: streakTotals, goalMl: goal, today: today)

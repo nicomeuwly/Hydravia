@@ -812,10 +812,11 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "jours atteints"
+            "value" : "objectifs atteints"
           }
         }
-      }
+      },
+      "comment" : "History stat: number of days the daily goal was reached, all time."
     },
     "history.subtitle" : {
       "extractionState" : "manual",
