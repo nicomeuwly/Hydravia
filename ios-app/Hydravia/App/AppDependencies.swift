@@ -14,6 +14,7 @@ final class AppDependencies {
     let reminders: ReminderService
     let store: StoreService
     let blocker: BlockerService
+    let watch: WatchSyncService
 
     init(container: ModelContainer, settings: SettingsStore) {
         self.container = container
@@ -27,6 +28,8 @@ final class AppDependencies {
         // Starts listening for App Store transactions immediately.
         self.store = StoreService(reminders: reminders)
         self.blocker = BlockerService()
+        // Listening at launch: a pour from the watch can be what woke the app.
+        self.watch = WatchSyncService(hydration: hydration, settings: settings, blocker: blocker, reminders: reminders)
     }
 
     /// The real, on-disk dependencies.
@@ -68,6 +71,7 @@ extension View {
             .environment(dependencies.location)
             .environment(dependencies.store)
             .environment(dependencies.blocker)
+            .environment(\.watch, dependencies.watch)
             .environment(\.reminders, dependencies.reminders)
     }
 }

@@ -1,0 +1,167 @@
+import HydraviaData
+import SwiftUI
+
+/// The watch's one screen: today's water as a ring, the next reminder, and
+/// (with Pro) the favourite amounts to pour in one tap.
+struct TodayView: View {
+    @Environment(WatchModel.self) private var model
+
+    var body: some View {
+        NavigationStack {
+            // Re-evaluated every minute: midnight resets the count and the
+            // reminder line moves on.
+            TimelineView(.everyMinute) { context in
+                ScrollView {
+                    VStack(spacing: 12) {
+                        // Before the iPhone's first numbers, the goal would
+                        // be a made-up one: only the way to set things up.
+                        if model.hasSnapshot {
+                            ProgressRing(
+                                progress: model.local.progress(at: context.date),
+                                consumedMl: model.local.todayMl(at: context.date),
+                                goalMl: model.local.state.goalMl
+                            )
+                            .frame(height: 118)
+
+                            StatusLine(local: model.local, now: context.date)
+                        }
+
+                        if !model.hasSnapshot {
+                            Note(icon: "iphone", title: Text(.watchSetupTitle), detail: Text(.watchSetupBody))
+                        } else if model.hasPro {
+                            PourButtons(amounts: model.favoritesMl) { model.pour($0) }
+                        } else {
+                            Note(icon: "lock.fill", title: Text(.watchProTitle), detail: Text(.watchProBody))
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            }
+            .navigationTitle(Text(verbatim: "Hydravia"))
+            .containerBackground(WatchPalette.background, for: .navigation)
+        }
+    }
+}
+
+/// Today's water against the goal.
+private struct ProgressRing: View {
+    let progress: Double
+    let consumedMl: Int
+    let goalMl: Int
+
+    private var reached: Bool { consumedMl >= goalMl }
+
+    var body: some View {
+        ZStack {
+            Circle().stroke(WatchPalette.track, lineWidth: 11)
+            Circle()
+                .trim(from: 0, to: max(0.001, min(progress, 1)))
+                .stroke(
+                    AngularGradient(colors: [WatchPalette.secondaryBlue, WatchPalette.foam], center: .center,
+                                    startAngle: .degrees(0), endAngle: .degrees(360 * max(progress, 0.05))),
+                    style: StrokeStyle(lineWidth: 11, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.spring(duration: 0.6), value: progress)
+
+            VStack(spacing: 0) {
+                Image(systemName: reached ? "checkmark.circle.fill" : "drop.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(WatchPalette.foam)
+                    .contentTransition(.symbolEffect(.replace))
+                Text(consumedMl.formatted())
+                    .font(.brand(.bold, size: 30, relativeTo: .title))
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(consumedMl)))
+                    .animation(.snappy, value: consumedMl)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text(.watchOfGoal(goalMl.formatted()))
+                    .font(.brand(.semiBold, size: 13, relativeTo: .caption))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 18)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(.watchProgressLabel(consumedMl.formatted(), goalMl.formatted())))
+    }
+}
+
+/// When the iPhone sends the next reminder, or that today's are done.
+private struct StatusLine: View {
+    let local: WatchLocalState
+    let now: Date
+
+    var body: some View {
+        if let text {
+            text
+                .font(.brand(.semiBold, size: 14, relativeTo: .footnote))
+                .foregroundStyle(local.isGoalReached(at: now) ? WatchPalette.foam : .secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var text: Text? {
+        guard local.snapshot != nil else { return nil }
+        let reached = local.isGoalReached(at: now)
+        guard local.state.remindersOn else { return reached ? Text(.watchGoalReached) : nil }
+        if reached { return Text(.watchGoalReachedPaused) }
+        guard let next = local.nextReminder(after: now) else { return nil }
+        let time = next.formatted(date: .omitted, time: .shortened)
+        return Calendar.autoupdatingCurrent.isDate(next, inSameDayAs: now)
+            ? Text(.watchNextReminder(time))
+            : Text(.watchNextReminderTomorrow(time))
+    }
+}
+
+/// The favourite amounts, one tap each.
+private struct PourButtons: View {
+    let amounts: [Int]
+    let pour: (Int) -> Void
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ForEach(amounts, id: \.self) { ml in
+                Button { pour(ml) } label: {
+                    Label {
+                        Text(.watchAdd(ml.formatted()))
+                    } icon: {
+                        Image(systemName: "drop.fill")
+                    }
+                    .font(.brand(.bold, size: 16, relativeTo: .body))
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(WatchPalette.secondaryBlue)
+            }
+        }
+    }
+}
+
+/// Why there's nothing to tap: no iPhone data yet, or no Pro.
+private struct Note: View {
+    let icon: String
+    let title: Text
+    let detail: Text
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Label { title } icon: { Image(systemName: icon) }
+                .font(.brand(.bold, size: 15, relativeTo: .headline))
+            detail
+                .font(.brand(.regular, size: 13, relativeTo: .footnote))
+                .foregroundStyle(.secondary)
+        }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .padding(10)
+        .background(.white.opacity(0.08), in: .rect(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+}
+
+#Preview {
+    TodayView().environment(WatchModel.shared)
+}

@@ -3,11 +3,12 @@ import OSLog
 import SwiftData
 
 /// Where an entry came from: added by hand, drunk through the unlock
-/// ritual, or poured from a home screen widget.
+/// ritual, poured from a home screen widget or from the Apple Watch.
 public enum EntrySource: String, Codable, Sendable {
     case manual
     case unlock
     case widget
+    case watch
 }
 
 /// Version 1 of the on-disk schema.

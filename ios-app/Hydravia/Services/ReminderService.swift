@@ -185,6 +185,15 @@ final class ReminderService: NSObject {
         center.removePendingNotificationRequests(withIdentifiers: [Self.trialEndIdentifier])
     }
 
+    /// Today's goal was reached away from the screen (a pour from the
+    /// watch): drops today's remaining reminders now, without waiting for
+    /// the next reschedule.
+    func restForToday() async {
+        let prefix = ReminderPlan.dayPrefix(for: .now, calendar: .autoupdatingCurrent)
+        let today = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(prefix) }
+        center.removePendingNotificationRequests(withIdentifiers: today)
+    }
+
     // MARK: Delivered reminders
 
     /// Whether a reminder was delivered and not answered yet — a banner the

@@ -15,6 +15,7 @@ struct RootView: View {
     @Environment(StoreService.self) private var store
     @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.watch) private var watch
     @AppStorage(QuickAdd.storageKey) private var lastQuickAddMl = 0
 
     /// What the reminder schedule depends on: any change reschedules.
@@ -136,6 +137,7 @@ struct RootView: View {
             )
             // The widgets read the same store: show the new total at once.
             WidgetCenter.shared.reloadAllTimelines()
+            watch?.push()
         }
         // The widgets can't read the settings or the App Store: hand them
         // what they show, once the plan is known (a subscriber's widgets
@@ -144,6 +146,8 @@ struct RootView: View {
             guard store.hasLoadedEntitlements, WidgetState.load() != widgetState else { return }
             widgetState.save()
             WidgetCenter.shared.reloadAllTimelines()
+            // The watch gets the same settings and plan.
+            watch?.push()
         }
         // A locked Pro widget opens the app here.
         .onOpenURL { url in

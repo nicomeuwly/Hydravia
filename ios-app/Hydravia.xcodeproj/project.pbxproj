@@ -7,25 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		000000000000000236000000 /* Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000160 /* Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		000000000000000220000000 /* HydraviaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000210000000 /* HydraviaCore */; };
+		000000000000000221000000 /* HydraviaData in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000211000000 /* HydraviaData */; };
 		000000000000000222000000 /* HydraviaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000212000000 /* HydraviaCore */; };
 		000000000000000223000000 /* HydraviaData in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000213000000 /* HydraviaData */; };
 		000000000000000233000000 /* DeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000130 /* DeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		000000000000000234000000 /* ShieldConfiguration.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000140 /* ShieldConfiguration.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		000000000000000235000000 /* ShieldAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000150 /* ShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		000000000000000220000000 /* HydraviaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000210000000 /* HydraviaCore */; };
-		000000000000000221000000 /* HydraviaData in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000211000000 /* HydraviaData */; };
+		000000000000000236000000 /* Widgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000160 /* Widgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		03C44836307807C70099DEEF /* Hydravia.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 03C44835307807C70099DEEF /* Hydravia.storekit */; };
+		0A1100000000000000000019 /* HydraviaWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A1100000000000000000003 /* HydraviaWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0A1100000000000000000018 /* HydraviaWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0A1100000000000000000004 /* HydraviaWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0A1100000000000000000010 /* HydraviaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0A1100000000000000000014 /* HydraviaCore */; };
+		0A1100000000000000000011 /* HydraviaData in Frameworks */ = {isa = PBXBuildFile; productRef = 0A1100000000000000000015 /* HydraviaData */; };
+		0A1100000000000000000012 /* HydraviaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0A1100000000000000000016 /* HydraviaCore */; };
+		0A1100000000000000000013 /* HydraviaData in Frameworks */ = {isa = PBXBuildFile; productRef = 0A1100000000000000000017 /* HydraviaData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		000000000000000600000007 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 000000000000000000000000 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 000000000000000700000000;
-			remoteInfo = Widgets;
-		};
 		000000000000000600000003 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 000000000000000000000000 /* Project object */;
@@ -47,14 +46,34 @@
 			remoteGlobalIDString = 000000000000000500000000;
 			remoteInfo = ShieldAction;
 		};
+		000000000000000600000007 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000700000000;
+			remoteInfo = Widgets;
+		};
+		0A110000000000000000001A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0A1100000000000000000002;
+			remoteInfo = HydraviaWatchWidgets;
+		};
+		0A110000000000000000001C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0A1100000000000000000001;
+			remoteInfo = HydraviaWatch;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		000000000000000150000000 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 13;
+			dstSubfolder = PlugIns;
 			files = (
 				000000000000000233000000 /* DeviceActivityMonitor.appex in Embed Foundation Extensions */,
 				000000000000000234000000 /* ShieldConfiguration.appex in Embed Foundation Extensions */,
@@ -62,27 +81,43 @@
 				000000000000000236000000 /* Widgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+		};
+		0A110000000000000000000C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0A1100000000000000000018 /* HydraviaWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A1100000000000000000024 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				0A1100000000000000000019 /* HydraviaWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		000000000000000000000160 /* Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* Hydravia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hydravia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000130 /* DeviceActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000140 /* ShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000150 /* ShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000120 /* Hydravia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hydravia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000160 /* Widgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		03C44835307807C70099DEEF /* Hydravia.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = Hydravia.storekit; path = StoreKit/Hydravia.storekit; sourceTree = "<group>"; };
+		0A1100000000000000000003 /* HydraviaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HydraviaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A1100000000000000000004 /* HydraviaWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HydraviaWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		000000000000000000000046 /* Exceptions for "Widgets" folder in "Widgets" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 000000000000000700000000 /* Widgets */;
-		};
 		000000000000000000000043 /* Exceptions for "DeviceActivityMonitor" folder in "DeviceActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -104,15 +139,33 @@
 			);
 			target = 000000000000000500000000 /* ShieldAction */;
 		};
+		000000000000000000000046 /* Exceptions for "Widgets" folder in "Widgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 000000000000000700000000 /* Widgets */;
+		};
+		0A1100000000000000000007 /* Exceptions for "WatchApp" folder in "HydraviaWatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0A1100000000000000000001 /* HydraviaWatch */;
+		};
+		0A1100000000000000000008 /* Exceptions for "WatchWidgets" folder in "HydraviaWatchWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0A1100000000000000000002 /* HydraviaWatchWidgets */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000034 /* Widgets */ = {
+		000000000000000000000010 /* Hydravia */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				000000000000000000000046 /* Exceptions for "Widgets" folder in "Widgets" target */,
-			);
-			path = Widgets;
+			path = Hydravia;
 			sourceTree = "<group>";
 		};
 		000000000000000000000030 /* Shared */ = {
@@ -144,19 +197,38 @@
 			path = ShieldAction;
 			sourceTree = "<group>";
 		};
-		000000000000000000000010 /* Hydravia */ = {
+		000000000000000000000034 /* Widgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Hydravia;
+			exceptions = (
+				000000000000000000000046 /* Exceptions for "Widgets" folder in "Widgets" target */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		0A1100000000000000000005 /* WatchApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0A1100000000000000000007 /* Exceptions for "WatchApp" folder in "HydraviaWatch" target */,
+			);
+			path = WatchApp;
+			sourceTree = "<group>";
+		};
+		0A1100000000000000000006 /* WatchWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0A1100000000000000000008 /* Exceptions for "WatchWidgets" folder in "HydraviaWatchWidgets" target */,
+			);
+			path = WatchWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		000000000000000730000000 /* Frameworks */ = {
+		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				000000000000000222000000 /* HydraviaCore in Frameworks */,
-				000000000000000223000000 /* HydraviaData in Frameworks */,
+				000000000000000220000000 /* HydraviaCore in Frameworks */,
+				000000000000000221000000 /* HydraviaData in Frameworks */,
 			);
 		};
 		000000000000000330000000 /* Frameworks */ = {
@@ -174,27 +246,34 @@
 			files = (
 			);
 		};
-		000000000000000130000000 /* Frameworks */ = {
+		000000000000000730000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				000000000000000220000000 /* HydraviaCore in Frameworks */,
-				000000000000000221000000 /* HydraviaData in Frameworks */,
+				000000000000000222000000 /* HydraviaCore in Frameworks */,
+				000000000000000223000000 /* HydraviaData in Frameworks */,
 			);
+		};
+		0A110000000000000000000A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A1100000000000000000010 /* HydraviaCore in Frameworks */,
+				0A1100000000000000000011 /* HydraviaData in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A110000000000000000000E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A1100000000000000000012 /* HydraviaCore in Frameworks */,
+				0A1100000000000000000013 /* HydraviaData in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		000000000000000000000021 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				000000000000000000000031 /* DeviceActivityMonitor */,
-				000000000000000000000032 /* ShieldConfiguration */,
-				000000000000000000000033 /* ShieldAction */,
-				000000000000000000000034 /* Widgets */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +282,8 @@
 				000000000000000000000030 /* Shared */,
 				000000000000000000000021 /* Extensions */,
 				000000000000000000000020 /* Products */,
+				0A1100000000000000000005 /* WatchApp */,
+				0A1100000000000000000006 /* WatchWidgets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -214,13 +295,115 @@
 				000000000000000000000140 /* ShieldConfiguration.appex */,
 				000000000000000000000150 /* ShieldAction.appex */,
 				000000000000000000000160 /* Widgets.appex */,
+				0A1100000000000000000003 /* HydraviaWatch.app */,
+				0A1100000000000000000004 /* HydraviaWatchWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		000000000000000000000021 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000031 /* DeviceActivityMonitor */,
+				000000000000000000000032 /* ShieldConfiguration */,
+				000000000000000000000033 /* ShieldAction */,
+				000000000000000000000034 /* Widgets */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		000000000000000100000000 /* Hydravia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Hydravia" */;
+			buildPhases = (
+				000000000000000120000000 /* Sources */,
+				000000000000000130000000 /* Frameworks */,
+				000000000000000140000000 /* Resources */,
+				000000000000000150000000 /* Embed Foundation Extensions */,
+				0A1100000000000000000024 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				000000000000000610000003 /* PBXTargetDependency */,
+				000000000000000610000004 /* PBXTargetDependency */,
+				000000000000000610000005 /* PBXTargetDependency */,
+				000000000000000610000007 /* PBXTargetDependency */,
+				0A110000000000000000001D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000010 /* Hydravia */,
+				000000000000000000000030 /* Shared */,
+			);
+			name = Hydravia;
+			packageProductDependencies = (
+				000000000000000210000000 /* HydraviaCore */,
+				000000000000000211000000 /* HydraviaData */,
+			);
+			productName = Hydravia;
+			productReference = 000000000000000000000120 /* Hydravia.app */;
+			productType = "com.apple.product-type.application";
+		};
+		000000000000000300000000 /* DeviceActivityMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000310000000 /* Build configuration list for PBXNativeTarget "DeviceActivityMonitor" */;
+			buildPhases = (
+				000000000000000320000000 /* Sources */,
+				000000000000000330000000 /* Frameworks */,
+				000000000000000340000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000030 /* Shared */,
+				000000000000000000000031 /* DeviceActivityMonitor */,
+			);
+			name = DeviceActivityMonitor;
+			productName = DeviceActivityMonitor;
+			productReference = 000000000000000000000130 /* DeviceActivityMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		000000000000000400000000 /* ShieldConfiguration */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000410000000 /* Build configuration list for PBXNativeTarget "ShieldConfiguration" */;
+			buildPhases = (
+				000000000000000420000000 /* Sources */,
+				000000000000000430000000 /* Frameworks */,
+				000000000000000440000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000030 /* Shared */,
+				000000000000000000000032 /* ShieldConfiguration */,
+			);
+			name = ShieldConfiguration;
+			productName = ShieldConfiguration;
+			productReference = 000000000000000000000140 /* ShieldConfiguration.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		000000000000000500000000 /* ShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000510000000 /* Build configuration list for PBXNativeTarget "ShieldAction" */;
+			buildPhases = (
+				000000000000000520000000 /* Sources */,
+				000000000000000530000000 /* Frameworks */,
+				000000000000000540000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000030 /* Shared */,
+				000000000000000000000033 /* ShieldAction */,
+			);
+			name = ShieldAction;
+			productName = ShieldAction;
+			productReference = 000000000000000000000150 /* ShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		000000000000000700000000 /* Widgets */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 000000000000000710000000 /* Build configuration list for PBXNativeTarget "Widgets" */;
@@ -243,92 +426,55 @@
 			productReference = 000000000000000000000160 /* Widgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		000000000000000300000000 /* DeviceActivityMonitor */ = {
+		0A1100000000000000000001 /* HydraviaWatch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000310000000 /* Build configuration list for PBXNativeTarget "DeviceActivityMonitor" */;
+			buildConfigurationList = 0A110000000000000000001E /* Build configuration list for PBXNativeTarget "HydraviaWatch" */;
 			buildPhases = (
-				000000000000000320000000 /* Sources */,
-				000000000000000330000000 /* Frameworks */,
-				000000000000000340000000 /* Resources */,
-			);
-			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000031 /* DeviceActivityMonitor */,
-				000000000000000000000030 /* Shared */,
-			);
-			name = DeviceActivityMonitor;
-			productName = DeviceActivityMonitor;
-			productReference = 000000000000000000000130 /* DeviceActivityMonitor.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		000000000000000400000000 /* ShieldConfiguration */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000410000000 /* Build configuration list for PBXNativeTarget "ShieldConfiguration" */;
-			buildPhases = (
-				000000000000000420000000 /* Sources */,
-				000000000000000430000000 /* Frameworks */,
-				000000000000000440000000 /* Resources */,
-			);
-			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000032 /* ShieldConfiguration */,
-				000000000000000000000030 /* Shared */,
-			);
-			name = ShieldConfiguration;
-			productName = ShieldConfiguration;
-			productReference = 000000000000000000000140 /* ShieldConfiguration.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		000000000000000500000000 /* ShieldAction */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000510000000 /* Build configuration list for PBXNativeTarget "ShieldAction" */;
-			buildPhases = (
-				000000000000000520000000 /* Sources */,
-				000000000000000530000000 /* Frameworks */,
-				000000000000000540000000 /* Resources */,
-			);
-			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000033 /* ShieldAction */,
-				000000000000000000000030 /* Shared */,
-			);
-			name = ShieldAction;
-			productName = ShieldAction;
-			productReference = 000000000000000000000150 /* ShieldAction.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		000000000000000100000000 /* Hydravia */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Hydravia" */;
-			buildPhases = (
-				000000000000000120000000 /* Sources */,
-				000000000000000130000000 /* Frameworks */,
-				000000000000000140000000 /* Resources */,
-				000000000000000150000000 /* Embed Foundation Extensions */,
+				0A1100000000000000000009 /* Sources */,
+				0A110000000000000000000A /* Frameworks */,
+				0A110000000000000000000B /* Resources */,
+				0A110000000000000000000C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				000000000000000610000003 /* PBXTargetDependency */,
-				000000000000000610000004 /* PBXTargetDependency */,
-				000000000000000610000005 /* PBXTargetDependency */,
-				000000000000000610000007 /* PBXTargetDependency */,
+				0A110000000000000000001B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* Hydravia */,
-				000000000000000000000030 /* Shared */,
+				0A1100000000000000000005 /* WatchApp */,
 			);
-			name = Hydravia;
+			name = HydraviaWatch;
 			packageProductDependencies = (
-				000000000000000210000000 /* HydraviaCore */,
-				000000000000000211000000 /* HydraviaData */,
+				0A1100000000000000000014 /* HydraviaCore */,
+				0A1100000000000000000015 /* HydraviaData */,
 			);
-			productName = Hydravia;
-			productReference = 000000000000000000000120 /* Hydravia.app */;
+			productName = HydraviaWatch;
+			productReference = 0A1100000000000000000003 /* HydraviaWatch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		0A1100000000000000000002 /* HydraviaWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A1100000000000000000021 /* Build configuration list for PBXNativeTarget "HydraviaWatchWidgets" */;
+			buildPhases = (
+				0A110000000000000000000D /* Sources */,
+				0A110000000000000000000E /* Frameworks */,
+				0A110000000000000000000F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0A1100000000000000000006 /* WatchWidgets */,
+			);
+			name = HydraviaWatchWidgets;
+			packageProductDependencies = (
+				0A1100000000000000000016 /* HydraviaCore */,
+				0A1100000000000000000017 /* HydraviaData */,
+			);
+			productName = HydraviaWatchWidgets;
+			productReference = 0A1100000000000000000004 /* HydraviaWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -353,6 +499,12 @@
 						CreatedOnToolsVersion = 27.2;
 					};
 					000000000000000700000000 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					0A1100000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					0A1100000000000000000002 = {
 						CreatedOnToolsVersion = 27.2;
 					};
 				};
@@ -382,14 +534,17 @@
 				000000000000000400000000 /* ShieldConfiguration */,
 				000000000000000500000000 /* ShieldAction */,
 				000000000000000700000000 /* Widgets */,
+				0A1100000000000000000001 /* HydraviaWatch */,
+				0A1100000000000000000002 /* HydraviaWatchWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		000000000000000740000000 /* Resources */ = {
+		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				03C44836307807C70099DEEF /* Hydravia.storekit in Resources */,
 			);
 		};
 		000000000000000340000000 /* Resources */ = {
@@ -407,16 +562,29 @@
 			files = (
 			);
 		};
-		000000000000000140000000 /* Resources */ = {
+		000000000000000740000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				03C44836307807C70099DEEF /* Hydravia.storekit in Resources */,
 			);
+		};
+		0A110000000000000000000B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A110000000000000000000F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		000000000000000720000000 /* Sources */ = {
+		000000000000000120000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -436,19 +604,28 @@
 			files = (
 			);
 		};
-		000000000000000120000000 /* Sources */ = {
+		000000000000000720000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
 		};
+		0A1100000000000000000009 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A110000000000000000000D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		000000000000000610000007 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 000000000000000700000000 /* Widgets */;
-			targetProxy = 000000000000000600000007 /* PBXContainerItemProxy */;
-		};
 		000000000000000610000003 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 000000000000000300000000 /* DeviceActivityMonitor */;
@@ -464,32 +641,181 @@
 			target = 000000000000000500000000 /* ShieldAction */;
 			targetProxy = 000000000000000600000005 /* PBXContainerItemProxy */;
 		};
+		000000000000000610000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000700000000 /* Widgets */;
+			targetProxy = 000000000000000600000007 /* PBXContainerItemProxy */;
+		};
+		0A110000000000000000001B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0A1100000000000000000002 /* HydraviaWatchWidgets */;
+			targetProxy = 0A110000000000000000001A /* PBXContainerItemProxy */;
+		};
+		0A110000000000000000001D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0A1100000000000000000001 /* HydraviaWatch */;
+			targetProxy = 0A110000000000000000001C /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000711000000 /* Debug configuration for PBXNativeTarget "Widgets" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "Hydravia" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Entitlements/Widgets.entitlements;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		000000000000000012000000 /* Release configuration for PBXProject "Hydravia" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Hydravia" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/Hydravia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Extensions/Widgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Hydravia uses your location to adapt your dose to the outside temperature.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
@@ -497,29 +823,40 @@
 			};
 			name = Debug;
 		};
-		000000000000000712000000 /* Release configuration for PBXNativeTarget "Widgets" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "Hydravia" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Entitlements/Widgets.entitlements;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/Hydravia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Extensions/Widgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Hydravia uses your location to adapt your dose to the outside temperature.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
@@ -707,219 +1044,218 @@
 			};
 			name = Release;
 		};
-		000000000000000011000000 /* Debug configuration for PBXProject "Hydravia" */ = {
+		000000000000000711000000 /* Debug configuration for PBXNativeTarget "Widgets" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+				CODE_SIGN_ENTITLEMENTS = Entitlements/Widgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Extensions/Widgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
 				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "Hydravia" */ = {
+		000000000000000712000000 /* Release configuration for PBXNativeTarget "Widgets" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				SDKROOT = iphoneos;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/Widgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Extensions/Widgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				VALIDATE_PRODUCT = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Hydravia" */ = {
+		0A110000000000000000001F /* Debug configuration for PBXNativeTarget "HydraviaWatch" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Entitlements/Hydravia.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WatchApp.entitlements;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Hydravia uses your location to adapt your dose to the outside temperature.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				INFOPLIST_FILE = WatchApp/Info.plist;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.nicomeuwly.hydravia;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.watchkitapp;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "Hydravia" */ = {
+		0A1100000000000000000020 /* Release configuration for PBXNativeTarget "HydraviaWatch" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Entitlements/Hydravia.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WatchApp.entitlements;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Hydravia uses your location to adapt your dose to the outside temperature.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				INFOPLIST_FILE = WatchApp/Info.plist;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.nicomeuwly.hydravia;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.watchkitapp;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		0A1100000000000000000022 /* Debug configuration for PBXNativeTarget "HydraviaWatchWidgets" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WatchWidgets.entitlements;
+				INFOPLIST_FILE = WatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.watchkitapp.widgets;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		0A1100000000000000000023 /* Release configuration for PBXNativeTarget "HydraviaWatchWidgets" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Entitlements/WatchWidgets.entitlements;
+				INFOPLIST_FILE = WatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicomeuwly.hydravia.watchkitapp.widgets;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WLUNP8LN7D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000710000000 /* Build configuration list for PBXNativeTarget "Widgets" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "Hydravia" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000711000000 /* Debug configuration for PBXNativeTarget "Widgets" */,
-				000000000000000712000000 /* Release configuration for PBXNativeTarget "Widgets" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "Hydravia" */,
+				000000000000000012000000 /* Release configuration for PBXProject "Hydravia" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Hydravia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Hydravia" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "Hydravia" */,
 			);
 			defaultConfigurationName = Release;
 		};
@@ -947,19 +1283,27 @@
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000010000000 /* Build configuration list for PBXProject "Hydravia" */ = {
+		000000000000000710000000 /* Build configuration list for PBXNativeTarget "Widgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "Hydravia" */,
-				000000000000000012000000 /* Release configuration for PBXProject "Hydravia" */,
+				000000000000000711000000 /* Debug configuration for PBXNativeTarget "Widgets" */,
+				000000000000000712000000 /* Release configuration for PBXNativeTarget "Widgets" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Hydravia" */ = {
+		0A110000000000000000001E /* Build configuration list for PBXNativeTarget "HydraviaWatch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Hydravia" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "Hydravia" */,
+				0A110000000000000000001F /* Debug configuration for PBXNativeTarget "HydraviaWatch" */,
+				0A1100000000000000000020 /* Release configuration for PBXNativeTarget "HydraviaWatch" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		0A1100000000000000000021 /* Build configuration list for PBXNativeTarget "HydraviaWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A1100000000000000000022 /* Debug configuration for PBXNativeTarget "HydraviaWatchWidgets" */,
+				0A1100000000000000000023 /* Release configuration for PBXNativeTarget "HydraviaWatchWidgets" */,
 			);
 			defaultConfigurationName = Release;
 		};
@@ -973,6 +1317,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		000000000000000210000000 /* HydraviaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HydraviaCore;
+		};
+		000000000000000211000000 /* HydraviaData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HydraviaData;
+		};
 		000000000000000212000000 /* HydraviaCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HydraviaCore;
@@ -981,11 +1333,19 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = HydraviaData;
 		};
-		000000000000000210000000 /* HydraviaCore */ = {
+		0A1100000000000000000014 /* HydraviaCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HydraviaCore;
 		};
-		000000000000000211000000 /* HydraviaData */ = {
+		0A1100000000000000000015 /* HydraviaData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HydraviaData;
+		};
+		0A1100000000000000000016 /* HydraviaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HydraviaCore;
+		};
+		0A1100000000000000000017 /* HydraviaData */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HydraviaData;
 		};

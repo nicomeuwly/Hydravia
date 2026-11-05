@@ -12,7 +12,7 @@ import PackageDescription
 // same way — against an in-memory store, on the Mac, in a second.
 let package = Package(
     name: "HydraviaCore",
-    platforms: [.iOS(.v26), .macOS(.v15)],
+    platforms: [.iOS(.v26), .watchOS(.v26), .macOS(.v15)],
     products: [
         .library(name: "HydraviaCore", targets: ["HydraviaCore"]),
         .library(name: "HydraviaData", targets: ["HydraviaData"]),

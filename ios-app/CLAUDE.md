@@ -51,6 +51,16 @@ node Scripts/generate-strings.mjs
   widget, the Pro quick-add widget (`AddWaterIntent` writes straight to the
   store) and Pro Lock Screen widgets. It links HydraviaCore/HydraviaData, not
   `Shared/`, and keeps its own tokens, fonts and `Localizable.xcstrings`.
+- `WatchApp/` (target `HydraviaWatch`, watchOS 26, MainActor default) and
+  `WatchWidgets/` (`HydraviaWatchWidgets`, complications), synchronized
+  folders with their own tokens, fonts and catalogs; they link
+  HydraviaCore/HydraviaData only. The iPhone holds the history:
+  `WatchSyncService` (WatchConnectivity) counts the watch's pours once
+  (`WatchTally`, by pour id) and sends a `WatchSnapshot` (application
+  context, plus complication transfers) after every change. The watch keeps
+  `WatchLocalState` (snapshot + undelivered pours) in its App Group and
+  resends pending pours until a snapshot lists them. Viewing is free,
+  pouring from the watch is Pro.
 - The SwiftData store lives in the App Group (moved there once by
   `Persistence.makeContainer`); extensions open it only if it exists. The app
   copies what widgets need (goal, amounts, schedule, plan) into
