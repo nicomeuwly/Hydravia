@@ -2,6 +2,7 @@ import Combine
 import HydraviaCore
 import HydraviaData
 import SwiftUI
+import WidgetKit
 
 /// Picks onboarding or the app, and keeps "today" fresh: returning to the
 /// foreground or crossing midnight re-reads the day, so the home screen never
@@ -14,6 +15,7 @@ struct RootView: View {
     @Environment(StoreService.self) private var store
     @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(QuickAdd.storageKey) private var lastQuickAddMl = 0
 
     /// What the reminder schedule depends on: any change reschedules.
     private struct Schedule: Equatable {
@@ -116,7 +118,39 @@ struct RootView: View {
                 goalMl: goal,
                 streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today)
             )
+            // The widgets read the same store: show the new total at once.
+            WidgetCenter.shared.reloadAllTimelines()
         }
+        // The widgets can't read the settings or the App Store: hand them
+        // what they show, once the plan is known (a subscriber's widgets
+        // must not flash locked at launch).
+        .task(id: WidgetSync(state: widgetState, loaded: store.hasLoadedEntitlements)) {
+            guard store.hasLoadedEntitlements, WidgetState.load() != widgetState else { return }
+            widgetState.save()
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        // A locked Pro widget opens the app here.
+        .onOpenURL { url in
+            guard url == URL(string: "hydravia://paywall"), settings.settings.onboardingDone else { return }
+            router.sheet = .paywall
+        }
+    }
+
+    private var widgetState: WidgetState {
+        WidgetState(
+            goalMl: settings.dailyGoalMl,
+            quickAddMl: QuickAdd.amount(last: lastQuickAddMl, favorites: settings.settings.favoriteAmountsMl),
+            favoritesMl: settings.settings.favoriteAmountsMl,
+            window: settings.settings.window,
+            remindersOn: areRemindersEnabled,
+            isPro: store.hasPro,
+            proUntil: store.isPremium ? Blocker.proUntil : nil
+        )
+    }
+
+    private struct WidgetSync: Equatable {
+        let state: WidgetState
+        let loaded: Bool
     }
 
     private struct ShieldProgress: Equatable {

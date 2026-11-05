@@ -6969,6 +6969,36 @@
           }
         }
       }
+    },
+    "paywall.feature3" : {
+      "comment" : "Paywall feature: the Pro widgets (quick add buttons, Lock Screen).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets, um ein Glas mit einem Tipp einzutragen, auch auf dem Sperrbildschirm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets to log a glass in one tap, even on the Lock Screen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widgets para registrar un vaso con un toque, incluso en la pantalla bloqueada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les widgets pour boire en un geste, même écran verrouillé"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

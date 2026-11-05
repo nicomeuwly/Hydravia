@@ -47,8 +47,16 @@ node Scripts/generate-strings.mjs
   look and copy), `ShieldAction` (shield buttons; "Drink my dose" posts a
   `hydration-reminder-shield` notification that opens the ritual). Each
   `Info.plist` is excluded from its folder's membership. Class names must
-  match `NSExtensionPrincipalClass`.
-- `Entitlements/` — Family Controls + App Group for all four targets.
+  match `NSExtensionPrincipalClass`. `Widgets` (WidgetKit): the free progress
+  widget, the Pro quick-add widget (`AddWaterIntent` writes straight to the
+  store) and Pro Lock Screen widgets. It links HydraviaCore/HydraviaData, not
+  `Shared/`, and keeps its own tokens, fonts and `Localizable.xcstrings`.
+- The SwiftData store lives in the App Group (moved there once by
+  `Persistence.makeContainer`); extensions open it only if it exists. The app
+  copies what widgets need (goal, amounts, schedule, plan) into
+  `WidgetState` and reloads timelines after every change.
+- `Entitlements/` — App Group for every target, Family Controls for the app
+  and the Screen Time extensions.
   Screen Time only works on a real device; on the simulator authorization
   fails and the lock stays off.
 

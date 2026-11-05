@@ -91,6 +91,7 @@ struct PaywallView: View {
             VStack(alignment: .leading, spacing: Spacing.lg) {
                 feature(.paywallFeature1, icon: "lock.fill")
                 feature(.paywallFeature2, icon: "sun.max.fill")
+                feature(.paywallFeature3, icon: "apps.iphone")
             }
            }
            .frame(maxWidth: .infinity, alignment: .leading)
