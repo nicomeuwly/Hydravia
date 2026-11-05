@@ -24,6 +24,9 @@ struct QuickAddWidgetView: View {
 
     private var ink: PlateInk { PlateInk(mode: mode) }
 
+    /// A third of the medium widget's content height, less the gaps.
+    private static let buttonHeight: CGFloat = 40
+
     private var amounts: [Int] {
         family == .systemSmall ? [entry.state.quickAddMl] : Array(entry.state.favoritesMl.prefix(3))
     }
@@ -80,6 +83,9 @@ struct QuickAddWidgetView: View {
                         .font(.brand(.bold, size: 15, relativeTo: .body))
                         .foregroundStyle(ink.primary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        // The medium widget's three buttons share its height;
+                        // the small one's single button matches them.
+                        .frame(height: family == .systemSmall ? Self.buttonHeight : nil)
                         .background { Plate(shape: Capsule()) }
                     }
                     .buttonStyle(.plain)

@@ -137,3 +137,26 @@ struct PlateInk {
     var primary: Color { mode == .fullColor ? WidgetPalette.primaryDark : .white }
     var secondary: Color { mode == .fullColor ? WidgetPalette.textSecondary : .white.opacity(0.75) }
 }
+
+/// A drop filling up with today's progress: what says "Hydravia" once a
+/// tinted or clear Home Screen has taken the water away. A hard-edged
+/// gradient fills it from the bottom (a mask would leave a ghost frame).
+struct DropGauge: View {
+    var level: Double
+    var tint: Color
+    var size: CGFloat = 30
+
+    var body: some View {
+        let surface = 1 - min(max(level, 0), 1)
+        Image(systemName: "drop.fill")
+            .font(.system(size: size, weight: .semibold))
+            .foregroundStyle(LinearGradient(stops: [
+                .init(color: tint.opacity(0.3), location: 0),
+                .init(color: tint.opacity(0.3), location: surface),
+                .init(color: tint, location: surface),
+                .init(color: tint, location: 1),
+            ], startPoint: .top, endPoint: .bottom))
+            .widgetAccentable()
+            .accessibilityHidden(true)
+    }
+}

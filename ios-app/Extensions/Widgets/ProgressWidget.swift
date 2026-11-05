@@ -17,18 +17,31 @@ struct ProgressWidget: Widget {
 struct ProgressWidgetView: View {
     let entry: HydrationEntry
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var mode
 
     var body: some View {
         Waterline(level: entry.progress) { tint, secondary in
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 0) {
-                    WidgetHeader(entry: entry, tint: tint)
+                    HStack(alignment: .top) {
+                        WidgetHeader(entry: entry, tint: tint)
+                        if mode != .fullColor && family == .systemSmall {
+                            Spacer(minLength: 4)
+                            DropGauge(level: entry.progress, tint: tint)
+                        }
+                    }
                     Spacer(minLength: 0)
                     AmountLabel(entry: entry, tint: tint, secondary: secondary, size: family == .systemSmall ? 30 : 34)
                 }
                 if family == .systemMedium {
                     Spacer(minLength: 8)
-                    ReminderLabel(entry: entry, tint: tint, secondary: secondary)
+                    VStack(alignment: .trailing, spacing: 0) {
+                        if mode != .fullColor {
+                            DropGauge(level: entry.progress, tint: tint, size: 34)
+                        }
+                        Spacer(minLength: 0)
+                        ReminderLabel(entry: entry, tint: tint, secondary: secondary)
+                    }
                 }
             }
             .padding(16)
