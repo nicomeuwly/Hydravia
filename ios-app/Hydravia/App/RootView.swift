@@ -88,6 +88,12 @@ struct RootView: View {
         }
         .onReceive(Self.dayOrZoneChanges) { _ in
             hydration.refresh()
+            // The lock's window is wall-clock time: re-register it in the new
+            // zone (DeviceActivity schedules otherwise keep the old offsets).
+            if store.hasLoadedEntitlements {
+                blocker.sync(window: settings.settings.window,
+                             enabled: areRemindersEnabled && hasRitual, force: true)
+            }
         }
         // The shield shows today's progress; every drink, goal change or new
         // day hands it fresh numbers.
@@ -96,7 +102,7 @@ struct RootView: View {
             blocker.shareProgress(
                 consumedMl: hydration.todayTotalMl,
                 goalMl: goal,
-                streak: Streak.current(hydration.recentTotals, goalMl: goal, today: hydration.today)
+                streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today)
             )
         }
     }

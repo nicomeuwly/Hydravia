@@ -49,10 +49,17 @@ final class ShieldActionExtension: ShieldActionDelegate {
         content.threadIdentifier = "hydration"
 
         let center = UNUserNotificationCenter.current()
-        center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
-        center.add(UNNotificationRequest(identifier: Blocker.shieldNotificationIdentifier,
-                                         content: content, trigger: nil)) { error in
-            completion(error == nil)
+        // With notifications off nothing would appear: report failure so the
+        // shield closes the app instead of leaving the user on a dead button.
+        center.getNotificationSettings { settings in
+            guard [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus),
+                  settings.alertSetting == .enabled
+            else { return completion(false) }
+            center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
+            center.add(UNNotificationRequest(identifier: Blocker.shieldNotificationIdentifier,
+                                             content: content, trigger: nil)) { error in
+                completion(error == nil)
+            }
         }
     }
 }

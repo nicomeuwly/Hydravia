@@ -11,7 +11,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         switch activity {
         case Blocker.windowActivity:
             // A new day's window: yesterday's unlock doesn't carry over.
-            if let until = Blocker.unlockedUntil, !Calendar.current.isDateInToday(until) {
+            if let until = Blocker.unlockedUntil, !Calendar.autoupdatingCurrent.isDateInToday(until) {
                 Blocker.unlockedUntil = nil
             }
             Blocker.refreshShield()

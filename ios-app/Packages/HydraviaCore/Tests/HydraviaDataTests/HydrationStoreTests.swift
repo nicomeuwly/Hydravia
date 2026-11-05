@@ -67,6 +67,21 @@ struct HydrationStoreTests {
         #expect(store.recentTotals.count == 1) // yesterday's 500 is still recent
     }
 
+    @Test func streaksSeeFurtherBackThanTheWeek() throws {
+        // Goal met every day from Aug 1 to Aug 20, then "today" is Aug 21.
+        let clock = Clock(date(1, 12))
+        let store = try makeStore(at: clock)
+        for day in 1...20 {
+            clock.date = date(day, 12)
+            try store.add(2_000, source: .manual)
+        }
+        clock.date = date(21, 9)
+        store.refresh()
+        #expect(store.recentTotals.count == 6) // Aug 15–20; today is empty
+        #expect(Streak.current(store.streakTotals, goalMl: 2_000, today: store.today) == 20)
+        #expect(Streak.best(store.streakTotals, goalMl: 2_000, today: store.today) == 20)
+    }
+
     @Test func dailyTotalsGroupByLocalDayAndOmitEmptyDays() throws {
         let clock = Clock(date(10, 9))
         let store = try makeStore(at: clock)

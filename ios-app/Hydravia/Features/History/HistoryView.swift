@@ -11,6 +11,7 @@ struct HistoryView: View {
 
     var body: some View {
         let totals = hydration.recentTotals
+        let streakTotals = hydration.streakTotals
         let goal = settings.dailyGoalMl
         let today = hydration.today
 
@@ -30,7 +31,7 @@ struct HistoryView: View {
 
                 HStack(spacing: Spacing.md) {
                     StatCard(icon: "flame.fill", tint: Palette.amber, label: .historyCurrentStreak,
-                             value: Streak.current(totals, goalMl: goal, today: today), suffix: nil)
+                             value: Streak.current(streakTotals, goalMl: goal, today: today), suffix: nil)
                     StatCard(icon: "calendar.badge.checkmark", tint: Palette.secondaryBlue, label: .historyDaysReached,
                              value: Streak.daysReached(totals, goalMl: goal, today: today),
                              suffix: "/\(HydrationStore.recentWindowDays)")
@@ -38,7 +39,7 @@ struct HistoryView: View {
 
                 WeekChartCard(totals: totals, goalMl: goal, today: today)
 
-                let best = Streak.best(totals, goalMl: goal, today: today)
+                let best = Streak.best(streakTotals, goalMl: goal, today: today)
                 HStack {
                     Label {
                         Text(.historyBestStreak)

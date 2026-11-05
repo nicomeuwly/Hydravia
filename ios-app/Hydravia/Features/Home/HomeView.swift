@@ -109,7 +109,7 @@ struct HomeView: View {
     }
 
     private var currentStreak: Int {
-        Streak.current(hydration.recentTotals, goalMl: settings.dailyGoalMl, today: hydration.today)
+        Streak.current(hydration.streakTotals, goalMl: settings.dailyGoalMl, today: hydration.today)
     }
 
     // MARK: Waterline header

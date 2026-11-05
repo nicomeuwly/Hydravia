@@ -95,10 +95,15 @@ final class StoreService {
         await task.value
     }
 
+    /// Renewals reach the device only when the app runs; a day's margin keeps
+    /// a renewing subscriber's lock from lapsing in between.
+    private static let renewalGrace: TimeInterval = 24 * 3600
+
     private func readEntitlements() async {
         var active = false
         var sawUnverified = false
         var trial: Transaction?
+        var expiresAt: Date?
 
         for await result in Transaction.currentEntitlements {
             switch result {
@@ -106,6 +111,7 @@ final class StoreService {
                 guard Self.productIDs.contains(transaction.productID), transaction.revocationDate == nil else { continue }
                 active = true
                 if transaction.offer?.type == .introductory { trial = transaction }
+                if let date = transaction.expirationDate { expiresAt = max(expiresAt ?? date, date) }
             case .unverified(let transaction, let error):
                 guard Self.productIDs.contains(transaction.productID) else { continue }
                 sawUnverified = true
@@ -120,6 +126,10 @@ final class StoreService {
             isPremium = active || (sawUnverified && isPremium)
         }
         hasLoadedEntitlements = true
+        // The Screen Time extensions can't ask the App Store: tell them how
+        // long the lock may run, so a lapse while the app is closed doesn't
+        // keep shielding a non-subscriber's apps.
+        if active { Blocker.proUntil = expiresAt.map { $0.addingTimeInterval(Self.renewalGrace) } }
 
         await syncTrialEndReminder(trial: trial)
         await updateTrialEligibility()

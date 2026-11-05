@@ -18,8 +18,9 @@ struct LiveWater<Overlay: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
 
-    private var calm: Bool { reduceMotion }
-    private var minimumInterval: Double? { reduceMotion || lowPower ? 1.0 / 30 : nil }
+    /// Reduce Motion or Low Power Mode: calmer waves, 30 fps, no motion sensor.
+    private var calm: Bool { reduceMotion || lowPower }
+    private var minimumInterval: Double? { calm ? 1.0 / 30 : nil }
 
     var body: some View {
         GeometryReader { proxy in

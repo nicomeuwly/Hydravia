@@ -24,6 +24,8 @@ struct PaywallView: View {
     @State private var showsError = false
     @State private var showsPending = false
     @State private var restoreResult: Bool?
+    @State private var isRestoring = false
+    @State private var isRetrying = false
 
     var body: some View {
         ZStack {
@@ -172,10 +174,26 @@ struct PaywallView: View {
     @ViewBuilder
     private var plans: some View {
         if store.productsFailedToLoad {
-            Label { Text(.paywallUnavailable) } icon: { Image(systemName: "wifi.exclamationmark") }
-                .font(.brandFootnote)
-                .foregroundStyle(Palette.textSecondary)
-                .task { await store.loadProducts() }
+            VStack(spacing: Spacing.md) {
+                Label { Text(.paywallUnavailable) } icon: { Image(systemName: "wifi.exclamationmark") }
+                    .font(.brandFootnote)
+                    .foregroundStyle(Palette.textSecondary)
+                Button {
+                    isRetrying = true
+                    Task {
+                        await store.loadProducts()
+                        isRetrying = false
+                    }
+                } label: {
+                    if isRetrying { ProgressView() } else { Text(.commonRetry) }
+                }
+                .font(.brand(.semiBold, size: 15, relativeTo: .subheadline))
+                .tint(Palette.primaryDark)
+                .frame(minHeight: 44)
+                .disabled(isRetrying)
+            }
+            .frame(maxWidth: .infinity)
+            .task { await store.loadProducts() }
         } else if let yearly = store.yearly, let monthly = store.monthly {
             VStack(spacing: Spacing.md) {
                 PlanCard(
@@ -208,8 +226,15 @@ struct PaywallView: View {
             Link(destination: AppConfig.privacyURL) { Text(.paywallPrivacy) }
             Text(verbatim: "·")
             Button {
-                Task { restoreResult = await store.restore() }
-            } label: { Text(.paywallRestore) }
+                isRestoring = true
+                Task {
+                    restoreResult = await store.restore()
+                    isRestoring = false
+                }
+            } label: {
+                if isRestoring { ProgressView().controlSize(.small) } else { Text(.paywallRestore) }
+            }
+            .disabled(isRestoring)
         }
         .font(.brandCaption)
         .foregroundStyle(Palette.textSecondary)

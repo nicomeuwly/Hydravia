@@ -35,6 +35,7 @@ nonisolated enum Blocker {
         static let sleepMinute = "blocker.sleepMinute.v1"
         static let unlockedUntil = "blocker.unlockedUntil.v1"
         static let progress = "blocker.progress.v1"
+        static let proUntil = "blocker.proUntil.v1"
     }
 
     /// Today's numbers, copied from the app so the shield can talk about them.
@@ -49,7 +50,7 @@ nonisolated enum Blocker {
 
     /// Today's progress, or nil when the app hasn't shared any since midnight
     /// (the numbers would be yesterday's).
-    static func progress(at date: Date = .now, calendar: Calendar = .current) -> Progress? {
+    static func progress(at date: Date = .now, calendar: Calendar = .autoupdatingCurrent) -> Progress? {
         guard let data = defaults?.data(forKey: Key.progress),
               let value = try? JSONDecoder().decode(Progress.self, from: data),
               calendar.isDate(value.day, inSameDayAs: date)
@@ -97,6 +98,13 @@ nonisolated enum Blocker {
         }
     }
 
+    /// When the Hydravia Pro entitlement last seen by the app runs out (plus
+    /// a renewal margin). Nil: no known limit — `isEnabled` alone decides.
+    static var proUntil: Date? {
+        get { defaults?.object(forKey: Key.proUntil) as? Date }
+        set { defaults?.set(newValue, forKey: Key.proUntil) }
+    }
+
     /// The end of the unlock earned by the last dose, if any.
     static var unlockedUntil: Date? {
         get { defaults?.object(forKey: Key.unlockedUntil) as? Date }
@@ -107,7 +115,7 @@ nonisolated enum Blocker {
         selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
 
-    static func isWithinWindow(_ date: Date, calendar: Calendar = .current) -> Bool {
+    static func isWithinWindow(_ date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
         guard let window else { return false }
         let parts = calendar.dateComponents([.hour, .minute], from: date)
         let minute = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
@@ -122,6 +130,7 @@ nonisolated enum Blocker {
     /// Whether the selected apps should be shielded right now.
     static func shouldShield(at date: Date = .now) -> Bool {
         isEnabled
+            && (proUntil.map { date < $0 } ?? true)
             && selectionCount(selection) > 0
             && isWithinWindow(date)
             && !isUnlocked(at: date)
@@ -174,7 +183,7 @@ nonisolated enum Blocker {
     /// The dose was drunk: lift the shield for `minutes`, and have the monitor
     /// put it back afterwards. An unlock running past bedtime simply ends with
     /// the window.
-    static func grantUnlock(minutes: Int, now: Date = .now, calendar: Calendar = .current) throws {
+    static func grantUnlock(minutes: Int, now: Date = .now, calendar: Calendar = .autoupdatingCurrent) throws {
         let until = now.addingTimeInterval(TimeInterval(minutes * 60))
         unlockedUntil = until
         lowerShield()

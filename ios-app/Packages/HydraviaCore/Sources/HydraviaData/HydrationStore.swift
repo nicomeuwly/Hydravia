@@ -28,6 +28,12 @@ public final class HydrationStore {
     public private(set) var todayEntries: [WaterEntry] = []
     /// Totals of the last `recentWindowDays` days; empty days are absent.
     public private(set) var recentTotals: [DayTotal] = []
+    /// How far back streaks look (today included). A year of entries is a few
+    /// thousand rows at most: cheap to total on every refresh.
+    public static let streakWindowDays = 366
+    /// Totals of the last `streakWindowDays` days, for streaks: the 7-day
+    /// window would cap them at 6.
+    public private(set) var streakTotals: [DayTotal] = []
     /// Bumped on every refresh (writes included), for screens showing
     /// derived data that want one cheap value to observe.
     public private(set) var revision = 0
@@ -54,7 +60,9 @@ public final class HydrationStore {
         today = LocalDay(now(), calendar: calendar)
         todayEntries = entries(on: today)
         todayTotalMl = todayEntries.reduce(0) { $0 + $1.amountMl }
-        recentTotals = dailyTotals(lastDays: Self.recentWindowDays)
+        streakTotals = dailyTotals(lastDays: Self.streakWindowDays)
+        let firstRecent = today.adding(days: -(Self.recentWindowDays - 1))
+        recentTotals = streakTotals.filter { $0.day >= firstRecent }
         revision += 1
     }
 

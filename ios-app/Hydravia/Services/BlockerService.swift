@@ -65,11 +65,14 @@ final class BlockerService {
 
     /// Mirrors the reminder schedule: the lock runs during the same window,
     /// and only while the ritual is on.
-    func sync(window: ActiveWindow, enabled: Bool) {
+    /// `force` re-registers the schedule even if nothing it depends on
+    /// changed (a new time zone).
+    func sync(window: ActiveWindow, enabled: Bool, force: Bool = false) {
         self.window = window
         wanted = enabled
         // Permission can be revoked in iOS Settings while the app is away.
         authorization = Self.read(AuthorizationCenter.shared.authorizationStatus)
+        if force { scheduled = nil }
         apply()
     }
 

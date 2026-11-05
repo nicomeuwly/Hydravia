@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(BlockerService.self) private var blocker
     @State private var managesSubscription = false
     @State private var restoreResult: Bool?
+    @State private var isRestoring = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationPermission: ReminderService.Permission = .notDetermined
     /// What the switch shows while the permission round-trip is in flight, so
@@ -126,10 +127,19 @@ struct SettingsView: View {
                             }
                         }
                         Button {
-                            Task { restoreResult = await store.restore() }
+                            isRestoring = true
+                            Task {
+                                restoreResult = await store.restore()
+                                isRestoring = false
+                            }
                         } label: {
-                            Text(.paywallRestore).foregroundStyle(Palette.textPrimary)
+                            LabeledContent {
+                                if isRestoring { ProgressView() }
+                            } label: {
+                                Text(.paywallRestore).foregroundStyle(Palette.textPrimary)
+                            }
                         }
+                        .disabled(isRestoring)
                     }
                 } header: {
                     Text(.settingsSectionSubscription)

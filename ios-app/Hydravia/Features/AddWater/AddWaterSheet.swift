@@ -5,6 +5,9 @@ import SwiftUI
 /// The sheet hugs its content and grows with the keyboard.
 struct AddWaterSheet: View {
     @Environment(HydrationStore.self) private var hydration
+    @Environment(AppRouter.self) private var router
+    @Environment(BlockerService.self) private var blocker
+    @Environment(\.reminders) private var reminders
     @Environment(\.dismiss) private var dismiss
 
     @State private var custom = ""
@@ -126,6 +129,11 @@ struct AddWaterSheet: View {
         do {
             try hydration.add(ml, source: .manual)
             added += 1
+            // Drinking answers the reminder. The apps stay locked, though
+            // (only the ritual lifts the shield): while it's up the ritual
+            // card stays lit.
+            router.reminderFired = blocker.isShieldUp
+            Task { await reminders?.clearDeliveredReminders() }
             fieldFocused = false
             dismiss()
         } catch {

@@ -2369,30 +2369,31 @@
       }
     },
     "paywall.cta" : {
+      "comment" : "No duration on purpose: the real trial length comes from the App Store (paywall.trialThen).",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meine 7 Gratistage starten"
+            "value" : "Gratis-Testphase starten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start my 7 free days"
+            "value" : "Start my free trial"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empezar mis 7 días gratis"
+            "value" : "Empezar mi prueba gratis"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Démarrer mes 7 jours gratuits"
+            "value" : "Démarrer mon essai gratuit"
           }
         }
       }
@@ -2577,25 +2578,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 Tage, um das Ritual aufzubauen. Ohne Verpflichtung."
+            "value" : "Eine Gratis-Testphase, um das Ritual aufzubauen. Ohne Verpflichtung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 days to build the ritual. No commitment."
+            "value" : "A free trial to build the ritual. No commitment."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 días para crear el ritual. Sin compromiso."
+            "value" : "Una prueba gratis para crear el ritual. Sin compromiso."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 jours pour installer le rituel. Sans engagement."
+            "value" : "Un essai gratuit pour installer le rituel. Sans engagement."
           }
         }
       }
@@ -2746,31 +2747,31 @@
       }
     },
     "paywall.planLegal" : {
-      "comment" : "Arguments: date",
+      "comment" : "Arguments: date of the first charge.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verlängert sich automatisch nach den 7 Gratistagen. Erste Abbuchung am %1$@. Jederzeit in den Einstellungen kündbar."
+            "value" : "Verlängert sich automatisch nach der Gratis-Testphase. Erste Abbuchung am %1$@. Jederzeit in den Einstellungen kündbar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Renews automatically after the 7 free days. First charge on %1$@. Cancel any time from your settings."
+            "value" : "Renews automatically when the free trial ends. First charge on %1$@. Cancel any time from your settings."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se renueva automáticamente tras los 7 días gratis. Primer cobro el %1$@. Cancela cuando quieras desde los ajustes."
+            "value" : "Se renueva automáticamente al terminar la prueba gratis. Primer cobro el %1$@. Cancela cuando quieras desde los ajustes."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Renouvellement automatique après les 7 jours gratuits. Premier prélèvement le %1$@. Annulable à tout moment depuis les réglages."
+            "value" : "Renouvellement automatique à la fin de l’essai gratuit. Premier prélèvement le %1$@. Annulable à tout moment depuis les réglages."
           }
         }
       }
@@ -6059,6 +6060,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ton verre t’attend. Une gorgée et tu gardes le rythme."
+          }
+        }
+      }
+    },
+    "common.retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
           }
         }
       }
