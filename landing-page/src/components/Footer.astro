@@ -77,25 +77,17 @@ const year = new Date().getFullYear();
     font-weight: 700;
     margin-bottom: 2px;
   }
-  .ft-nav a {
+  /* Global: the contact link is drawn by ContactEmail, out of reach of
+     this component's scoped styles (it came out dark on the dark footer). */
+  .ft-nav :global(a) {
     color: rgba(255, 255, 255, 0.78);
     text-decoration: none;
     font-size: 15px;
     transition: color 0.18s ease;
   }
-  .ft-nav a:hover {
+  .ft-nav :global(a:hover) {
     color: #fff;
     text-decoration: underline;
-  }
-  /* The unfilled-contact placeholder lands on the dark footer, where the
-     light-background .todo styling would be unreadable. */
-  .ft-nav :global(.todo) {
-    font-size: 13.5px;
-    color: #ffd9a0;
-    border: 1px dashed rgba(255, 217, 160, 0.5);
-    border-radius: 4px;
-    padding: 2px 8px;
-    display: inline-block;
   }
   .ft-btm {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
