@@ -35,6 +35,7 @@ export const fr = {
   'hero.body':
     "Un rituel d'hydratation, pas un compteur de plus. À l'heure du rappel, tes apps se verrouillent. Tu bois ton verre, tout se débloque.",
   'hero.cta': 'Télécharger sur l’App Store',
+  'hero.soon': 'Bientôt disponible',
   'hero.ctaNote': 'Gratuit · Pro avec 7 jours d’essai',
   'hero.chip': 'apps débloquées',
   'hero.shotAlt':
@@ -96,11 +97,7 @@ export const fr = {
   'every.watch.title': 'Et sur ton Apple Watch',
   'every.watch.body':
     'L’anneau du jour, l’heure du prochain rappel et des complications pour ton cadran. Avec Pro, tes trois quantités favorites se versent d’un tap, depuis ton poignet.',
-  'every.widgetToday': 'Aujourd’hui',
-  'every.widgetLeft': 'il reste {n} ml',
-  'every.widgetDone': 'Objectif atteint',
-  'every.widgetAdd': 'Ajouter',
-  'every.widgetAlt': 'Widget Hydravia : 1 320 ml sur 2 300 ml, avec des boutons pour ajouter 230, 330 ou 510 ml.',
+  'every.widgetAlt': 'Écran d’accueil de l’iPhone avec deux widgets Hydravia : la progression du jour (1 320 ml sur 2 300 ml) et l’ajout rapide de 230, 330 ou 510 ml.',
   'every.watchAlt': 'Hydravia sur Apple Watch : l’anneau du jour et les boutons pour verser un verre.',
 
   // ── Pricing ───────────────────────────────────────────────────────────────
@@ -201,6 +198,7 @@ export const en: Catalogue = {
   'hero.body':
     'A hydration ritual, not another counter. When the reminder lands, your apps lock. Drink your dose and everything opens back up.',
   'hero.cta': 'Download on the App Store',
+  'hero.soon': 'Coming soon',
   'hero.ctaNote': 'Free · Pro with a 7-day trial',
   'hero.chip': 'apps unlocked',
   'hero.shotAlt':
@@ -258,11 +256,7 @@ export const en: Catalogue = {
   'every.watch.title': 'And on your Apple Watch',
   'every.watch.body':
     'Today’s ring, the time of the next reminder and complications for your watch face. With Pro, your three favourite amounts pour in one tap, right from your wrist.',
-  'every.widgetToday': 'Today',
-  'every.widgetLeft': '{n} ml to go',
-  'every.widgetDone': 'Goal reached',
-  'every.widgetAdd': 'Add',
-  'every.widgetAlt': 'Hydravia widget: 1,320 ml of 2,300 ml, with buttons to add 230, 330 or 510 ml.',
+  'every.widgetAlt': 'iPhone Home Screen with two Hydravia widgets: today’s progress (1,320 ml of 2,300 ml) and quick-add buttons for 230, 330 or 510 ml.',
   'every.watchAlt': 'Hydravia on Apple Watch: today’s ring and the buttons to pour a glass.',
 
   'price.eyebrow': 'PRICING',

@@ -5,8 +5,10 @@ interface Props {
   label: string;
   /** Dark button on a light background, or light button on dark. */
   variant?: 'dark' | 'light';
+  /** Shown on the greyed button until the app is live ("Coming soon"). */
+  soon?: string;
 }
-const { label, variant = 'dark' } = Astro.props;
+const { label, variant = 'dark', soon } = Astro.props;
 
 // Until the app is live there is no URL to point at. Rendering a <span> rather
 // than a dead <a> keeps the promise honest: nothing looks clickable that
@@ -15,6 +17,7 @@ const live = APP_STORE_URL.length > 0;
 const Tag = live ? 'a' : 'span';
 ---
 
+<span class="store">
 <Tag
   class:list={['btn', variant, !live && 'soon']}
   href={live ? APP_STORE_URL : undefined}
@@ -28,6 +31,8 @@ const Tag = live ? 'a' : 'span';
   </svg>
   <span>{label}</span>
 </Tag>
+{!live && soon && <span class="soon-badge">{soon}</span>}
+</span>
 
 <style>
   .btn {
@@ -64,9 +69,29 @@ const Tag = live ? 'a' : 'span';
     transform: translateY(0);
   }
 
-  /* Pre-launch state: still on-brand, visibly not interactive. */
+  /* Pre-launch state: still on-brand, visibly not interactive, and saying
+     why: the badge stays at full strength over the greyed button. */
+  .store {
+    position: relative;
+    display: inline-flex;
+  }
   .soon {
     opacity: 0.55;
     cursor: default;
+  }
+  .soon-badge {
+    position: absolute;
+    top: -11px;
+    right: -10px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    color: var(--primary-dark);
+    background: var(--accent);
+    border-radius: var(--r-full);
+    box-shadow: 0 4px 12px rgba(7, 49, 74, 0.25);
+    transform: rotate(3deg);
   }
 </style>

@@ -61,7 +61,7 @@ struct MainTabView: View {
     }
 }
 
-/// Dark on Home, automatic elsewhere, on the UITabBar behind SwiftUI's TabView.
+/// Dark on Home, light elsewhere, on the UITabBar behind SwiftUI's TabView.
 private enum TabBarStyle {
     static func apply(dark: Bool) async {
         // The bar may not exist yet on the very first frame.
@@ -73,9 +73,17 @@ private enum TabBarStyle {
                 // the containers that hold nothing but the bar: with Liquid
                 // Glass set between Clear and Tinted, the platter stayed light
                 // on device even with its own style dark.
-                let style: UIUserInterfaceStyle = dark ? .dark : .unspecified
+                // Light, not automatic, off Home: left to guess, the glass
+                // kept Home's dark look on the light screens. The UI is
+                // light-only anyway.
+                let style: UIUserInterfaceStyle = dark ? .dark : .light
                 for container in barOnlyContainers(of: bar) { container.overrideUserInterfaceStyle = style }
                 setStyle(style, on: bar, depth: 0)
+                // The glass samples what's behind it only when that moves:
+                // on a still light screen it kept Home's dark look. Hiding
+                // and showing the bar in the same frame makes it sample again.
+                bar.isHidden = true
+                bar.isHidden = false
                 return
             }
             try? await Task.sleep(for: .milliseconds(50))

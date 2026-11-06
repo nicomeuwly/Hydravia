@@ -7,8 +7,7 @@
  * later means adding a catalogue, not copying this file.
  *
  * Motion: sections fade up as they scroll into view (`data-reveal`), the hero
- * has moving waves and rising bubbles like the app's home screen, and the
- * widget demo pours for real. Everything still reads without JavaScript, and
+ * has moving waves and rising bubbles like the app's home screen. Everything still reads without JavaScript, and
  * `prefers-reduced-motion` turns it all into a static page.
  */
 import Phone from './Phone.astro';
@@ -37,14 +36,9 @@ const features = [
   { title: t(lang, 'feat.streak.title'), body: t(lang, 'feat.streak.body'), icon: 'chart' },
 ];
 
-// The widget demo starts where the home screenshot is, with the app's
-// default favourite amounts.
-const widget = { goal: 2300, start: 1320, amounts: [230, 330, 510] };
-
-const watchShots =
-  lang === 'fr'
-    ? ['/shots/watch-ring.webp', '/shots/watch-pour.webp']
-    : ['/shots/watch-ring-en.webp', '/shots/watch-pour-en.webp'];
+// Real captures from the simulator, one set per language (raw PNGs in
+// captures/, for mockups).
+const shot = (name: string) => `/shots/${lang}/${name}.webp`;
 
 const freeItems = ['price.free.f1', 'price.free.f2', 'price.free.f3', 'price.free.f4'] as const;
 const proItems = ['price.pro.f1', 'price.pro.f2', 'price.pro.f3', 'price.pro.f4'] as const;
@@ -78,20 +72,33 @@ const faqSchema = {
   })),
 };
 
-// Rising bubbles: position, size, duration and a negative delay so the hero
-// is already busy on first paint.
+// Rising bubbles, drawn like the app's ambient ones (WaterPhysics): flat
+// white discs, 5 to 16 points, each with its own opacity (0.12 to 0.36) so
+// some read further back; the bigger ones rise faster, all wobble a little.
+// A negative delay so the hero is already busy on first paint.
 const bubbles = [
-  { x: 6, s: 10, d: 13, o: -2 },
-  { x: 14, s: 18, d: 17, o: -9 },
-  { x: 27, s: 8, d: 11, o: -5 },
-  { x: 38, s: 14, d: 15, o: -12 },
-  { x: 49, s: 6, d: 10, o: -3 },
-  { x: 58, s: 20, d: 19, o: -7 },
-  { x: 66, s: 9, d: 12, o: -10 },
-  { x: 74, s: 13, d: 16, o: -1 },
-  { x: 83, s: 7, d: 11, o: -6 },
-  { x: 91, s: 16, d: 18, o: -14 },
-];
+  { x: 6, s: 9, a: 0.22, o: -3 },
+  { x: 13, s: 15, a: 0.3, o: -11 },
+  { x: 21, s: 6, a: 0.14, o: -6 },
+  { x: 30, s: 12, a: 0.34, o: -15 },
+  { x: 39, s: 7, a: 0.18, o: -2 },
+  { x: 47, s: 16, a: 0.26, o: -9 },
+  { x: 55, s: 5, a: 0.12, o: -13 },
+  { x: 63, s: 11, a: 0.2, o: -4 },
+  { x: 71, s: 8, a: 0.36, o: -8 },
+  { x: 79, s: 14, a: 0.16, o: -12 },
+  { x: 87, s: 6, a: 0.28, o: -1 },
+  { x: 94, s: 10, a: 0.2, o: -7 },
+].map((b, i) => ({
+  ...b,
+  // Speed grows with size, as in the app.
+  d: (26 - b.s * 0.75).toFixed(1),
+  // Wobble: 2 to 7 px, its own period.
+  w: 2 + (i * 5) % 6,
+  p: (1.8 + (i % 4) * 0.45).toFixed(2),
+}));
+const bubbleStyle = (b: (typeof bubbles)[number], x = b.x) =>
+  `--x:${x}%;--s:${b.s}px;--a:${b.a};--d:${b.d}s;--o:${b.o}s;--w:${b.w}px;--p:${b.p}s`;
 
 // One wave period is 1440 wide; the path holds two so it can slide by half
 // its width and loop without a seam.
@@ -108,10 +115,7 @@ const wavePath =
   <div class="bubbles" aria-hidden="true">
     {
       bubbles.map((b) => (
-        <span
-          class="bubble"
-          style={`--x:${b.x}%;--s:${b.s}px;--d:${b.d}s;--o:${b.o}s`}
-        />
+        <span class="bubble" style={bubbleStyle(b)} />
       ))
     }
   </div>
@@ -130,14 +134,14 @@ const wavePath =
       </h1>
       <p class="lede enter" style="--i:4">{t(lang, 'hero.body')}</p>
       <div class="hero-cta enter" style="--i:5">
-        <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+        <AppStoreButton label={t(lang, 'hero.cta')} variant="light" soon={t(lang, 'hero.soon')} />
         <p class="note">{t(lang, 'hero.ctaNote')}</p>
       </div>
     </div>
     <div class="hero-shot">
       <div class="glow" aria-hidden="true"></div>
       <div class="float">
-        <Phone src="/shots/home.webp" alt={t(lang, 'hero.shotAlt')} priority />
+        <Phone src={shot('home')} alt={t(lang, 'hero.shotAlt')} priority />
       </div>
       <p class="chip" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -192,8 +196,8 @@ const wavePath =
       </ol>
 
       <div class="how-shots" data-reveal="tilt">
-        <Phone src="/shots/unlock.webp" alt={t(lang, 'how.shotAlt')} class="shot-a" />
-        <Phone src="/shots/unlock-dose.webp" alt={t(lang, 'how.doseAlt')} class="shot-b" />
+        <Phone src={shot('unlock')} alt={t(lang, 'how.shotAlt')} class="shot-a" />
+        <Phone src={shot('unlock-dose')} alt={t(lang, 'how.doseAlt')} class="shot-b" />
       </div>
     </div>
   </div>
@@ -241,7 +245,7 @@ const wavePath =
       </ul>
 
       <div class="feat-shot" data-reveal="tilt">
-        <Phone src="/shots/history.webp" alt={t(lang, 'feat.streakAlt')} />
+        <Phone src={shot('history')} alt={t(lang, 'feat.streakAlt')} />
       </div>
     </div>
   </div>
@@ -256,45 +260,7 @@ const wavePath =
     <div class="every-grid">
       <article class="every-col" data-reveal>
         <div class="widget-stage">
-          <div
-            class="widget"
-            role="img"
-            aria-label={t(lang, 'every.widgetAlt')}
-            data-widget
-            data-goal={widget.goal}
-            data-start={widget.start}
-            data-locale={locale}
-            data-left={t(lang, 'every.widgetLeft')}
-            data-done={t(lang, 'every.widgetDone')}
-            style={`--p:${((widget.start / widget.goal) * 100).toFixed(1)}`}
-          >
-            <div class="w-ring">
-              <div class="w-ring-in">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2.7S5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-12.3-7-12.3Z" />
-                </svg>
-              </div>
-            </div>
-            <div class="w-text">
-              <p class="w-label">{t(lang, 'every.widgetToday')}</p>
-              <p class="w-count">
-                <strong data-count>{ml(widget.start)}</strong>
-                <span>/ {ml(widget.goal)} ml</span>
-              </p>
-              <p class="w-left" data-left-text>
-                {t(lang, 'every.widgetLeft').replace('{n}', ml(widget.goal - widget.start))}
-              </p>
-            </div>
-            <div class="w-buttons">
-              {
-                widget.amounts.map((a) => (
-                  <button type="button" data-add={a} aria-hidden="true" tabindex="-1">
-                    +{ml(a)}
-                  </button>
-                ))
-              }
-            </div>
-          </div>
+          <Phone src={shot('widgets')} alt={t(lang, 'every.widgetAlt')} class="widget-phone" />
         </div>
         <h3>{t(lang, 'every.widgets.title')}</h3>
         <p>{t(lang, 'every.widgets.body')}</p>
@@ -308,7 +274,7 @@ const wavePath =
             <span class="crown" aria-hidden="true"></span>
             <div class="watch-screen">
               <img
-                src={watchShots[0]}
+                src={shot('watch-ring')}
                 alt={t(lang, 'every.watchAlt')}
                 width="416"
                 height="496"
@@ -317,7 +283,7 @@ const wavePath =
               />
               <img
                 class="watch-next"
-                src={watchShots[1]}
+                src={shot('watch-pour')}
                 alt=""
                 width="416"
                 height="496"
@@ -445,11 +411,8 @@ const wavePath =
   </div>
   <div class="bubbles" aria-hidden="true">
     {
-      bubbles.slice(0, 6).map((b) => (
-        <span
-          class="bubble"
-          style={`--x:${b.x * 1.1}%;--s:${b.s}px;--d:${b.d}s;--o:${b.o}s`}
-        />
+      bubbles.filter((_, i) => i % 2 === 0).map((b) => (
+        <span class="bubble" style={bubbleStyle(b, b.x * 1.6)} />
       ))
     }
   </div>
@@ -457,7 +420,7 @@ const wavePath =
     <h2 data-reveal>{t(lang, 'final.title')}</h2>
     <p data-reveal style="--i:1">{t(lang, 'final.body')}</p>
     <div data-reveal style="--i:2">
-      <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+      <AppStoreButton label={t(lang, 'hero.cta')} variant="light" soon={t(lang, 'hero.soon')} />
     </div>
     <p class="note">{t(lang, 'hero.ctaNote')}</p>
   </div>
@@ -484,76 +447,6 @@ const wavePath =
       { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
     );
     targets.forEach((el) => io.observe(el));
-  }
-
-  // ── Widget demo: tap an amount and it pours ──
-  const widget = document.querySelector<HTMLElement>('[data-widget]');
-  if (widget) {
-    const goal = Number(widget.dataset.goal);
-    const start = Number(widget.dataset.start);
-    const format = new Intl.NumberFormat(widget.dataset.locale);
-    const countEl = widget.querySelector<HTMLElement>('[data-count]')!;
-    const leftEl = widget.querySelector<HTMLElement>('[data-left-text]')!;
-    let value = start;
-    let shown = start;
-    let frame = 0;
-    let resetTimer = 0;
-
-    const render = (n: number) => {
-      countEl.textContent = format.format(Math.round(n));
-    };
-
-    const setValue = (next: number) => {
-      value = next;
-      widget.style.setProperty('--p', String(Math.min(100, (value / goal) * 100)));
-      const done = value >= goal;
-      widget.classList.toggle('done', done);
-      leftEl.textContent = done
-        ? widget.dataset.done!
-        : widget.dataset.left!.replace('{n}', format.format(goal - value));
-
-      cancelAnimationFrame(frame);
-      if (still) {
-        shown = value;
-        render(value);
-        return;
-      }
-      const from = shown;
-      const t0 = performance.now();
-      const step = (now: number) => {
-        const k = Math.min(1, (now - t0) / 650);
-        const eased = 1 - Math.pow(1 - k, 3);
-        shown = from + (value - from) * eased;
-        render(shown);
-        if (k < 1) frame = requestAnimationFrame(step);
-      };
-      frame = requestAnimationFrame(step);
-    };
-
-    widget.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((button) => {
-      button.addEventListener('click', () => {
-        window.clearTimeout(resetTimer);
-        setValue(value + Number(button.dataset.add));
-        button.classList.remove('pop');
-        void button.offsetWidth;
-        button.classList.add('pop');
-        // The demo starts over once the goal is reached, like a new day.
-        if (value >= goal) resetTimer = window.setTimeout(() => setValue(start), 2600);
-      });
-    });
-
-    // The ring fills from empty the first time it scrolls into view.
-    if (!still && 'IntersectionObserver' in window) {
-      widget.style.setProperty('--p', '0');
-      shown = 0;
-      render(0);
-      const io = new IntersectionObserver((entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        io.disconnect();
-        window.setTimeout(() => setValue(start), 250);
-      }, { threshold: 0.5 });
-      io.observe(widget);
-    }
   }
 </script>
 
@@ -621,32 +514,43 @@ const wavePath =
   .bubble {
     position: absolute;
     left: var(--x);
-    bottom: -30px;
+    bottom: -20px;
     width: var(--s);
     height: var(--s);
-    border-radius: 50%;
-    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08) 60%);
-    border: 1px solid rgba(255, 255, 255, 0.22);
     opacity: 0;
-    animation: bubble var(--d) linear var(--o) infinite;
+    animation: bubble-rise var(--d) linear var(--o) infinite;
   }
-  @keyframes bubble {
+  .bubble::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #fff;
+    animation: bubble-wobble var(--p) ease-in-out infinite alternate;
+  }
+  /* Fades in at the bottom, out over the last stretch, like the app's. */
+  @keyframes bubble-rise {
     0% {
-      transform: translate3d(0, 0, 0);
+      transform: translateY(0);
       opacity: 0;
     }
-    12% {
-      opacity: 0.9;
+    6% {
+      opacity: var(--a);
     }
-    50% {
-      transform: translate3d(14px, -48vh, 0);
-    }
-    85% {
-      opacity: 0.6;
+    70% {
+      opacity: var(--a);
     }
     100% {
-      transform: translate3d(-6px, -100vh, 0);
+      transform: translateY(-95vh);
       opacity: 0;
+    }
+  }
+  @keyframes bubble-wobble {
+    from {
+      transform: translateX(calc(var(--w) * -1));
+    }
+    to {
+      transform: translateX(var(--w));
     }
   }
 
@@ -1024,113 +928,17 @@ const wavePath =
     padding: 24px 16px;
   }
 
-  /* The widget, drawn in HTML so it can pour for real. */
-  @property --p {
-    syntax: '<number>';
-    inherits: true;
-    initial-value: 0;
+  /* The Home Screen capture, cropped to its top half where the widgets
+     are: the phone slides up out of the stage. */
+  .widget-stage {
+    align-items: start;
+    padding-bottom: 0;
+    max-height: 420px;
   }
-  .widget {
-    --ring: var(--accent-cyan);
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 16px 18px;
-    width: min(100%, 330px);
-    padding: 18px;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 20px 44px rgba(3, 24, 38, 0.4);
-    transition: --p 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  .widget-stage :global(.widget-phone) {
+    max-width: 250px;
+    margin-top: 8px;
   }
-  .widget.done {
-    --ring: #2fae8f;
-  }
-  .w-ring {
-    width: 76px;
-    height: 76px;
-    border-radius: 50%;
-    background: conic-gradient(var(--ring) calc(var(--p) * 1%), var(--bg-element) 0);
-    display: grid;
-    place-items: center;
-  }
-  .w-ring-in {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #fff;
-    display: grid;
-    place-items: center;
-    color: var(--ring);
-  }
-  .w-text {
-    align-self: center;
-    min-width: 0;
-  }
-  .w-text p {
-    margin: 0;
-  }
-  .w-label {
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-  }
-  .w-count {
-    margin-top: 2px;
-    color: var(--text-secondary);
-    font-size: 14px;
-    white-space: nowrap;
-    line-height: 1.3;
-  }
-  .w-count strong {
-    font-size: 26px;
-    font-variant-numeric: tabular-nums;
-    color: var(--primary-dark);
-  }
-  .w-left {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-  }
-  .widget.done .w-left {
-    color: #2fae8f;
-    font-weight: 700;
-  }
-  .w-buttons {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .w-buttons button {
-    font: inherit;
-    font-weight: 700;
-    font-size: 15px;
-    color: #fff;
-    background: var(--secondary-blue);
-    border: 0;
-    border-radius: var(--r-full);
-    padding: 10px 0;
-    cursor: pointer;
-    transition:
-      transform 0.15s ease,
-      background 0.2s ease;
-  }
-  .w-buttons button:hover {
-    background: var(--primary-dark);
-  }
-  .w-buttons button:active {
-    transform: scale(0.94);
-  }
-  .w-buttons button.pop {
-    animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
-  }
-  @keyframes pop {
-    40% {
-      transform: scale(1.1);
-    }
-  }
-
   /* The watch: a CSS case around the real capture, the two screens
      crossfading like a swipe between the watch app's pages. */
   .watch {
@@ -1463,6 +1271,8 @@ const wavePath =
     }
     .how-shots {
       margin-top: 20px;
+      /* The tilted phone ran 2 px past a phone's edge. */
+      overflow-x: clip;
     }
   }
 
@@ -1487,13 +1297,6 @@ const wavePath =
     .chip {
       left: 0;
       bottom: 8%;
-    }
-    .widget {
-      padding: 16px;
-      gap: 14px;
-    }
-    .w-count strong {
-      font-size: 22px;
     }
   }
 
