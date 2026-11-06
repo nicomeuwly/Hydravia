@@ -44,7 +44,8 @@ const altEn = new URL(`/en${path}`, Astro.site);
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icon-180.png" />
-    <meta name="theme-color" content="#0b3d5c" />
+    <!-- The header's colour: Safari paints the status bar with it. -->
+    <meta name="theme-color" content="#f3f7f9" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />

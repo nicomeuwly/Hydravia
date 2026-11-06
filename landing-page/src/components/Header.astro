@@ -26,7 +26,7 @@ const otherHref = localePath(other, path);
     <nav class="nav" aria-label="Navigation">
       <a href={`${home === '/' ? '' : home}#how`}>{t(lang, 'nav.how')}</a>
       <a href={`${home === '/' ? '' : home}#features`}>{t(lang, 'nav.features')}</a>
-      <a href={`${home === '/' ? '' : home}#pricing`}>{t(lang, 'nav.pricing')}</a>
+      <a href={`${home === '/' ? '' : home}#pricing`} class="keep">{t(lang, 'nav.pricing')}</a>
       <a href={`${home === '/' ? '' : home}#faq`}>{t(lang, 'nav.faq')}</a>
       <a href={otherHref} class="lang" hreflang={other} aria-label={t(lang, 'a11y.langSwitch')}>
         {other.toUpperCase()}
@@ -98,10 +98,10 @@ const otherHref = localePath(other, path);
     border-color: var(--primary-dark);
   }
 
-  /* Below 640px the section links crowd the bar; the language switch and the
-     logo are what matter on a phone, so the rest steps aside. */
+  /* Below 640px the section links crowd the bar: only the logo, the prices
+     and the language switch stay. */
   @media (max-width: 640px) {
-    .nav a:not(.lang) {
+    .nav a:not(.lang, .keep) {
       display: none;
     }
   }

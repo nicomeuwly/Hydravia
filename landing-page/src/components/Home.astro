@@ -6,9 +6,12 @@
  * exists once and the copy comes entirely from src/i18n. Adding a language
  * later means adding a catalogue, not copying this file.
  *
- * Motion: sections fade up as they scroll into view (`data-reveal`), the hero
- * has moving waves and rising bubbles like the app's home screen. Everything still reads without JavaScript, and
- * `prefers-reduced-motion` turns it all into a static page.
+ * Motion, kept to what has a purpose: the hero has moving waves and rising
+ * bubbles like the app's home screen and one floating phone; text fades in
+ * briefly as it scrolls into view, the visuals (phones, watch, plans) rise a
+ * little. Hover motion is for mice only, so a tap never leaves a card lifted.
+ * Everything still reads without JavaScript, and `prefers-reduced-motion`
+ * turns it all into a static page.
  */
 import Phone from './Phone.astro';
 import AppStoreButton from './AppStoreButton.astro';
@@ -268,7 +271,7 @@ const wavePath =
     <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'every.title')}</h2>
 
     <div class="every-grid">
-      <article class="every-col" data-reveal>
+      <article class="every-col" data-reveal="lift">
         <div class="widget-stage">
           <Phone src={shot('widgets')} alt={t(lang, 'every.widgetAlt')} class="widget-phone" />
         </div>
@@ -276,7 +279,7 @@ const wavePath =
         <p>{t(lang, 'every.widgets.body')}</p>
       </article>
 
-      <article class="every-col" data-reveal style="--i:1">
+      <article class="every-col" data-reveal="lift" style="--i:1">
         <div class="watch-stage">
           <div class="watch">
             {
@@ -308,7 +311,7 @@ const wavePath =
     <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'price.title')}</h2>
 
     <div class="plans">
-      <article class="plan" data-reveal>
+      <article class="plan" data-reveal="lift">
         <h3>{t(lang, 'price.free.name')}</h3>
         <p class="price">
           <strong>{t(lang, 'price.free.price')}</strong>
@@ -328,7 +331,7 @@ const wavePath =
         </ul>
       </article>
 
-      <article class="plan pro" data-reveal style="--i:1">
+      <article class="plan pro" data-reveal="lift" style="--i:1">
         <h3>{t(lang, 'price.pro.name')}</h3>
         <p class="price">
           <strong>{t(lang, 'price.pro.price')}</strong>
@@ -472,27 +475,38 @@ const wavePath =
     padding-block: clamp(64px, 9vw, 108px);
   }
 
-  /* ── Motion: reveal on scroll ── */
+  /* ── Motion: reveal on scroll ──
+     Text only fades, and fast: a visitor scrolling quickly shouldn't wait
+     for words to arrive. The visuals (phones, watch, plans) rise a little,
+     which is where motion says something. */
   :global(html.js) [data-reveal] {
     opacity: 0;
-    transform: translateY(26px);
+    transition: opacity 0.3s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 40ms);
+  }
+  :global(html.js) [data-reveal='lift'] {
+    transform: translateY(16px);
     transition:
-      opacity 0.7s ease,
-      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
-    transition-delay: calc(var(--i, 0) * 90ms);
+      opacity 0.4s var(--ease-out),
+      transform 0.5s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 60ms);
   }
   :global(html.js) [data-reveal='tilt'] {
-    transform: translateY(40px) rotate(3deg) scale(0.96);
+    transform: translateY(28px) rotate(3deg) scale(0.96);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.6s var(--ease-out);
   }
   :global(html.js) [data-reveal].is-in {
     opacity: 1;
     transform: none;
   }
 
-  /* Load-time entrance for the hero, which is already on screen. */
+  /* Load-time entrance for the hero, which is already on screen: short, so
+     the headline is readable at once (all in by 0.65 s). */
   .enter {
-    animation: rise-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-    animation-delay: calc(0.1s + var(--i, 0) * 0.11s);
+    animation: rise-in 0.4s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
   }
   @keyframes rise-in {
     from {
@@ -665,9 +679,11 @@ const wavePath =
   .float {
     width: 100%;
     max-width: 300px;
+    /* No delay: the phone is the largest thing on the first screen. Then
+       the page's one floating element. */
     animation:
-      rise-in 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both,
-      float 7s ease-in-out 1.3s infinite;
+      rise-in 0.5s var(--ease-out) both,
+      float 7s ease-in-out 0.5s infinite;
   }
   @keyframes float {
     0%,
@@ -684,18 +700,7 @@ const wavePath =
     border-radius: 50%;
     background: radial-gradient(closest-side, rgba(110, 200, 235, 0.45), transparent);
     filter: blur(30px);
-    animation: pulse 6s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 0.55;
-      transform: scale(0.95);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.05);
-    }
+    opacity: 0.8;
   }
   .chip {
     position: absolute;
@@ -711,9 +716,7 @@ const wavePath =
     background: rgba(255, 255, 255, 0.94);
     border-radius: var(--r-full);
     box-shadow: 0 14px 34px rgba(4, 30, 46, 0.35);
-    animation:
-      chip-in 0.7s cubic-bezier(0.3, 1.4, 0.5, 1) 1.2s both,
-      float 6s ease-in-out 2s infinite reverse;
+    animation: chip-in 0.35s var(--ease-out) 0.4s both;
   }
   .chip svg {
     color: var(--accent-cyan);
@@ -724,7 +727,7 @@ const wavePath =
   @keyframes chip-in {
     from {
       opacity: 0;
-      transform: translateY(16px) scale(0.85);
+      transform: translateY(8px) scale(0.95);
     }
     to {
       opacity: 1;
@@ -788,12 +791,14 @@ const wavePath =
     display: grid;
     place-items: center;
     transition:
-      background 0.3s ease,
-      color 0.3s ease;
+      background 0.15s ease,
+      color 0.15s ease;
   }
-  .steps li:hover .step-n {
-    background: var(--accent-cyan);
-    color: #fff;
+  @media (hover: hover) and (pointer: fine) {
+    .steps li:hover .step-n {
+      background: var(--accent-cyan);
+      color: #fff;
+    }
   }
   .steps h3 {
     font-size: 19px;
@@ -822,11 +827,13 @@ const wavePath =
     opacity: 0.97;
     transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
-  .how-shots:hover :global(.shot-a) {
-    transform: rotate(-6deg) translateX(2%) translateY(-2%);
-  }
-  .how-shots:hover :global(.shot-b) {
-    transform: rotate(7deg) translateX(-10%) translateY(5%) scale(0.92);
+  @media (hover: hover) and (pointer: fine) {
+    .how-shots:hover :global(.shot-a) {
+      transform: rotate(-6deg) translateX(2%) translateY(-2%);
+    }
+    .how-shots:hover :global(.shot-b) {
+      transform: rotate(7deg) translateX(-10%) translateY(5%) scale(0.92);
+    }
   }
 
   /* ── Features ── */
@@ -855,13 +862,19 @@ const wavePath =
   :global(html.js) .card.is-in,
   :global(html:not(.js)) .card {
     transition:
-      transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
-      box-shadow 0.35s ease,
-      opacity 0.7s ease;
+      transform 0.25s var(--ease-out),
+      box-shadow 0.25s ease,
+      opacity 0.3s var(--ease-out);
   }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-medium), 0 18px 40px rgba(11, 61, 92, 0.08);
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-medium), 0 18px 40px rgba(11, 61, 92, 0.08);
+    }
+    .card:hover .ficon {
+      background: var(--accent-cyan);
+      color: #fff;
+    }
   }
   .ficon {
     display: grid;
@@ -872,10 +885,9 @@ const wavePath =
     background: var(--bg-element);
     color: var(--primary-dark);
     margin-bottom: 16px;
-    transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
-  }
-  .card:hover .ficon {
-    transform: rotate(-8deg) scale(1.08);
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
   }
   .card h3 {
     font-size: 17.5px;
@@ -943,13 +955,13 @@ const wavePath =
   /* The watch mockup, its three screens (ring, pour buttons, goal
      reached) taking turns, 4 s each. Only one is shown at a time: the
      mockups aren't opaque, so a screen left underneath showed through. The
-     outgoing one fades out while the next fades in, over 0.4 s. */
+     outgoing one fades out while the next fades in, over 0.4 s, both
+     slightly blurred so the eye reads one change, not two screens. */
   .watch {
     position: relative;
     width: 210px;
     aspect-ratio: 567 / 891;
     filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.4));
-    animation: float 8s ease-in-out infinite;
   }
   .watch img {
     position: absolute;
@@ -963,13 +975,16 @@ const wavePath =
     0%,
     30% {
       opacity: 1;
+      filter: blur(0);
     }
     33.34%,
     96.67% {
       opacity: 0;
+      filter: blur(2px);
     }
     100% {
       opacity: 1;
+      filter: blur(0);
     }
   }
 
@@ -1042,25 +1057,6 @@ const wavePath =
       linear-gradient(160deg, #0b3d5c, #062940);
     box-shadow: var(--shadow-heavy);
     overflow: hidden;
-  }
-  /* A slow sheen across the Pro card. */
-  .plan.pro::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.1) 50%, transparent 65%);
-    transform: translateX(-100%);
-    animation: sheen 7s ease-in-out 1s infinite;
-    pointer-events: none;
-  }
-  @keyframes sheen {
-    0%,
-    60% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
   }
   .plan.pro .price span,
   .plan.pro .alt,
@@ -1155,7 +1151,7 @@ const wavePath =
   summary svg {
     flex: none;
     color: var(--text-tertiary);
-    transition: transform 0.25s ease;
+    transition: transform 0.2s var(--ease-out);
   }
   details[open] summary svg {
     transform: rotate(180deg);
@@ -1167,7 +1163,13 @@ const wavePath =
     max-width: 62ch;
   }
   details[open] p {
-    animation: rise-in 0.4s ease both;
+    animation: answer-in 0.2s var(--ease-out) both;
+  }
+  @keyframes answer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
   }
 
   /* ── Final CTA ── */

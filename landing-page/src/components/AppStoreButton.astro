@@ -47,7 +47,7 @@ const Tag = live ? 'a' : 'span';
     font-size: 16.5px;
     text-decoration: none;
     transition:
-      transform 0.18s ease,
+      transform 0.12s var(--ease-out),
       box-shadow 0.18s ease,
       background 0.18s ease;
   }
@@ -61,12 +61,16 @@ const Tag = live ? 'a' : 'span';
     color: var(--primary-dark);
     box-shadow: var(--shadow-heavy);
   }
-  a.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 26px rgba(11, 61, 92, 0.22);
+  /* Lift for mice only: a tap would leave it lifted. Every input gets the
+     press, the moment the finger lands. */
+  @media (hover: hover) and (pointer: fine) {
+    a.btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(11, 61, 92, 0.22);
+    }
   }
   a.btn:active {
-    transform: translateY(0);
+    transform: scale(0.97);
   }
 
   /* Pre-launch state: still on-brand, visibly not interactive, and saying
