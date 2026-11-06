@@ -1,20 +1,21 @@
 /**
- * Everything that must be filled in before this site goes live.
+ * The publisher's details, shown on both legal pages in both languages.
  *
- * These values are centralised here on purpose: they appear across the home
- * page and both legal pages, and getting them wrong in one place while right
- * in another is exactly the sort of mistake that survives a proofread. Search
- * the built output for "[À COMPLÉTER]" to confirm none are left.
+ * Centralised so they can't drift between pages. Hydravia is published by
+ * a private individual (no company): Swiss unfair competition law (LCD art.
+ * 3 al. 1 let. s) asks an online seller for their identity, a postal
+ * address (not a PO box alone) and an email.
  */
 
-/** Legal entity publishing the app and the site. */
-export const LEGAL_ENTITY = '[À COMPLÉTER : raison sociale / nom de l’éditeur]';
+/** Who publishes the app and the site. */
+export const LEGAL_ENTITY = 'Nicolas Meuwly';
 
-/** Postal address of that entity. Required by the App Store for a publisher. */
-export const LEGAL_ADDRESS = '[À COMPLÉTER : adresse postale complète]';
-
-/** Country whose law governs the terms, and the competent courts. */
-export const LEGAL_JURISDICTION = '[À COMPLÉTER : pays / juridiction compétente]';
+/**
+ * Postal address, without the country: the pages add it in their own
+ * language. Governing law and courts follow from it (Swiss law, the courts
+ * of the publisher's domicile, canton of Fribourg).
+ */
+export const LEGAL_ADDRESS = 'Route de Fétigny 11, 1482 Cugy FR';
 
 /**
  * Contact address for support and privacy requests.
@@ -23,7 +24,7 @@ export const LEGAL_JURISDICTION = '[À COMPLÉTER : pays / juridiction compéten
  * GDPR requires a reachable contact for data-subject requests. A personal
  * inbox works, but a dedicated alias ages better.
  */
-export const CONTACT_EMAIL = '[À COMPLÉTER : email de contact]';
+export const CONTACT_EMAIL = 'contact@hydravia.app';
 
 /**
  * True once CONTACT_EMAIL is a real address.
@@ -42,7 +43,7 @@ export const HAS_CONTACT_EMAIL = !CONTACT_EMAIL.startsWith('[');
 export const APP_STORE_URL = '';
 
 /** Date shown on the legal pages. Update whenever their text changes. */
-export const LEGAL_UPDATED = '2026-11-05';
+export const LEGAL_UPDATED = '2026-11-06';
 
 /** Subscription products, mirroring App Store Connect (StoreKit 2). */
 export const PRODUCTS = {

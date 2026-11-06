@@ -1,7 +1,7 @@
 ---
 import Legal from '../layouts/Legal.astro';
 import ContactEmail from '../components/ContactEmail.astro';
-import { LEGAL_ENTITY, LEGAL_ADDRESS, LEGAL_JURISDICTION, PRODUCTS } from '../config';
+import { LEGAL_ENTITY, LEGAL_ADDRESS, PRODUCTS } from '../config';
 
 const lang = 'fr' as const;
 ---
@@ -21,8 +21,8 @@ const lang = 'fr' as const;
 
   <h2>1. Éditeur</h2>
   <p>
-    Hydravia est édité par <span class="todo">{LEGAL_ENTITY}</span>, dont l’adresse
-    est <span class="todo">{LEGAL_ADDRESS}</span>. Contact :
+    Hydravia est édité par {LEGAL_ENTITY}, à titre personnel, dont l’adresse
+    est {LEGAL_ADDRESS}, Suisse. Contact :
     <ContactEmail />.
   </p>
 
@@ -153,8 +153,10 @@ const lang = 'fr' as const;
 
   <h2>10. Droit applicable</h2>
   <p>
-    Les présentes conditions sont régies par le droit
-    <span class="todo">{LEGAL_JURISDICTION}</span>. Pour toute question, écris-nous à
+    Les présentes conditions sont régies par le droit suisse. Le for est au
+    domicile de l’éditeur, dans le canton de Fribourg, sous réserve des règles
+    impératives qui te permettent, en tant que consommateur, d’agir devant le
+    tribunal de ton propre domicile. Pour toute question, écris-nous à
     <ContactEmail /> : nous privilégions
     toujours une résolution amiable.
   </p>

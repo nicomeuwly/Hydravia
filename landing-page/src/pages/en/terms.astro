@@ -1,7 +1,7 @@
 ---
 import Legal from '../../layouts/Legal.astro';
 import ContactEmail from '../../components/ContactEmail.astro';
-import { LEGAL_ENTITY, LEGAL_ADDRESS, LEGAL_JURISDICTION, PRODUCTS } from '../../config';
+import { LEGAL_ENTITY, LEGAL_ADDRESS, PRODUCTS } from '../../config';
 
 const lang = 'en' as const;
 ---
@@ -20,8 +20,8 @@ const lang = 'en' as const;
 
   <h2>1. Publisher</h2>
   <p>
-    Hydravia is published by <span class="todo">{LEGAL_ENTITY}</span>, at
-    <span class="todo">{LEGAL_ADDRESS}</span>. Contact:
+    Hydravia is published by {LEGAL_ENTITY}, as a private individual, at
+    {LEGAL_ADDRESS}, Switzerland. Contact:
     <ContactEmail />.
   </p>
 
@@ -149,8 +149,10 @@ const lang = 'en' as const;
 
   <h2>10. Governing law</h2>
   <p>
-    These terms are governed by the law of
-    <span class="todo">{LEGAL_JURISDICTION}</span>. For any question write to
+    These terms are governed by Swiss law. The place of jurisdiction is the
+    publisher's domicile, in the canton of Fribourg, subject to the mandatory
+    rules that let you, as a consumer, go to the courts where you live. For
+    any question write to
     <ContactEmail />. We always prefer an
     amicable resolution.
   </p>
