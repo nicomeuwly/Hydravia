@@ -5,6 +5,11 @@
  * Both language routes render this with a different `lang`, so the structure
  * exists once and the copy comes entirely from src/i18n. Adding a language
  * later means adding a catalogue, not copying this file.
+ *
+ * Motion: sections fade up as they scroll into view (`data-reveal`), the hero
+ * has moving waves and rising bubbles like the app's home screen, and the
+ * widget demo pours for real. Everything still reads without JavaScript, and
+ * `prefers-reduced-motion` turns it all into a static page.
  */
 import Phone from './Phone.astro';
 import AppStoreButton from './AppStoreButton.astro';
@@ -14,6 +19,10 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const locale = lang === 'fr' ? 'fr-FR' : 'en-US';
+const ml = (n: number) => n.toLocaleString(locale);
+
+const titleLines = t(lang, 'hero.title').split('\n');
 
 const steps = [
   { n: '01', title: t(lang, 'how.step1.title'), body: t(lang, 'how.step1.body') },
@@ -24,13 +33,27 @@ const steps = [
 const features = [
   { title: t(lang, 'feat.dose.title'), body: t(lang, 'feat.dose.body'), icon: 'dose' },
   { title: t(lang, 'feat.lock.title'), body: t(lang, 'feat.lock.body'), icon: 'lock' },
+  { title: t(lang, 'feat.pause.title'), body: t(lang, 'feat.pause.body'), icon: 'moon' },
   { title: t(lang, 'feat.streak.title'), body: t(lang, 'feat.streak.body'), icon: 'chart' },
-  { title: t(lang, 'feat.privacy.title'), body: t(lang, 'feat.privacy.body'), icon: 'shield' },
 ];
+
+// The widget demo starts where the home screenshot is, with the app's
+// default favourite amounts.
+const widget = { goal: 2300, start: 1320, amounts: [230, 330, 510] };
+
+const watchShots =
+  lang === 'fr'
+    ? ['/shots/watch-ring.webp', '/shots/watch-pour.webp']
+    : ['/shots/watch-ring-en.webp', '/shots/watch-pour-en.webp'];
+
+const freeItems = ['price.free.f1', 'price.free.f2', 'price.free.f3', 'price.free.f4'] as const;
+const proItems = ['price.pro.f1', 'price.pro.f2', 'price.pro.f3', 'price.pro.f4'] as const;
 
 const faqs = [
   { q: t(lang, 'faq.q1'), a: t(lang, 'faq.a1') },
   { q: t(lang, 'faq.q2'), a: t(lang, 'faq.a2') },
+  { q: t(lang, 'faq.q7'), a: t(lang, 'faq.a7') },
+  { q: t(lang, 'faq.q6'), a: t(lang, 'faq.a6') },
   { q: t(lang, 'faq.q3'), a: t(lang, 'faq.a3') },
   { q: t(lang, 'faq.q4'), a: t(lang, 'faq.a4') },
   { q: t(lang, 'faq.q5'), a: t(lang, 'faq.a5') },
@@ -54,53 +77,110 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: f.a },
   })),
 };
+
+// Rising bubbles: position, size, duration and a negative delay so the hero
+// is already busy on first paint.
+const bubbles = [
+  { x: 6, s: 10, d: 13, o: -2 },
+  { x: 14, s: 18, d: 17, o: -9 },
+  { x: 27, s: 8, d: 11, o: -5 },
+  { x: 38, s: 14, d: 15, o: -12 },
+  { x: 49, s: 6, d: 10, o: -3 },
+  { x: 58, s: 20, d: 19, o: -7 },
+  { x: 66, s: 9, d: 12, o: -10 },
+  { x: 74, s: 13, d: 16, o: -1 },
+  { x: 83, s: 7, d: 11, o: -6 },
+  { x: 91, s: 16, d: 18, o: -14 },
+];
+
+// One wave period is 1440 wide; the path holds two so it can slide by half
+// its width and loop without a seam.
+const wavePath =
+  'M0,60 C240,100 480,20 720,60 C960,100 1200,20 1440,60 C1680,100 1920,20 2160,60 C2400,100 2640,20 2880,60 L2880,120 L0,120 Z';
 ---
+
+<!-- Set before the sections parse, so hidden-until-revealed content is only
+     ever hidden when the script that reveals it can run. -->
+<script is:inline>document.documentElement.classList.add('js');</script>
 
 <!-- ═══ Hero ═══ -->
 <section class="hero">
+  <div class="bubbles" aria-hidden="true">
+    {
+      bubbles.map((b) => (
+        <span
+          class="bubble"
+          style={`--x:${b.x}%;--s:${b.s}px;--d:${b.d}s;--o:${b.o}s`}
+        />
+      ))
+    }
+  </div>
+
   <div class="wrap hero-in">
     <div class="hero-copy">
-      <p class="badge">{t(lang, 'hero.badge')}</p>
-      <h1>{t(lang, 'hero.title')}</h1>
-      <p class="lede">{t(lang, 'hero.body')}</p>
-      <div class="hero-cta">
+      <p class="badge enter" style="--i:0">{t(lang, 'hero.badge')}</p>
+      <h1>
+        {
+          titleLines.map((line, i) => (
+            <span class="line enter" style={`--i:${i + 1}`}>
+              {line}
+            </span>
+          ))
+        }
+      </h1>
+      <p class="lede enter" style="--i:4">{t(lang, 'hero.body')}</p>
+      <div class="hero-cta enter" style="--i:5">
         <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
         <p class="note">{t(lang, 'hero.ctaNote')}</p>
       </div>
     </div>
     <div class="hero-shot">
-      <Phone src="/shots/home.webp" alt={t(lang, 'hero.shotAlt')} priority />
+      <div class="glow" aria-hidden="true"></div>
+      <div class="float">
+        <Phone src="/shots/home.webp" alt={t(lang, 'hero.shotAlt')} priority />
+      </div>
+      <p class="chip" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+        </svg>
+        <strong>+{ml(140)} ml</strong>
+        <span>{t(lang, 'hero.chip')}</span>
+      </p>
     </div>
   </div>
 
-  <!-- Decorative wave, echoing the rising water inside the app. -->
-  <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-    <path
-      fill="var(--bg)"
-      d="M0,64 C240,110 480,10 720,40 C960,70 1200,120 1440,86 L1440,120 L0,120 Z"></path>
-  </svg>
+  <!-- Decorative waves, echoing the rising water inside the app. -->
+  <div class="waves" aria-hidden="true">
+    <svg class="wave back" viewBox="0 0 2880 120" preserveAspectRatio="none">
+      <path d={wavePath}></path>
+    </svg>
+    <svg class="wave front" viewBox="0 0 2880 120" preserveAspectRatio="none">
+      <path d={wavePath}></path>
+    </svg>
+  </div>
 </section>
 
 <!-- ═══ Problem ═══ -->
 <section class="problem">
   <div class="wrap narrow">
-    <h2>{t(lang, 'problem.title')}</h2>
-    <p class="body">{t(lang, 'problem.body')}</p>
-    <p class="kicker">{t(lang, 'problem.kicker')}</p>
+    <h2 data-reveal>{t(lang, 'problem.title')}</h2>
+    <p class="body" data-reveal style="--i:1">{t(lang, 'problem.body')}</p>
+    <p class="kicker" data-reveal style="--i:2">{t(lang, 'problem.kicker')}</p>
   </div>
 </section>
 
 <!-- ═══ How it works ═══ -->
 <section id="how" class="how">
   <div class="wrap">
-    <p class="eyebrow">{t(lang, 'how.eyebrow')}</p>
-    <h2 class="sec-title">{t(lang, 'how.title')}</h2>
+    <p class="eyebrow" data-reveal>{t(lang, 'how.eyebrow')}</p>
+    <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'how.title')}</h2>
 
     <div class="how-grid">
       <ol class="steps">
         {
-          steps.map((s) => (
-            <li>
+          steps.map((s, i) => (
+            <li data-reveal style={`--i:${i + 1}`}>
               <span class="step-n">{s.n}</span>
               <div>
                 <h3>{s.title}</h3>
@@ -111,7 +191,7 @@ const faqSchema = {
         }
       </ol>
 
-      <div class="how-shots">
+      <div class="how-shots" data-reveal="tilt">
         <Phone src="/shots/unlock.webp" alt={t(lang, 'how.shotAlt')} class="shot-a" />
         <Phone src="/shots/unlock-dose.webp" alt={t(lang, 'how.doseAlt')} class="shot-b" />
       </div>
@@ -122,14 +202,14 @@ const faqSchema = {
 <!-- ═══ Features ═══ -->
 <section id="features" class="features">
   <div class="wrap">
-    <p class="eyebrow">{t(lang, 'feat.eyebrow')}</p>
-    <h2 class="sec-title">{t(lang, 'feat.title')}</h2>
+    <p class="eyebrow" data-reveal>{t(lang, 'feat.eyebrow')}</p>
+    <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'feat.title')}</h2>
 
     <div class="feat-layout">
       <ul class="feat-grid">
         {
-          features.map((f) => (
-            <li class="card">
+          features.map((f, i) => (
+            <li class="card" data-reveal style={`--i:${i}`}>
               <span class="ficon" aria-hidden="true">
                 {f.icon === 'dose' && (
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,14 +222,14 @@ const faqSchema = {
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
                 )}
+                {f.icon === 'moon' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+                  </svg>
+                )}
                 {f.icon === 'chart' && (
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 20V10M12 20V4M18 20v-6" />
-                  </svg>
-                )}
-                {f.icon === 'shield' && (
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
                   </svg>
                 )}
               </span>
@@ -160,21 +240,162 @@ const faqSchema = {
         }
       </ul>
 
-      <div class="feat-shot">
+      <div class="feat-shot" data-reveal="tilt">
         <Phone src="/shots/history.webp" alt={t(lang, 'feat.streakAlt')} />
       </div>
     </div>
   </div>
 </section>
 
+<!-- ═══ Widgets & Apple Watch ═══ -->
+<section class="every">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>{t(lang, 'every.eyebrow')}</p>
+    <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'every.title')}</h2>
+
+    <div class="every-grid">
+      <article class="every-col" data-reveal>
+        <div class="widget-stage">
+          <div
+            class="widget"
+            role="img"
+            aria-label={t(lang, 'every.widgetAlt')}
+            data-widget
+            data-goal={widget.goal}
+            data-start={widget.start}
+            data-locale={locale}
+            data-left={t(lang, 'every.widgetLeft')}
+            data-done={t(lang, 'every.widgetDone')}
+            style={`--p:${((widget.start / widget.goal) * 100).toFixed(1)}`}
+          >
+            <div class="w-ring">
+              <div class="w-ring-in">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2.7S5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-12.3-7-12.3Z" />
+                </svg>
+              </div>
+            </div>
+            <div class="w-text">
+              <p class="w-label">{t(lang, 'every.widgetToday')}</p>
+              <p class="w-count">
+                <strong data-count>{ml(widget.start)}</strong>
+                <span>/ {ml(widget.goal)} ml</span>
+              </p>
+              <p class="w-left" data-left-text>
+                {t(lang, 'every.widgetLeft').replace('{n}', ml(widget.goal - widget.start))}
+              </p>
+            </div>
+            <div class="w-buttons">
+              {
+                widget.amounts.map((a) => (
+                  <button type="button" data-add={a} aria-hidden="true" tabindex="-1">
+                    +{ml(a)}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+        <h3>{t(lang, 'every.widgets.title')}</h3>
+        <p>{t(lang, 'every.widgets.body')}</p>
+      </article>
+
+      <article class="every-col" data-reveal style="--i:1">
+        <div class="watch-stage">
+          <div class="watch">
+            <span class="band top" aria-hidden="true"></span>
+            <span class="band bottom" aria-hidden="true"></span>
+            <span class="crown" aria-hidden="true"></span>
+            <div class="watch-screen">
+              <img
+                src={watchShots[0]}
+                alt={t(lang, 'every.watchAlt')}
+                width="416"
+                height="496"
+                loading="lazy"
+                decoding="async"
+              />
+              <img
+                class="watch-next"
+                src={watchShots[1]}
+                alt=""
+                width="416"
+                height="496"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </div>
+        <h3>{t(lang, 'every.watch.title')}</h3>
+        <p>{t(lang, 'every.watch.body')}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pricing ═══ -->
+<section id="pricing" class="pricing">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>{t(lang, 'price.eyebrow')}</p>
+    <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'price.title')}</h2>
+
+    <div class="plans">
+      <article class="plan" data-reveal>
+        <h3>{t(lang, 'price.free.name')}</h3>
+        <p class="price">
+          <strong>{t(lang, 'price.free.price')}</strong>
+          <span>{t(lang, 'price.free.per')}</span>
+        </p>
+        <ul>
+          {
+            freeItems.map((k) => (
+              <li>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                <span>{t(lang, k)}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+
+      <article class="plan pro" data-reveal style="--i:1">
+        <h3>{t(lang, 'price.pro.name')}</h3>
+        <p class="price">
+          <strong>{t(lang, 'price.pro.price')}</strong>
+          <span>{t(lang, 'price.pro.per')}</span>
+        </p>
+        <p class="alt">{t(lang, 'price.pro.alt')}</p>
+        <p class="lead">{t(lang, 'price.pro.lead')}</p>
+        <ul>
+          {
+            proItems.map((k) => (
+              <li>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                <span>{t(lang, k)}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="trial">{t(lang, 'price.pro.trial')}</p>
+      </article>
+    </div>
+    <p class="price-note" data-reveal>{t(lang, 'price.note')}</p>
+  </div>
+</section>
+
 <!-- ═══ Privacy ═══ -->
 <section class="privacy">
   <div class="wrap privacy-in">
-    <h2>{t(lang, 'privacy.title')}</h2>
+    <h2 data-reveal>{t(lang, 'privacy.title')}</h2>
     <ul>
       {
-        privacyPoints.map((p) => (
-          <li>
+        privacyPoints.map((p, i) => (
+          <li data-reveal style={`--i:${i}`}>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M20 6 9 17l-5-5" />
             </svg>
@@ -192,12 +413,12 @@ const faqSchema = {
 <!-- ═══ FAQ ═══ -->
 <section id="faq" class="faq">
   <div class="wrap narrow">
-    <p class="eyebrow">{t(lang, 'faq.eyebrow')}</p>
-    <h2 class="sec-title">{t(lang, 'faq.title')}</h2>
+    <p class="eyebrow" data-reveal>{t(lang, 'faq.eyebrow')}</p>
+    <h2 class="sec-title" data-reveal style="--i:1">{t(lang, 'faq.title')}</h2>
     <div class="faq-list">
       {
-        faqs.map((f) => (
-          <details>
+        faqs.map((f, i) => (
+          <details data-reveal style={`--i:${Math.min(i, 4)}`}>
             <summary>
               <span>{f.q}</span>
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
@@ -214,15 +435,127 @@ const faqSchema = {
 
 <!-- ═══ Final CTA ═══ -->
 <section class="final">
+  <div class="waves top" aria-hidden="true">
+    <svg class="wave back" viewBox="0 0 2880 120" preserveAspectRatio="none">
+      <path d={wavePath}></path>
+    </svg>
+    <svg class="wave front" viewBox="0 0 2880 120" preserveAspectRatio="none">
+      <path d={wavePath}></path>
+    </svg>
+  </div>
+  <div class="bubbles" aria-hidden="true">
+    {
+      bubbles.slice(0, 6).map((b) => (
+        <span
+          class="bubble"
+          style={`--x:${b.x * 1.1}%;--s:${b.s}px;--d:${b.d}s;--o:${b.o}s`}
+        />
+      ))
+    }
+  </div>
   <div class="wrap final-in">
-    <h2>{t(lang, 'final.title')}</h2>
-    <p>{t(lang, 'final.body')}</p>
-    <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+    <h2 data-reveal>{t(lang, 'final.title')}</h2>
+    <p data-reveal style="--i:1">{t(lang, 'final.body')}</p>
+    <div data-reveal style="--i:2">
+      <AppStoreButton label={t(lang, 'hero.cta')} variant="light" />
+    </div>
     <p class="note">{t(lang, 'hero.ctaNote')}</p>
   </div>
 </section>
 
 <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} is:inline />
+
+<script>
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── Reveal on scroll ──
+  const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  if (still || !('IntersectionObserver' in window)) {
+    targets.forEach((el) => el.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+    );
+    targets.forEach((el) => io.observe(el));
+  }
+
+  // ── Widget demo: tap an amount and it pours ──
+  const widget = document.querySelector<HTMLElement>('[data-widget]');
+  if (widget) {
+    const goal = Number(widget.dataset.goal);
+    const start = Number(widget.dataset.start);
+    const format = new Intl.NumberFormat(widget.dataset.locale);
+    const countEl = widget.querySelector<HTMLElement>('[data-count]')!;
+    const leftEl = widget.querySelector<HTMLElement>('[data-left-text]')!;
+    let value = start;
+    let shown = start;
+    let frame = 0;
+    let resetTimer = 0;
+
+    const render = (n: number) => {
+      countEl.textContent = format.format(Math.round(n));
+    };
+
+    const setValue = (next: number) => {
+      value = next;
+      widget.style.setProperty('--p', String(Math.min(100, (value / goal) * 100)));
+      const done = value >= goal;
+      widget.classList.toggle('done', done);
+      leftEl.textContent = done
+        ? widget.dataset.done!
+        : widget.dataset.left!.replace('{n}', format.format(goal - value));
+
+      cancelAnimationFrame(frame);
+      if (still) {
+        shown = value;
+        render(value);
+        return;
+      }
+      const from = shown;
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const k = Math.min(1, (now - t0) / 650);
+        const eased = 1 - Math.pow(1 - k, 3);
+        shown = from + (value - from) * eased;
+        render(shown);
+        if (k < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    widget.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((button) => {
+      button.addEventListener('click', () => {
+        window.clearTimeout(resetTimer);
+        setValue(value + Number(button.dataset.add));
+        button.classList.remove('pop');
+        void button.offsetWidth;
+        button.classList.add('pop');
+        // The demo starts over once the goal is reached, like a new day.
+        if (value >= goal) resetTimer = window.setTimeout(() => setValue(start), 2600);
+      });
+    });
+
+    // The ring fills from empty the first time it scrolls into view.
+    if (!still && 'IntersectionObserver' in window) {
+      widget.style.setProperty('--p', '0');
+      shown = 0;
+      render(0);
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        window.setTimeout(() => setValue(start), 250);
+      }, { threshold: 0.5 });
+      io.observe(widget);
+    }
+  }
+</script>
 
 <style>
   /* ── Shared section furniture ── */
@@ -245,6 +578,120 @@ const faqSchema = {
     padding-block: clamp(64px, 9vw, 108px);
   }
 
+  /* ── Motion: reveal on scroll ── */
+  :global(html.js) [data-reveal] {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(var(--i, 0) * 90ms);
+  }
+  :global(html.js) [data-reveal='tilt'] {
+    transform: translateY(40px) rotate(3deg) scale(0.96);
+  }
+  :global(html.js) [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Load-time entrance for the hero, which is already on screen. */
+  .enter {
+    animation: rise-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(0.1s + var(--i, 0) * 0.11s);
+  }
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ── Bubbles ── */
+  .bubbles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bubble {
+    position: absolute;
+    left: var(--x);
+    bottom: -30px;
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08) 60%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    opacity: 0;
+    animation: bubble var(--d) linear var(--o) infinite;
+  }
+  @keyframes bubble {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    12% {
+      opacity: 0.9;
+    }
+    50% {
+      transform: translate3d(14px, -48vh, 0);
+    }
+    85% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate3d(-6px, -100vh, 0);
+      opacity: 0;
+    }
+  }
+
+  /* ── Waves ── */
+  .waves {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: clamp(56px, 8vw, 104px);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .waves.top {
+    top: -1px;
+    bottom: auto;
+    transform: scaleY(-1);
+  }
+  .wave {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 200%;
+    max-width: none;
+    height: 100%;
+    animation: drift 16s linear infinite;
+  }
+  .wave path {
+    fill: var(--bg);
+  }
+  .wave.back {
+    height: 120%;
+    opacity: 0.35;
+    animation-duration: 24s;
+    animation-direction: reverse;
+  }
+  @keyframes drift {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
   /* ── Hero ── */
   .hero {
     position: relative;
@@ -257,6 +704,7 @@ const faqSchema = {
     overflow: hidden;
   }
   .hero-in {
+    position: relative;
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
     gap: clamp(32px, 6vw, 72px);
@@ -275,12 +723,17 @@ const faqSchema = {
     border-radius: var(--r-full);
   }
   .hero h1 {
-    /* The three-line break is intentional — it mirrors the app's welcome
-       screen, where the same words stack the same way. */
-    white-space: pre-line;
+    /* Three stacked lines on purpose: they mirror the app's welcome screen,
+       where the same words stack the same way. */
     font-size: clamp(44px, 7.4vw, 76px);
     letter-spacing: -0.035em;
     margin-bottom: 24px;
+  }
+  .hero h1 .line {
+    display: block;
+  }
+  .hero h1 .line:nth-child(2) {
+    color: #8fd3ee;
   }
   .lede {
     font-size: clamp(17px, 1.9vw, 19.5px);
@@ -300,16 +753,78 @@ const faqSchema = {
     color: rgba(255, 255, 255, 0.55);
   }
   .hero-shot {
+    position: relative;
     display: flex;
     justify-content: center;
   }
-  .wave {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
+  .float {
     width: 100%;
-    height: clamp(56px, 8vw, 104px);
+    max-width: 300px;
+    animation:
+      rise-in 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both,
+      float 7s ease-in-out 1.3s infinite;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(-0.6deg);
+    }
+  }
+  .glow {
+    position: absolute;
+    inset: 10% 5%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(110, 200, 235, 0.45), transparent);
+    filter: blur(30px);
+    animation: pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+  .chip {
+    position: absolute;
+    left: max(0px, calc(50% - 210px));
+    bottom: 16%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--primary-dark);
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: var(--r-full);
+    box-shadow: 0 14px 34px rgba(4, 30, 46, 0.35);
+    animation:
+      chip-in 0.7s cubic-bezier(0.3, 1.4, 0.5, 1) 1.2s both,
+      float 6s ease-in-out 2s infinite reverse;
+  }
+  .chip svg {
+    color: var(--accent-cyan);
+  }
+  .chip span {
+    color: var(--text-secondary);
+  }
+  @keyframes chip-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* ── Problem ── */
@@ -367,6 +882,13 @@ const faqSchema = {
     height: 42px;
     display: grid;
     place-items: center;
+    transition:
+      background 0.3s ease,
+      color 0.3s ease;
+  }
+  .steps li:hover .step-n {
+    background: var(--accent-cyan);
+    color: #fff;
   }
   .steps h3 {
     font-size: 19px;
@@ -383,15 +905,23 @@ const faqSchema = {
     justify-content: center;
     align-items: center;
   }
-  /* Two phones, slightly overlapped and tilted — the pair reads as one
+  /* Two phones, slightly overlapped and tilted: the pair reads as one
      sequence rather than two unrelated captures. */
   .how-shots :global(.shot-a) {
     transform: rotate(-4deg) translateX(6%);
     z-index: 1;
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
   .how-shots :global(.shot-b) {
     transform: rotate(5deg) translateX(-16%) translateY(7%) scale(0.9);
     opacity: 0.97;
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .how-shots:hover :global(.shot-a) {
+    transform: rotate(-6deg) translateX(2%) translateY(-2%);
+  }
+  .how-shots:hover :global(.shot-b) {
+    transform: rotate(7deg) translateX(-10%) translateY(5%) scale(0.92);
   }
 
   /* ── Features ── */
@@ -416,6 +946,18 @@ const faqSchema = {
     padding: 26px 24px;
     box-shadow: var(--shadow-light);
   }
+  /* After the reveal, so the hover doesn't fight the entrance transition. */
+  :global(html.js) .card.is-in,
+  :global(html:not(.js)) .card {
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.35s ease,
+      opacity 0.7s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium), 0 18px 40px rgba(11, 61, 92, 0.08);
+  }
   .ficon {
     display: grid;
     place-items: center;
@@ -425,6 +967,10 @@ const faqSchema = {
     background: var(--bg-element);
     color: var(--primary-dark);
     margin-bottom: 16px;
+    transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .card:hover .ficon {
+    transform: rotate(-8deg) scale(1.08);
   }
   .card h3 {
     font-size: 17.5px;
@@ -438,6 +984,339 @@ const faqSchema = {
   .feat-shot {
     display: flex;
     justify-content: center;
+  }
+
+  /* ── Widgets & Apple Watch ── */
+  .every {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-element) 100%);
+  }
+  .every-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 40px);
+  }
+  .every-col {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xxl);
+    padding: clamp(22px, 3vw, 32px);
+    box-shadow: var(--shadow-light);
+  }
+  .every-col h3 {
+    font-size: 20px;
+    margin: 26px 0 8px;
+  }
+  .every-col > p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+  .widget-stage,
+  .watch-stage {
+    display: grid;
+    place-items: center;
+    min-height: 320px;
+    border-radius: var(--r-xl);
+    background:
+      radial-gradient(90% 80% at 30% 10%, rgba(62, 155, 199, 0.45), transparent 60%),
+      linear-gradient(160deg, #0b3d5c, #062940);
+    overflow: hidden;
+    padding: 24px 16px;
+  }
+
+  /* The widget, drawn in HTML so it can pour for real. */
+  @property --p {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+  }
+  .widget {
+    --ring: var(--accent-cyan);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px 18px;
+    width: min(100%, 330px);
+    padding: 18px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 20px 44px rgba(3, 24, 38, 0.4);
+    transition: --p 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .widget.done {
+    --ring: #2fae8f;
+  }
+  .w-ring {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: conic-gradient(var(--ring) calc(var(--p) * 1%), var(--bg-element) 0);
+    display: grid;
+    place-items: center;
+  }
+  .w-ring-in {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    color: var(--ring);
+  }
+  .w-text {
+    align-self: center;
+    min-width: 0;
+  }
+  .w-text p {
+    margin: 0;
+  }
+  .w-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .w-count {
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+  .w-count strong {
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary-dark);
+  }
+  .w-left {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+  .widget.done .w-left {
+    color: #2fae8f;
+    font-weight: 700;
+  }
+  .w-buttons {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .w-buttons button {
+    font: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    background: var(--secondary-blue);
+    border: 0;
+    border-radius: var(--r-full);
+    padding: 10px 0;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      background 0.2s ease;
+  }
+  .w-buttons button:hover {
+    background: var(--primary-dark);
+  }
+  .w-buttons button:active {
+    transform: scale(0.94);
+  }
+  .w-buttons button.pop {
+    animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  @keyframes pop {
+    40% {
+      transform: scale(1.1);
+    }
+  }
+
+  /* The watch: a CSS case around the real capture, the two screens
+     crossfading like a swipe between the watch app's pages. */
+  .watch {
+    position: relative;
+    isolation: isolate;
+    width: 196px;
+    padding: 11px;
+    border-radius: 52px;
+    background: linear-gradient(150deg, #3a4a54, #0d1a22 60%);
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.45),
+      0 1px 0 rgba(255, 255, 255, 0.2) inset;
+    animation: float 8s ease-in-out infinite;
+  }
+  .band {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    height: 90px;
+    background: linear-gradient(90deg, #12313f, #1c4558 50%, #12313f);
+    z-index: -1;
+  }
+  .band.top {
+    bottom: 100%;
+    margin-bottom: -18px;
+    border-radius: 24px 24px 8px 8px;
+  }
+  .band.bottom {
+    top: 100%;
+    margin-top: -18px;
+    border-radius: 8px 8px 24px 24px;
+  }
+  .crown {
+    position: absolute;
+    right: -6px;
+    top: 26%;
+    width: 8px;
+    height: 34px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2a3a44, #5a6a74);
+  }
+  .watch-screen {
+    position: relative;
+    border-radius: 42px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 416 / 496;
+  }
+  .watch-screen img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .watch-next {
+    animation: watch-swap 9s ease-in-out infinite;
+  }
+  @keyframes watch-swap {
+    0%,
+    40% {
+      opacity: 0;
+      transform: translateY(18%);
+    }
+    50%,
+    90% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-18%);
+    }
+  }
+
+  /* ── Pricing ── */
+  .plans {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(18px, 3vw, 28px);
+    align-items: stretch;
+  }
+  .plan {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xxl);
+    padding: clamp(26px, 3.4vw, 36px);
+    box-shadow: var(--shadow-light);
+  }
+  .plan h3 {
+    font-size: 18px;
+    margin: 0 0 10px;
+  }
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 6px;
+  }
+  .price strong {
+    font-size: clamp(36px, 5vw, 46px);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .price span {
+    color: var(--text-secondary);
+  }
+  .plan .alt,
+  .plan .lead {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+  .plan .lead {
+    margin-top: 18px;
+    font-weight: 600;
+  }
+  .plan ul {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 11px;
+  }
+  .plan li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 11px;
+    align-items: start;
+    font-size: 16px;
+  }
+  .plan li svg {
+    color: var(--accent-cyan);
+    margin-top: 4px;
+  }
+  .plan.pro {
+    color: #fff;
+    border: 0;
+    background:
+      radial-gradient(100% 70% at 90% 0%, rgba(62, 155, 199, 0.45), transparent 60%),
+      linear-gradient(160deg, #0b3d5c, #062940);
+    box-shadow: var(--shadow-heavy);
+    overflow: hidden;
+  }
+  /* A slow sheen across the Pro card. */
+  .plan.pro::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.1) 50%, transparent 65%);
+    transform: translateX(-100%);
+    animation: sheen 7s ease-in-out 1s infinite;
+    pointer-events: none;
+  }
+  @keyframes sheen {
+    0%,
+    60% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  .plan.pro .price span,
+  .plan.pro .alt,
+  .plan.pro .lead {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .plan.pro li svg {
+    color: #8fd3ee;
+  }
+  .plan .trial {
+    display: inline-block;
+    margin: 22px 0 0;
+    padding: 6px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    background: #8fd3ee;
+    border-radius: var(--r-full);
+  }
+  .price-note {
+    margin: 18px 0 0;
+    font-size: 14px;
+    color: var(--text-tertiary);
   }
 
   /* ── Privacy ── */
@@ -509,7 +1388,7 @@ const faqSchema = {
   summary svg {
     flex: none;
     color: var(--text-tertiary);
-    transition: transform 0.2s ease;
+    transition: transform 0.25s ease;
   }
   details[open] summary svg {
     transform: rotate(180deg);
@@ -520,14 +1399,21 @@ const faqSchema = {
     font-size: 16px;
     max-width: 62ch;
   }
+  details[open] p {
+    animation: rise-in 0.4s ease both;
+  }
 
   /* ── Final CTA ── */
   .final {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(150deg, #0b3d5c, #07314a);
     color: #fff;
     text-align: center;
+    padding-top: clamp(110px, 13vw, 160px);
   }
   .final-in {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -580,6 +1466,13 @@ const faqSchema = {
     }
   }
 
+  @media (max-width: 760px) {
+    .every-grid,
+    .plans {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (max-width: 620px) {
     .feat-grid,
     .privacy ul {
@@ -589,6 +1482,30 @@ const faqSchema = {
       display: none;
     }
     .how-shots :global(.shot-a) {
+      transform: none;
+    }
+    .chip {
+      left: 0;
+      bottom: 8%;
+    }
+    .widget {
+      padding: 16px;
+      gap: 14px;
+    }
+    .w-count strong {
+      font-size: 22px;
+    }
+  }
+
+  /* Still page: no drifting, floating or bubbles, content shown at once. */
+  @media (prefers-reduced-motion: reduce) {
+    .bubbles,
+    .glow,
+    .watch-next {
+      display: none;
+    }
+    :global(html.js) [data-reveal] {
+      opacity: 1;
       transform: none;
     }
   }

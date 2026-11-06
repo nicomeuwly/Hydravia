@@ -26,6 +26,7 @@ const otherHref = localePath(other, path);
     <nav class="nav" aria-label="Navigation">
       <a href={`${home === '/' ? '' : home}#how`}>{t(lang, 'nav.how')}</a>
       <a href={`${home === '/' ? '' : home}#features`}>{t(lang, 'nav.features')}</a>
+      <a href={`${home === '/' ? '' : home}#pricing`}>{t(lang, 'nav.pricing')}</a>
       <a href={`${home === '/' ? '' : home}#faq`}>{t(lang, 'nav.faq')}</a>
       <a href={otherHref} class="lang" hreflang={other} aria-label={t(lang, 'a11y.langSwitch')}>
         {other.toUpperCase()}
