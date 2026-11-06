@@ -77,15 +77,30 @@ private struct ProgressRing: View {
 
     private var reached: Bool { consumedMl >= goalMl }
 
+    private static let lineWidth: CGFloat = 11
+
     var body: some View {
+        // Square, so the ring is as wide as it is tall, and the numbers are
+        // kept inside it (they used to run under the stroke).
+        GeometryReader { proxy in
+            let side = min(proxy.size.width, proxy.size.height)
+            ring(side: side)
+                .frame(width: side, height: side)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(.watchProgressLabel(consumedMl.formatted(), goalMl.formatted())))
+    }
+
+    private func ring(side: CGFloat) -> some View {
         ZStack {
-            Circle().stroke(WatchPalette.track, lineWidth: 11)
+            Circle().stroke(WatchPalette.track, lineWidth: Self.lineWidth)
             Circle()
                 .trim(from: 0, to: max(0.001, min(progress, 1)))
                 .stroke(
                     AngularGradient(colors: [WatchPalette.secondaryBlue, WatchPalette.foam], center: .center,
                                     startAngle: .degrees(0), endAngle: .degrees(360 * max(progress, 0.05))),
-                    style: StrokeStyle(lineWidth: 11, lineCap: .round)
+                    style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
                 .animation(.spring(duration: 0.6), value: progress)
@@ -105,12 +120,12 @@ private struct ProgressRing: View {
                 Text(.watchOfGoal(goalMl.formatted()))
                     .font(.brand(.semiBold, size: 13, relativeTo: .caption))
                     .foregroundStyle(.secondary)
+                    .minimumScaleFactor(0.7)
                     .lineLimit(1)
             }
-            .padding(.horizontal, 18)
+            // The widest line that fits inside the stroke, with a margin.
+            .frame(width: (side - 2 * Self.lineWidth) * 0.8)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(.watchProgressLabel(consumedMl.formatted(), goalMl.formatted())))
     }
 }
 
