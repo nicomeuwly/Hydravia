@@ -46,6 +46,7 @@ const shots = {
   widgets: 'iphone-5-widgets',
   'watch-ring': 'watch-1-ring',
   'watch-pour': 'watch-2-pour',
+  'watch-goal': 'watch-3-goal',
 } as const;
 const shot = (name: keyof typeof shots) => `/shots/${lang}/mockup-${shots[name]}.webp`;
 
@@ -278,23 +279,19 @@ const wavePath =
       <article class="every-col" data-reveal style="--i:1">
         <div class="watch-stage">
           <div class="watch">
-            <img
-              src={shot('watch-ring')}
-              alt={t(lang, 'every.watchAlt')}
-              width="567"
-              height="891"
-              loading="lazy"
-              decoding="async"
-            />
-            <img
-              class="watch-next"
-              src={shot('watch-pour')}
-              alt=""
-              width="567"
-              height="891"
-              loading="lazy"
-              decoding="async"
-            />
+            {
+              (['watch-ring', 'watch-pour', 'watch-goal'] as const).map((name, i) => (
+                <img
+                  src={shot(name)}
+                  alt={i === 0 ? t(lang, 'every.watchAlt') : ''}
+                  width="567"
+                  height="891"
+                  loading="lazy"
+                  decoding="async"
+                  style={`--o:${-((3 - i) % 3) * 4}s`}
+                />
+              ))
+            }
           </div>
         </div>
         <h3>{t(lang, 'every.watch.title')}</h3>
@@ -943,36 +940,36 @@ const wavePath =
     max-width: 250px;
     margin-top: 8px;
   }
-  /* The watch mockup, its two screens crossfading like a swipe between
-     the watch app's pages (same frame, so only the screen changes). */
+  /* The watch mockup, its three screens (ring, pour buttons, goal
+     reached) taking turns, 4 s each. Only one is shown at a time: the
+     mockups aren't opaque, so a screen left underneath showed through. The
+     outgoing one fades out while the next fades in, over 0.4 s. */
   .watch {
     position: relative;
     width: 210px;
+    aspect-ratio: 567 / 891;
     filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.4));
     animation: float 8s ease-in-out infinite;
   }
   .watch img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .watch-next {
     position: absolute;
     inset: 0;
-    animation: watch-swap 9s ease-in-out infinite;
+    width: 100%;
+    height: 100%;
+    display: block;
+    animation: watch-turn 12s linear var(--o) infinite;
   }
-  @keyframes watch-swap {
+  @keyframes watch-turn {
     0%,
-    40% {
-      opacity: 0;
-    }
-    50%,
-    90% {
+    30% {
       opacity: 1;
     }
-    100% {
+    33.34%,
+    96.67% {
       opacity: 0;
-      transform: translateY(-18%);
+    }
+    100% {
+      opacity: 1;
     }
   }
 
@@ -1266,8 +1263,11 @@ const wavePath =
   @media (prefers-reduced-motion: reduce) {
     .bubbles,
     .glow,
-    .watch-next {
+    .watch img:not(:first-child) {
       display: none;
+    }
+    .watch img {
+      animation: none;
     }
     :global(html.js) [data-reveal] {
       opacity: 1;
