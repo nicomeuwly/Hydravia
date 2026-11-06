@@ -1,0 +1,19 @@
+# Hydravia
+
+> Hydravia is an iPhone and Apple Watch app (iOS 26, watchOS 26) that gets people to drink water. When a hydration reminder lands, the apps the user picked are locked through Apple's Screen Time; drinking the suggested dose (a short in-app ritual) unlocks them. Free to start; Hydravia Pro is €2.99 a month, €19.99 a year or €39.99 once, with a 7-day trial on subscriptions. Data stays on the device: no account, no tracker. Made in Cugy (Fribourg), Switzerland, by Nicolas Meuwly. Contact: contact@hydravia.app
+
+French is the main language; every page has an English version.
+
+## Pages
+
+- [Hydravia (français)](https://www.hydravia.app/): what the app does, how the ritual works, features, Apple Watch and widgets, pricing, FAQ
+- [Hydravia (English)](https://www.hydravia.app/en): the same page in English
+- [Politique de confidentialité](https://www.hydravia.app/privacy) / [Privacy Policy](https://www.hydravia.app/en/privacy): what data is used and where it goes
+- [Conditions d'utilisation](https://www.hydravia.app/terms) / [Terms of Use](https://www.hydravia.app/en/terms): subscriptions, trial, governing law (Swiss)
+
+## Key facts
+
+- Daily goal: about 33 ml per kilo of body weight, between 1.5 and 4 litres
+- Locks only the apps the user chose, only during their active hours; calls and messages stay available
+- Once the day's goal is reached, reminders stop and the lock rests until the next day
+- Apple Watch app: today's water, next reminder, complications; pouring from the watch is Pro

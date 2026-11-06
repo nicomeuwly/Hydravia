@@ -42,6 +42,18 @@ export const HAS_CONTACT_EMAIL = !CONTACT_EMAIL.startsWith('[');
  */
 export const APP_STORE_URL = '';
 
+/**
+ * The app's numeric App Store id (the digits after "id" in APP_STORE_URL).
+ * Once set, Safari on iPhone shows its "Open in App Store" banner.
+ */
+export const APP_STORE_ID = '';
+
+/**
+ * Prices as numbers, for the structured data search engines read. They must
+ * match the copy in src/i18n and App Store Connect.
+ */
+export const PRICES = { currency: 'EUR', monthly: 2.99, yearly: 19.99, lifetime: 39.99 } as const;
+
 /** Date shown on the legal pages. Update whenever their text changes. */
 export const LEGAL_UPDATED = '2026-11-06';
 

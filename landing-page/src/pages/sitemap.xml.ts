@@ -7,27 +7,27 @@ import { LANGS, localePath } from '../i18n';
  * alternates, which is how Google learns the two language versions are the
  * same page rather than duplicates.
  */
-const PAGES = [
-  { path: '', priority: '1.0' },
-  { path: '/privacy', priority: '0.5' },
-  { path: '/terms', priority: '0.5' },
-];
+const PAGES = ['', '/privacy', '/terms'];
+
+/** Every page is rebuilt on each deploy, so the build date is when it last
+ * changed. (No `priority`: Google ignores it.) */
+const LASTMOD = new Date().toISOString().slice(0, 10);
 
 export const GET: APIRoute = ({ site }) => {
-  const base = site ?? new URL('https://hydravia.app');
+  const base = site ?? new URL('https://www.hydravia.app');
   const abs = (p: string) => new URL(p, base).href;
 
-  const urls = PAGES.flatMap((page) =>
+  const urls = PAGES.flatMap((path) =>
     LANGS.map((lang) => {
       const alternates = LANGS.map(
         (l) =>
-          `    <xhtml:link rel="alternate" hreflang="${l}" href="${abs(localePath(l, page.path))}"/>`,
+          `    <xhtml:link rel="alternate" hreflang="${l}" href="${abs(localePath(l, path))}"/>`,
       ).join('\n');
 
       return `  <url>
-    <loc>${abs(localePath(lang, page.path))}</loc>
+    <loc>${abs(localePath(lang, path))}</loc>
+    <lastmod>${LASTMOD}</lastmod>
 ${alternates}
-    <priority>${page.priority}</priority>
   </url>`;
     }),
   ).join('\n');

@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { t, type Lang } from '../i18n';
+import { APP_STORE_ID, APP_STORE_URL, CONTACT_EMAIL, LEGAL_ENTITY } from '../config';
 
 interface Props {
   title: string;
@@ -17,6 +18,36 @@ const { title, description, lang, path = '' } = Astro.props;
 const canonical = new URL(lang === 'fr' ? path || '/' : `/en${path}`, Astro.site);
 const altFr = new URL(path || '/', Astro.site);
 const altEn = new URL(`/en${path}`, Astro.site);
+const ogImage = new URL(lang === 'fr' ? '/og.jpg' : '/og-en.jpg', Astro.site);
+const site = new URL('/', Astro.site).href;
+
+// Who publishes the site, on every page: tells search and AI engines that
+// Hydravia is one entity (name, logo, contact, publisher), apart from the
+// many hydration apps with a similar name.
+const entity = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${site}#org`,
+      name: 'Hydravia',
+      url: site,
+      logo: new URL('/icon-180.png', Astro.site).href,
+      email: CONTACT_EMAIL,
+      founder: { '@type': 'Person', name: LEGAL_ENTITY },
+      address: { '@type': 'PostalAddress', addressLocality: 'Cugy', addressRegion: 'FR', addressCountry: 'CH' },
+      ...(APP_STORE_URL ? { sameAs: [APP_STORE_URL] } : {}),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site}#website`,
+      name: 'Hydravia',
+      url: site,
+      inLanguage: ['fr', 'en'],
+      publisher: { '@id': `${site}#org` },
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -47,15 +78,20 @@ const altEn = new URL(`/en${path}`, Astro.site);
     <!-- The header's colour: Safari paints the status bar with it. -->
     <meta name="theme-color" content="#f3f7f9" />
 
+    {APP_STORE_ID && <meta name="apple-itunes-app" content={`app-id=${APP_STORE_ID}`} />}
+
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Hydravia" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL('/og.jpg', Astro.site)} />
+    <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t(lang, 'og.alt')} />
     <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(entity)} is:inline />
   </head>
   <body>
     <a class="skip" href="#main">{t(lang, 'a11y.skip')}</a>

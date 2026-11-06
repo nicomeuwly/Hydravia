@@ -15,7 +15,9 @@
  */
 import Phone from './Phone.astro';
 import AppStoreButton from './AppStoreButton.astro';
+import ContactEmail from './ContactEmail.astro';
 import { t, localePath, type Lang } from '../i18n';
+import { PRICES, LEGAL_ENTITY } from '../config';
 
 interface Props {
   lang: Lang;
@@ -56,15 +58,39 @@ const shot = (name: keyof typeof shots) => `/shots/${lang}/mockup-${shots[name]}
 const freeItems = ['price.free.f1', 'price.free.f2', 'price.free.f3', 'price.free.f4'] as const;
 const proItems = ['price.pro.f1', 'price.pro.f2', 'price.pro.f3', 'price.pro.f4'] as const;
 
-const faqs = [
+// The questions people search for (how much to drink, which devices, how it
+// differs from a reminder) sit among the ones about the product, each
+// answered in a few sentences that an answer engine can quote as is.
+type Faq = { q: string; a: string; src?: { label: string; url: string } };
+const faqs: Faq[] = [
   { q: t(lang, 'faq.q1'), a: t(lang, 'faq.a1') },
+  { q: t(lang, 'faq.q11'), a: t(lang, 'faq.a11') },
   { q: t(lang, 'faq.q2'), a: t(lang, 'faq.a2') },
   { q: t(lang, 'faq.q7'), a: t(lang, 'faq.a7') },
+  { q: t(lang, 'faq.q9'), a: t(lang, 'faq.a9') },
   { q: t(lang, 'faq.q6'), a: t(lang, 'faq.a6') },
   { q: t(lang, 'faq.q3'), a: t(lang, 'faq.a3') },
+  {
+    q: t(lang, 'faq.q8'),
+    a: t(lang, 'faq.a8'),
+    src: { label: t(lang, 'faq.src8'), url: 'https://www.efsa.europa.eu/en/efsajournal/pub/1459' },
+  },
   { q: t(lang, 'faq.q4'), a: t(lang, 'faq.a4') },
+  { q: t(lang, 'faq.q10'), a: t(lang, 'faq.a10') },
   { q: t(lang, 'faq.q5'), a: t(lang, 'faq.a5') },
 ];
+
+// The plans side by side, for readers (and answer engines) who compare.
+const compare = [
+  { k: 'price.cmp.r1', free: true, pro: true },
+  { k: 'price.cmp.r2', free: true, pro: true },
+  { k: 'price.cmp.r3', free: t(lang, 'price.cmp.one'), pro: t(lang, 'price.cmp.all') },
+  { k: 'price.cmp.r4', free: true, pro: true },
+  { k: 'price.cmp.r5', free: false, pro: true },
+  { k: 'price.cmp.r6', free: false, pro: true },
+  { k: 'price.cmp.r7', free: false, pro: true },
+  { k: 'price.cmp.r8', free: t(lang, 'price.free.price'), pro: t(lang, 'price.cmp.proPrice') },
+] as const;
 
 const privacyPoints = [
   t(lang, 'privacy.p1'),
@@ -83,6 +109,40 @@ const faqSchema = {
     name: f.q,
     acceptedAnswer: { '@type': 'Answer', text: f.a },
   })),
+};
+
+// The app itself, for search and AI engines: what it is, where it runs, what
+// it costs. No rating until there are real App Store reviews.
+const site = new URL('/', Astro.site).href;
+const offer = (name: string, price: number, extra = {}) => ({
+  '@type': 'Offer',
+  name,
+  price: price.toFixed(2),
+  priceCurrency: PRICES.currency,
+  ...extra,
+});
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'MobileApplication',
+  name: 'Hydravia',
+  description: t(lang, 'hero.body'),
+  url: new URL(localePath(lang), Astro.site).href,
+  image: new URL(lang === 'fr' ? '/og.jpg' : '/og-en.jpg', Astro.site).href,
+  inLanguage: lang,
+  operatingSystem: 'iOS 26, watchOS 26',
+  applicationCategory: 'HealthApplication',
+  author: { '@type': 'Person', name: LEGAL_ENTITY },
+  publisher: { '@id': `${site}#org` },
+  offers: [
+    offer(t(lang, 'price.free.name'), 0),
+    offer(`${t(lang, 'price.pro.name')} (${t(lang, 'price.pro.per')})`, PRICES.monthly, {
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: PRICES.monthly.toFixed(2), priceCurrency: PRICES.currency, billingDuration: 'P1M' },
+    }),
+    offer(`${t(lang, 'price.pro.name')} (${lang === 'fr' ? 'par an' : 'per year'})`, PRICES.yearly, {
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: PRICES.yearly.toFixed(2), priceCurrency: PRICES.currency, billingDuration: 'P1Y' },
+    }),
+    offer(`${t(lang, 'price.pro.name')} (${lang === 'fr' ? 'à vie' : 'lifetime'})`, PRICES.lifetime),
+  ],
 };
 
 // Rising bubbles, drawn like the app's ambient ones (WaterPhysics): flat
@@ -354,6 +414,44 @@ const wavePath =
         <p class="trial">{t(lang, 'price.pro.trial')}</p>
       </article>
     </div>
+    <details class="compare" data-reveal>
+      <summary>
+        <span>{t(lang, 'price.cmp.summary')}</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div class="compare-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{t(lang, 'price.cmp.feature')}</th>
+              <th scope="col">{t(lang, 'price.free.name')}</th>
+              <th scope="col">{t(lang, 'price.pro.name')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              compare.map((row) => (
+                <tr>
+                  <th scope="row">{t(lang, row.k)}</th>
+                  {[row.free, row.pro].map((v) =>
+                    typeof v === 'string' ? (
+                      <td>{v}</td>
+                    ) : (
+                      <td>
+                        <span class:list={['mark', { off: !v }]} aria-hidden="true">{v ? '✓' : '–'}</span>
+                        <span class="sr">{t(lang, v ? 'price.cmp.yes' : 'price.cmp.no')}</span>
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </details>
     <p class="price-note" data-reveal>{t(lang, 'price.note')}</p>
   </div>
 </section>
@@ -380,6 +478,16 @@ const wavePath =
   </div>
 </section>
 
+<!-- ═══ About ═══ -->
+<section class="about">
+  <div class="wrap narrow">
+    <p class="eyebrow" data-reveal>{t(lang, 'about.eyebrow')}</p>
+    <h2 data-reveal style="--i:1">{t(lang, 'about.title')}</h2>
+    <p data-reveal style="--i:2">{t(lang, 'about.body')}</p>
+    <p data-reveal style="--i:3">{t(lang, 'about.contact')} <ContactEmail /> {t(lang, 'about.contactEnd')}</p>
+  </div>
+</section>
+
 <!-- ═══ FAQ ═══ -->
 <section id="faq" class="faq">
   <div class="wrap narrow">
@@ -396,6 +504,11 @@ const wavePath =
               </svg>
             </summary>
             <p>{f.a}</p>
+            {f.src && (
+              <p class="faq-src">
+                <a href={f.src.url} rel="noopener" target="_blank">{f.src.label}</a>
+              </p>
+            )}
           </details>
         ))
       }
@@ -431,6 +544,7 @@ const wavePath =
 </section>
 
 <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} is:inline />
+<script type="application/ld+json" set:html={JSON.stringify(appSchema)} is:inline />
 
 <script>
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1082,6 +1196,75 @@ const wavePath =
     color: var(--text-tertiary);
   }
 
+  /* Pricing, side by side: folded away, the cards say it first. */
+  .compare {
+    margin-top: 28px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 4px 22px;
+  }
+  .compare summary {
+    color: var(--primary-dark);
+  }
+  .compare-scroll {
+    overflow-x: auto;
+    padding-bottom: 16px;
+  }
+  .compare table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .compare th,
+  .compare td {
+    text-align: left;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare thead th {
+    border-top: 0;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+  }
+  .compare tbody th {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .compare td {
+    color: var(--text-secondary);
+    min-width: 96px;
+  }
+  .mark {
+    font-weight: 700;
+    color: var(--accent-cyan);
+  }
+  .mark.off {
+    color: var(--text-tertiary);
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ── About ── */
+  .about h2 {
+    font-size: clamp(26px, 3.8vw, 36px);
+    margin-bottom: 18px;
+  }
+  .about p:not(.eyebrow) {
+    margin: 0 0 14px;
+    font-size: 17.5px;
+    color: var(--text-secondary);
+    max-width: 62ch;
+  }
+
   /* ── Privacy ── */
   .privacy {
     background: var(--white);
@@ -1161,6 +1344,10 @@ const wavePath =
     color: var(--text-secondary);
     font-size: 16px;
     max-width: 62ch;
+  }
+  details .faq-src {
+    margin-top: -10px;
+    font-size: 14px;
   }
   details[open] p {
     animation: answer-in 0.2s var(--ease-out) both;

@@ -30,9 +30,11 @@ npm run build && grep -r "À COMPLÉTER" dist/   # must return nothing
 | `CONTACT_EMAIL` | Apple requires a working support contact; GDPR requires a reachable address for data requests |
 | `APP_STORE_URL` | Empty until first submission — see below |
 
-Also update **`site`** in [`astro.config.mjs`](astro.config.mjs) and the
-`Sitemap:` line in [`public/robots.txt`](public/robots.txt) if the domain is not
-`hydravia.app`. Those two feed canonical URLs, `hreflang` and the sitemap.
+The site is served from `www.hydravia.app` (`hydravia.app` redirects to it).
+If that host changes, update **`site`** in [`astro.config.mjs`](astro.config.mjs),
+the `Sitemap:` line in [`public/robots.txt`](public/robots.txt) and the links in
+[`public/llms.txt`](public/llms.txt). They feed canonical URLs, `hreflang` and
+the sitemap, which must name the host that actually serves the pages.
 
 ### The download buttons
 

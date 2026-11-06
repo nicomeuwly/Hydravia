@@ -33,7 +33,7 @@ export const fr = {
   'hero.badge': 'iPhone et Apple Watch',
   'hero.title': 'Bois.\nDébloque.\nAvance.',
   'hero.body':
-    "Un rituel d'hydratation, pas un compteur de plus. À l'heure du rappel, tes apps se verrouillent. Tu bois ton verre, tout se débloque.",
+    'Hydravia est l’app iPhone et Apple Watch qui te fait vraiment boire : à l’heure du rappel, les apps de ton choix se verrouillent. Tu bois ton verre, tout se débloque.',
   'hero.cta': 'Télécharger sur l’App Store',
   'hero.soon': 'Bientôt disponible',
   'hero.ctaNote': 'Gratuit · Pro avec 7 jours d’essai',
@@ -162,6 +162,50 @@ export const fr = {
   'faq.a7':
     'Les rappels du jour s’arrêtent et le verrou se repose jusqu’au lendemain. Si tu relèves ton objectif ou supprimes un verre, ils reprennent.',
 
+  'faq.q8': 'Combien d’eau faut-il boire par jour ?',
+  'faq.a8':
+    'L’Autorité européenne de sécurité des aliments (EFSA) recommande environ 2 litres d’eau par jour pour une femme adulte et 2,5 litres pour un homme, aliments compris : ils en apportent à peu près 20 %. Hydravia calcule ton propre objectif à partir de ton poids, environ 33 ml par kilo.',
+  'faq.src8': 'Source : EFSA, valeurs de référence pour l’eau (2010)',
+
+  'faq.q9': 'Faut-il une Apple Watch ?',
+  'faq.a9':
+    'Non. Tout fonctionne avec l’iPhone seul : rappels, verrou, suivi et widgets. L’Apple Watch est un plus pour voir ton eau du jour d’un coup d’œil et, avec Pro, verser un verre depuis ton poignet.',
+
+  'faq.q10': 'Sur quels appareils fonctionne Hydravia ?',
+  'faq.a10':
+    'Sur iPhone avec iOS 26 ou plus récent, et en option sur Apple Watch avec watchOS 26. Le verrou passe par Temps d’écran, le système d’Apple, sur l’iPhone.',
+
+  'faq.q11': 'Quelle différence avec un simple rappel ?',
+  'faq.a11':
+    'Un rappel classique se balaie d’un geste. Avec Hydravia, les apps que tu as choisies se verrouillent à l’heure du rappel et ne se rouvrent qu’après le rituel, le temps de boire ton verre. Le rappel ne peut plus passer inaperçu.',
+
+  // ── Pricing comparison ────────────────────────────────────────────────────
+  'price.cmp.summary': 'Comparer les formules en détail',
+  'price.cmp.feature': 'Fonction',
+  'price.cmp.r1': 'Suivi de l’eau et historique',
+  'price.cmp.r2': 'Rappels pendant tes heures actives',
+  'price.cmp.r3': 'Apps et sites verrouillés',
+  'price.cmp.one': '1 app',
+  'price.cmp.all': 'Sans limite',
+  'price.cmp.r4': 'Widget de progression, Apple Watch et complications',
+  'price.cmp.r5': 'Widgets d’ajout rapide et d’écran verrouillé',
+  'price.cmp.r6': 'Dose ajustée à ta soif et à la météo',
+  'price.cmp.r7': 'Verser un verre depuis l’Apple Watch',
+  'price.cmp.r8': 'Prix',
+  'price.cmp.proPrice': '2,99 € par mois, 19,99 € par an ou 39,99 € à vie',
+  'price.cmp.yes': 'Inclus',
+  'price.cmp.no': 'Non inclus',
+
+  // ── About ─────────────────────────────────────────────────────────────────
+  'about.eyebrow': 'QUI EST DERRIÈRE',
+  'about.title': 'Conçu et développé en Suisse',
+  'about.body':
+    'Hydravia est conçu et développé à Cugy, dans le canton de Fribourg, par Nicolas Meuwly, à titre indépendant. L’idée est partie d’un constat simple : un rappel se balaie, un verrou non.',
+  'about.contact': 'Une question, une idée, un bug ? Écris à',
+  'about.contactEnd': ': c’est la personne qui fait l’app qui te répond.',
+
+  'og.alt': 'Hydravia, l’app iPhone et Apple Watch qui verrouille tes apps jusqu’à ce que tu boives.',
+
   // ── Final CTA ─────────────────────────────────────────────────────────────
   'final.title': 'Commence ce soir.',
   'final.body':
@@ -196,7 +240,7 @@ export const en: Catalogue = {
   'hero.badge': 'iPhone and Apple Watch',
   'hero.title': 'Drink.\nUnlock.\nCarry on.',
   'hero.body':
-    'A hydration ritual, not another counter. When the reminder lands, your apps lock. Drink your dose and everything opens back up.',
+    'Hydravia is the iPhone and Apple Watch app that actually gets you drinking: when the reminder lands, the apps you chose lock. Drink your dose and everything opens back up.',
   'hero.cta': 'Download on the App Store',
   'hero.soon': 'Coming soon',
   'hero.ctaNote': 'Free · Pro with a 7-day trial',
@@ -317,6 +361,48 @@ export const en: Catalogue = {
   'faq.q7': 'What happens when I reach my goal?',
   'faq.a7':
     'Today’s reminders stop and the lock rests until tomorrow. If you raise your goal or delete a glass, they come back.',
+
+  'faq.q8': 'How much water should I drink a day?',
+  'faq.a8':
+    'The European Food Safety Authority (EFSA) recommends about 2 litres of water a day for adult women and 2.5 litres for men, food included: it provides roughly 20% of it. Hydravia works out your own goal from your weight, about 33 ml per kilo.',
+  'faq.src8': 'Source: EFSA, dietary reference values for water (2010)',
+
+  'faq.q9': 'Do I need an Apple Watch?',
+  'faq.a9':
+    'No. Everything works with the iPhone alone: reminders, the lock, tracking and widgets. The Apple Watch is a bonus to see today’s water at a glance and, with Pro, pour a glass from your wrist.',
+
+  'faq.q10': 'Which devices does Hydravia run on?',
+  'faq.a10':
+    'iPhone with iOS 26 or later, and optionally Apple Watch with watchOS 26. The lock uses Screen Time, Apple’s own system, on the iPhone.',
+
+  'faq.q11': 'How is it different from a plain reminder?',
+  'faq.a11':
+    'A plain reminder is gone with one swipe. With Hydravia, the apps you picked lock when the reminder lands and only open again after the ritual, the time it takes to drink your glass. The reminder can no longer slip by.',
+
+  'price.cmp.summary': 'Compare the plans in detail',
+  'price.cmp.feature': 'Feature',
+  'price.cmp.r1': 'Water tracking and history',
+  'price.cmp.r2': 'Reminders during your active hours',
+  'price.cmp.r3': 'Apps and sites locked',
+  'price.cmp.one': '1 app',
+  'price.cmp.all': 'No limit',
+  'price.cmp.r4': 'Progress widget, Apple Watch and complications',
+  'price.cmp.r5': 'Quick-add and Lock Screen widgets',
+  'price.cmp.r6': 'Dose adjusted to your thirst and the weather',
+  'price.cmp.r7': 'Pour a glass from your Apple Watch',
+  'price.cmp.r8': 'Price',
+  'price.cmp.proPrice': '€2.99 a month, €19.99 a year or €39.99 for life',
+  'price.cmp.yes': 'Included',
+  'price.cmp.no': 'Not included',
+
+  'about.eyebrow': 'WHO MAKES IT',
+  'about.title': 'Designed and built in Switzerland',
+  'about.body':
+    'Hydravia is designed and built in Cugy, in the canton of Fribourg, by Nicolas Meuwly, independently. It started from a simple observation: you can swipe a reminder away, not a lock.',
+  'about.contact': 'A question, an idea, a bug? Write to',
+  'about.contactEnd': ': the person who makes the app answers.',
+
+  'og.alt': 'Hydravia, the iPhone and Apple Watch app that locks your apps until you drink.',
 
   'final.title': 'Start tonight.',
   'final.body':
