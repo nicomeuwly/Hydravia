@@ -80,14 +80,30 @@ struct SettingsView: View {
                         value: "\(settings.favoriteAmountsMl.map { units.volumeNumber(ml: $0) }.joined(separator: " · ")) \(units.volumeSymbol)") {
                         editor = .favorites
                     }
-                    Picker(selection: Bindable(settings).settings.unitPreference) {
-                        Text(.settingsUnitsAutomatic).tag(UnitPreference.automatic)
-                        Text(.settingsUnitsMetric).tag(UnitPreference.metric)
-                        Text(.settingsUnitsImperial).tag(UnitPreference.imperial)
+                    // A Menu rather than a menu-style Picker: the system picker
+                    // draws its value in the system font, bigger than the rows
+                    // around it.
+                    Menu {
+                        Picker(selection: Bindable(settings).settings.unitPreference) {
+                            Text(.settingsUnitsAutomatic).tag(UnitPreference.automatic)
+                            Text(.settingsUnitsMetric).tag(UnitPreference.metric)
+                            Text(.settingsUnitsImperial).tag(UnitPreference.imperial)
+                        } label: {
+                            Text(.settingsUnits)
+                        }
                     } label: {
-                        Text(.settingsUnits)
+                        LabeledContent {
+                            HStack(spacing: Spacing.sm) {
+                                unitPreferenceLabel(current.unitPreference)
+                                    .foregroundStyle(Palette.textSecondary)
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(Palette.textTertiary)
+                            }
+                        } label: {
+                            Text(.settingsUnits).foregroundStyle(Palette.textPrimary)
+                        }
                     }
-                    .tint(Palette.textSecondary)
                 } header: {
                     Text(.settingsSectionHydration)
                 }
@@ -272,19 +288,19 @@ struct SettingsView: View {
             .sheet(item: $editor) { editor in
                 switch editor {
                 case .weight:
-                    DraftSheet(title: .settingsWeightModalTitle, value: current.weightKg, detent: .medium) { draft in
+                    DraftSheet(title: .settingsWeightModalTitle, value: current.bodyWeight, detent: .medium) { draft in
                         VStack(spacing: Spacing.sm) {
-                            WeightPicker(weightKg: draft)
-                            Text(verbatim: units.volume(ml: HydrationGoal.dailyMl(weightKg: draft.wrappedValue)))
+                            WeightPicker(weight: draft)
+                            Text(verbatim: units.volume(ml: HydrationGoal.dailyMl(weightKg: draft.wrappedValue.kg)))
                                 .font(.cardTitle)
                                 .foregroundStyle(Palette.primaryDark)
                                 .contentTransition(.numericText())
-                                .animation(Motion.count, value: draft.wrappedValue)
+                                .animation(Motion.count, value: draft.wrappedValue.kg)
                             Text(.weightHint)
                                 .font(.brandFootnote)
                                 .foregroundStyle(Palette.textSecondary)
                         }
-                    } onSave: { settings.settings.weightKg = $0 }
+                    } onSave: { settings.settings.bodyWeight = $0 }
                 case .schedule:
                     DraftSheet(title: .settingsScheduleModalTitle, value: current.window, detent: .fraction(0.64)) { draft in
                         ActiveWindowEditor(window: draft)
@@ -356,6 +372,14 @@ struct SettingsView: View {
             } label: {
                 Text(label).foregroundStyle(Palette.textPrimary)
             }
+        }
+    }
+
+    private func unitPreferenceLabel(_ preference: UnitPreference) -> Text {
+        switch preference {
+        case .automatic: Text(.settingsUnitsAutomatic)
+        case .metric: Text(.settingsUnitsMetric)
+        case .imperial: Text(.settingsUnitsImperial)
         }
     }
 

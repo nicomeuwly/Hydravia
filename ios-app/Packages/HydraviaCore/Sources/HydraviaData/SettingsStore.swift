@@ -7,6 +7,8 @@ import OSLog
 /// and to test.
 public struct UserSettings: Codable, Equatable, Sendable {
     public var weightKg: Int
+    /// The exact pounds when the weight was picked in pounds (see `BodyWeight`).
+    public var weightLb: Int?
     public var window: ActiveWindow
     public var notificationsEnabled: Bool
     public var onboardingDone: Bool
@@ -39,9 +41,11 @@ public struct UserSettings: Codable, Equatable, Sendable {
         notificationsEnabled: Bool,
         onboardingDone: Bool,
         favoriteAmountsMl: [Int] = UserSettings.defaultFavoriteAmountsMl,
-        unitPreference: UnitPreference = .automatic
+        unitPreference: UnitPreference = .automatic,
+        weightLb: Int? = nil
     ) {
         self.weightKg = weightKg
+        self.weightLb = weightLb
         self.window = window
         self.notificationsEnabled = notificationsEnabled
         self.onboardingDone = onboardingDone
@@ -57,6 +61,14 @@ public struct UserSettings: Codable, Equatable, Sendable {
 
     public var dailyGoalMl: Int { HydrationGoal.dailyMl(weightKg: weightKg) }
 
+    public var bodyWeight: BodyWeight {
+        get { BodyWeight(kg: weightKg, pounds: weightLb) }
+        set {
+            weightKg = newValue.kg
+            weightLb = newValue.pounds
+        }
+    }
+
     public static let weightRangeKg = 30...250
 
     /// Settings forced back into what the screens can express (weight within
@@ -64,6 +76,8 @@ public struct UserSettings: Codable, Equatable, Sendable {
     public var sanitized: UserSettings {
         var copy = self
         copy.weightKg = min(max(weightKg, Self.weightRangeKg.lowerBound), Self.weightRangeKg.upperBound)
+        // Pounds that no longer match the kilograms (changed in kg since) go.
+        if let pounds = weightLb, UnitSystem.kg(fromPounds: pounds) != copy.weightKg { copy.weightLb = nil }
         copy.window = window.sanitized
         copy.favoriteAmountsMl = Self.sanitizedFavorites(favoriteAmountsMl)
         return copy
@@ -90,13 +104,14 @@ public struct UserSettings: Codable, Equatable, Sendable {
     // Every field falls back to its default when absent, so adding a setting
     // in a later version never wipes the ones a user already chose.
     private enum CodingKeys: String, CodingKey {
-        case weightKg, window, notificationsEnabled, onboardingDone, favoriteAmountsMl, unitPreference
+        case weightKg, weightLb, window, notificationsEnabled, onboardingDone, favoriteAmountsMl, unitPreference
     }
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let fallback = Self.defaults
         weightKg = try container.decodeIfPresent(Int.self, forKey: .weightKg) ?? fallback.weightKg
+        weightLb = try? container.decodeIfPresent(Int.self, forKey: .weightLb)
         window = try container.decodeIfPresent(ActiveWindow.self, forKey: .window) ?? fallback.window
         notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled)
             ?? fallback.notificationsEnabled

@@ -123,4 +123,15 @@ struct SettingsStoreTests {
         #expect(store.settings.weightKg == 80)
         #expect(store.settings.unitPreference == .automatic)
     }
+
+    @Test func poundsSurviveARelaunchAndGoWhenTheKilogramsChange() {
+        let defaults = freshDefaults()
+        let store = SettingsStore(defaults: defaults)
+        store.settings.bodyWeight = .pounds(155)
+        let relaunched = SettingsStore(defaults: defaults)
+        #expect(relaunched.settings.weightLb == 155)
+        #expect(relaunched.settings.weightKg == 70)
+        relaunched.settings.weightKg = 82
+        #expect(relaunched.settings.weightLb == nil)
+    }
 }

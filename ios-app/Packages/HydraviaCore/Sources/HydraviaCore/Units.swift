@@ -129,6 +129,9 @@ public enum UnitSystem: String, Codable, Sendable {
 
     public static func pounds(fromKg kg: Double) -> Double { kg / kgPerPound }
 
+    /// The whole kilogram a pick in pounds is stored as.
+    public static func kg(fromPounds pounds: Int) -> Int { Int((Double(pounds) * kgPerPound).rounded()) }
+
     /// The weight in this system's unit, to the unit.
     public func displayWeight(kg: Int) -> Int {
         switch self {
@@ -165,5 +168,31 @@ public enum UnitSystem: String, Codable, Sendable {
     public func temperature(celsius: Double, locale: Locale = .autoupdatingCurrent) -> String {
         let symbol = self == .metric ? "°C" : "°F"
         return "\(displayTemperature(celsius: celsius).formatted(.number.locale(locale)))\(symbol)"
+    }
+}
+
+/// A body weight as the user picked it. The goal is computed from whole
+/// kilograms; a pick made in pounds also keeps the exact pounds, so the
+/// wheel can offer every pound (one pound is less than half a kilogram,
+/// and many pounds share the same kilogram).
+public struct BodyWeight: Equatable, Sendable {
+    public var kg: Int
+    /// The exact pick when it was made in pounds.
+    public var pounds: Int?
+
+    public init(kg: Int, pounds: Int? = nil) {
+        self.kg = kg
+        self.pounds = pounds
+    }
+
+    public static func pounds(_ pounds: Int) -> BodyWeight {
+        BodyWeight(kg: UnitSystem.kg(fromPounds: pounds), pounds: pounds)
+    }
+
+    /// The pounds to show: the exact pick while it still matches the stored
+    /// kilograms, otherwise the kilograms converted.
+    public var displayPounds: Int {
+        if let pounds, UnitSystem.kg(fromPounds: pounds) == kg { return pounds }
+        return Int(UnitSystem.pounds(fromKg: Double(kg)).rounded())
     }
 }

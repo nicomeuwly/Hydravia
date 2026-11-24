@@ -76,4 +76,14 @@ struct UnitsTests {
         #expect(UnitSystem.imperial.displayTemperature(celsius: -40) == -40)
         #expect(UnitSystem.imperial.displayTemperature(celsius: 0) == 32)
     }
+
+    @Test func everyPoundIsKeptAsPicked() {
+        // 154 and 155 lb share 70 kg: both stay distinct on screen.
+        #expect(BodyWeight.pounds(154).kg == 70)
+        #expect(BodyWeight.pounds(155).kg == 70)
+        #expect(BodyWeight.pounds(155).displayPounds == 155)
+        #expect(BodyWeight(kg: 70).displayPounds == 154)
+        // Pounds that no longer match the kilograms are ignored.
+        #expect(BodyWeight(kg: 80, pounds: 155).displayPounds == 176)
+    }
 }

@@ -205,19 +205,33 @@ struct IntervalPicker: View {
 
 // MARK: - Weight
 
-/// One row per kilogram, the unit the goal is computed from. In imperial the
-/// rows read in pounds (66, 68, 71 lb…): every row is a weight that is
-/// really stored, so the wheel never jumps back after a pick.
+/// One row per kilogram in metric, one row per pound in imperial. A pick in
+/// pounds keeps the exact pounds next to the kilograms the goal uses, so
+/// every pound can be chosen and shown back as picked.
 struct WeightPicker: View {
-    static let range = UserSettings.weightRangeKg
-    @Binding var weightKg: Int
+    static let rangeKg = UserSettings.weightRangeKg
+    /// The pounds whose kilograms fall within the range (66 to 551 lb).
+    static let rangeLb = Int(UnitSystem.pounds(fromKg: Double(rangeKg.lowerBound)).rounded(.up))
+        ... Int(UnitSystem.pounds(fromKg: Double(rangeKg.upperBound)).rounded(.down))
+    @Binding var weight: BodyWeight
     @Environment(SettingsStore.self) private var settings
 
     var body: some View {
-        Picker(selection: $weightKg) {
-            ForEach(Self.range, id: \.self) { kg in
-                Text(verbatim: settings.unitSystem.weight(kg: kg))
-                    .tag(kg)
+        switch settings.unitSystem {
+        case .metric:
+            wheel(selection: Binding { weight.kg } set: { weight = BodyWeight(kg: $0) },
+                  range: Self.rangeKg, symbol: UnitSystem.metric.weightSymbol)
+        case .imperial:
+            wheel(selection: Binding { weight.displayPounds } set: { weight = .pounds($0) },
+                  range: Self.rangeLb, symbol: UnitSystem.imperial.weightSymbol)
+        }
+    }
+
+    private func wheel(selection: Binding<Int>, range: ClosedRange<Int>, symbol: String) -> some View {
+        Picker(selection: selection) {
+            ForEach(range, id: \.self) { value in
+                Text(verbatim: "\(value.formatted()) \(symbol)")
+                    .tag(value)
             }
         } label: {
             Text(.weightCardLabel)

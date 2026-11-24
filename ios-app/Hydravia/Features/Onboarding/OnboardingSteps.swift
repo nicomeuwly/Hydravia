@@ -72,7 +72,7 @@ struct WeightStep: View {
         OnboardingScaffold(step: .weight, title: .weightTitle, subtitle: .weightSubtitle,
                            primary: .commonContinue, onPrimary: onNext) {
             VStack(spacing: Spacing.md) {
-                WeightPicker(weightKg: $settings.settings.weightKg)
+                WeightPicker(weight: $settings.settings.bodyWeight)
                     .frame(height: 180)
                     .padding(.horizontal, Spacing.lg)
                     .background(.white, in: .rect(cornerRadius: Radius.xl, style: .continuous))
