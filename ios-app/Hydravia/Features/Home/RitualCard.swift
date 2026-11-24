@@ -15,6 +15,8 @@ struct RitualCard: View {
     let reminderFired: Bool
     let goalReached: Bool
     let window: ActiveWindow
+    /// Today's latest glass: the reminder it answered is skipped.
+    var lastDrink: Date? = nil
     let onChooseApp: () -> Void
     let onUnlock: () -> Void
 
@@ -62,7 +64,8 @@ struct RitualCard: View {
             guard let first = window.reminderSlots.first else { return "—" }
             return String(localized: .homeTomorrowAt(Self.format(first, calendar: calendar, now: now)))
         }
-        switch window.nextReminder(after: MinuteOfDay(now, calendar: calendar)) {
+        let answered = lastDrink.flatMap { window.reminderAnswered(byDrinkAt: MinuteOfDay($0, calendar: calendar)) }
+        switch window.nextReminder(after: MinuteOfDay(now, calendar: calendar), skipping: answered) {
         case .today(let minute):
             return Self.format(minute, calendar: calendar, now: now)
         case .tomorrow(let minute):

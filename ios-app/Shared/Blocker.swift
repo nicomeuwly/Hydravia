@@ -210,22 +210,33 @@ nonisolated enum Blocker {
             intervalEnd: DateComponents(hour: window.sleep / 60, minute: window.sleep % 60),
             repeats: true
         ))
+        // Turning the lock off stops the relock too: turned back on, an
+        // unlock still running must still end at its reminder, or the apps
+        // stay free until the app is next opened.
+        if let until = unlockedUntil, until > .now {
+            try scheduleRelock(at: until)
+        }
     }
 
-    /// The dose was drunk: lift the shield for `minutes`, and have the monitor
-    /// put it back afterwards. An unlock running past bedtime simply ends with
-    /// the window.
+    /// The dose was drunk: lift the shield until `until`, and have the
+    /// monitor put it back then. An unlock running past bedtime simply ends
+    /// with the window.
     static func grantUnlock(until: Date, calendar: Calendar = .autoupdatingCurrent) throws {
         unlockedUntil = until
         lowerShield()
+        try scheduleRelock(at: until, calendar: calendar)
+    }
 
+    private static func scheduleRelock(at until: Date, calendar: Calendar = .autoupdatingCurrent) throws {
         let center = DeviceActivityCenter()
         center.stopMonitoring([relockActivity])
         guard isEnabled, isWithinWindow(until, calendar: calendar) else { return }
         // DeviceActivity intervals last at least 15 minutes; only the start
-        // matters here.
-        let start = calendar.dateComponents([.hour, .minute, .second], from: until)
-        let end = calendar.dateComponents([.hour, .minute, .second], from: until.addingTimeInterval(16 * 60))
+        // matters here. A one-shot carries its full date: with the time of
+        // day alone the system has to guess which day is meant.
+        let parts: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute, .second]
+        let start = calendar.dateComponents(parts, from: until)
+        let end = calendar.dateComponents(parts, from: until.addingTimeInterval(16 * 60))
         try center.startMonitoring(relockActivity, during: DeviceActivitySchedule(
             intervalStart: start, intervalEnd: end, repeats: false
         ))

@@ -38,6 +38,26 @@ struct ReminderPlanTests {
         #expect(dates.allSatisfy { !calendar.isDate($0, inSameDayAs: date(5, 12)) })
     }
 
+    @Test func aDrinkJustBeforeAReminderSkipsOnlyThatOne() {
+        // Logged at 14:45: 15:00 stays quiet, 16:00 and the rest still come.
+        let dates = ReminderPlan.fireDates(window: window, now: date(5, 14, 46), goalReachedToday: false,
+                                           lastDrink: date(5, 14, 45), calendar: calendar)
+        #expect(dates.first == date(5, 16))
+        #expect(dates.contains(date(6, 15)))
+        #expect(dates.count == ReminderPlan.budget)
+    }
+
+    @Test func aDrinkEarlierInTheIntervalSkipsNothing() {
+        let dates = ReminderPlan.fireDates(window: window, now: date(5, 14, 31), goalReachedToday: false,
+                                           lastDrink: date(5, 14, 20), calendar: calendar)
+        #expect(dates.first == date(5, 15))
+    }
+
+    @Test func answeredDateIsOnTheDrinksDay() {
+        #expect(ReminderPlan.answeredDate(byDrinkAt: date(5, 14, 45), window: window, calendar: calendar) == date(5, 15))
+        #expect(ReminderPlan.answeredDate(byDrinkAt: date(5, 14, 15), window: window, calendar: calendar) == nil)
+    }
+
     @Test func staysWithinTheBudget() {
         let dates = ReminderPlan.fireDates(window: window, now: date(5, 6), goalReachedToday: false, calendar: calendar)
         #expect(dates.count == ReminderPlan.budget)

@@ -32,10 +32,18 @@ struct RootView: View {
         let goalReached: Bool
         /// A new day starts with its reminders again.
         let today: LocalDay
+        /// A glass just before a reminder answers it: that one stays quiet.
+        let lastDrink: Date?
     }
 
     private var isGoalReachedToday: Bool {
         hydration.todayTotalMl >= settings.dailyGoalMl
+    }
+
+    /// Today's latest glass, from any source (the ritual, by hand, a widget,
+    /// the watch).
+    private var lastDrink: Date? {
+        hydration.todayEntries.map(\.createdAt).max()
     }
 
     /// Midnight passing, or the user landing in another time zone, both move
@@ -77,8 +85,12 @@ struct RootView: View {
         guard let slot = settings.settings.window.lastReminder(atOrBefore: MinuteOfDay(now, calendar: calendar)),
               let due = calendar.date(bySettingHour: slot.value / 60, minute: slot.value % 60, second: 0, of: now)
         else { return false }
-        let lastDrink = hydration.todayEntries.map(\.createdAt).max()
-        return lastDrink.map { $0 < due } ?? true
+        guard let lastDrink else { return true }
+        // Drunk just before it: that reminder was answered, and skipped.
+        if ReminderPlan.answeredDate(byDrinkAt: lastDrink, window: settings.settings.window, calendar: calendar) == due {
+            return false
+        }
+        return lastDrink < due
     }
 
     var body: some View {
@@ -102,14 +114,19 @@ struct RootView: View {
         }
         // Launch, and every change of window, cadence or switch: the system
         // schedule always mirrors the settings.
-        .task(id: Schedule(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements, goalReached: isGoalReachedToday, today: hydration.today)) {
+        .task(id: Schedule(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro, active: scenePhase == .active, entitlementsLoaded: store.hasLoadedEntitlements, goalReached: isGoalReachedToday, today: hydration.today, lastDrink: lastDrink)) {
             // Wait for the App Store's answer: rescheduling on a not-yet-known
             // entitlement would wipe a subscriber's reminders at every launch.
             guard scenePhase == .active, store.hasLoadedEntitlements else { return }
             // The Screen Time lock follows the same window and switch.
             blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro)
+            // A glass just before the reminder ending the current unlock
+            // answers it: no relock there, and no notification below.
+            if let lastDrink {
+                blocker.extendUnlock(window: settings.settings.window, drinkAt: lastDrink)
+            }
             await reminders?.reschedule(window: settings.settings.window, enabled: areRemindersEnabled,
-                                        ritual: true, goalReachedToday: isGoalReachedToday)
+                                        ritual: true, goalReachedToday: isGoalReachedToday, lastDrink: lastDrink)
         }
         // Goal reached: the reminder that was due is answered for today.
         .onChange(of: isGoalReachedToday) { _, reached in

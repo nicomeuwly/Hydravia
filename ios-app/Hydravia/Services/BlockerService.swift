@@ -1,3 +1,4 @@
+import Combine
 import FamilyControls
 import HydraviaCore
 import Observation
@@ -46,10 +47,41 @@ final class BlockerService {
     @ObservationIgnored private var wanted = false
     @ObservationIgnored private var scheduled: String?
     @ObservationIgnored private let logger = Logger(subsystem: "com.nicomeuwly.hydravia", category: "Blocker")
+    @ObservationIgnored private var statusUpdates: AnyCancellable?
 
     init() {
-        authorization = Self.read(AuthorizationCenter.shared.authorizationStatus)
+        let status = Self.read(AuthorizationCenter.shared.authorizationStatus)
+        // A lock left on by the last run was approved: FamilyControls may
+        // simply not have loaded the status yet (see `readAuthorization`).
+        authorization = status == .notDetermined && Blocker.isEnabled ? .granted : status
         selection = Blocker.selection
+        // The real status arrives a moment after launch.
+        statusUpdates = AuthorizationCenter.shared.$authorizationStatus
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                MainActor.assumeIsolated {
+                    guard let self, self.readAuthorization(status) else { return }
+                    self.apply()
+                }
+            }
+    }
+
+    /// Takes in a status read from FamilyControls; true when it changed.
+    ///
+    /// Right after launch FamilyControls can report `.notDetermined` for an
+    /// app it has approved, until it has loaded the real status. Taken at
+    /// face value, that read turned the lock off: `apply` stopped the window
+    /// and the pending relock and lowered the shield, so the apps stayed
+    /// free at the next reminders, depending on how quickly the status
+    /// loaded at each launch. An approved app only goes back to
+    /// `.notDetermined` through `revokeAuthorization`, which sets the status
+    /// itself (a revoke in iOS Settings reads `.denied`).
+    @discardableResult
+    private func readAuthorization(_ status: AuthorizationStatus = AuthorizationCenter.shared.authorizationStatus) -> Bool {
+        let value = Self.read(status)
+        guard value != authorization, !(value == .notDetermined && authorization == .granted) else { return false }
+        authorization = value
+        return true
     }
 
     private static func read(_ status: AuthorizationStatus) -> Authorization {
@@ -104,21 +136,40 @@ final class BlockerService {
         wanted = enabled
         self.isPro = isPro
         // Permission can be revoked in iOS Settings while the app is away.
-        authorization = Self.read(AuthorizationCenter.shared.authorizationStatus)
+        readAuthorization()
         if force { scheduled = nil }
         apply()
     }
 
     /// The dose is drunk: the phone is free until the next reminder, so
     /// that reminder finds the apps locked whenever the dose was drunk (at
-    /// least `ActiveWindow.minimumBreakMin` away). After the day's last
+    /// least `ActiveWindow.answerWindowMin` away). After the day's last
     /// reminder, free until bedtime.
     func unlockAfterDrinking(window: ActiveWindow, now: Date = .now) {
+        grantUnlock(until: Self.unlockEnd(window: window, drinkAt: now))
+    }
+
+    /// A glass logged without the ritual (by hand, from the watch or a
+    /// widget) just before the reminder that ends the running unlock answers
+    /// that reminder: the break runs on to the next one, which still comes.
+    /// The notifications skip the same reminder (`ReminderPlan`). A shield
+    /// that is up stays up: only the ritual lifts it.
+    func extendUnlock(window: ActiveWindow, drinkAt: Date) {
+        guard let until = Blocker.unlockedUntil, Blocker.isUnlocked(at: .now), drinkAt < until else { return }
+        let extended = Self.unlockEnd(window: window, drinkAt: drinkAt)
+        guard extended > until else { return }
+        grantUnlock(until: extended)
+    }
+
+    /// The first reminder a drink at `drinkAt` doesn't answer, or bedtime.
+    private static func unlockEnd(window: ActiveWindow, drinkAt: Date) -> Date {
         let calendar = Calendar.autoupdatingCurrent
-        let minute = MinuteOfDay(now, calendar: calendar)
-        let end = window.unlockEnd(after: minute) ?? window.sleep
-        let until = calendar.date(bySettingHour: end.value / 60, minute: end.value % 60, second: 0, of: now)
-            ?? now.addingTimeInterval(TimeInterval(window.intervalMin * 60))
+        let end = window.unlockEnd(after: MinuteOfDay(drinkAt, calendar: calendar)) ?? window.sleep
+        return calendar.date(bySettingHour: end.value / 60, minute: end.value % 60, second: 0, of: drinkAt)
+            ?? drinkAt.addingTimeInterval(TimeInterval(window.intervalMin * 60))
+    }
+
+    private func grantUnlock(until: Date) {
         do {
             try Blocker.grantUnlock(until: until)
         } catch {

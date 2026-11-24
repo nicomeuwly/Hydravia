@@ -102,11 +102,12 @@ public struct ActiveWindow: Equatable, Codable, Sendable {
     }
 
     /// First reminder strictly after `now`, rolling over to tomorrow's first
-    /// slot once today's are spent.
-    public func nextReminder(after now: MinuteOfDay) -> NextReminder {
+    /// slot once today's are spent. `skipping`: a slot already answered by a
+    /// drink (`reminderAnswered(byDrinkAt:)`), which stays quiet.
+    public func nextReminder(after now: MinuteOfDay, skipping answered: MinuteOfDay? = nil) -> NextReminder {
         let slots = reminderSlots
         guard let first = slots.first else { return .none }
-        if let next = slots.first(where: { $0 > now }) { return .today(next) }
+        if let next = slots.first(where: { $0 > now && $0 != answered }) { return .today(next) }
         return .tomorrow(first)
     }
 
@@ -118,13 +119,33 @@ public struct ActiveWindow: Equatable, Codable, Sendable {
     /// Shortest break an unlock earns: drinking just before a reminder
     /// shouldn't relock the phone a minute later.
     public static let minimumBreakMin = 15
+    /// Longest stretch before a reminder in which a drink still answers it.
+    public static let maximumAnswerWindowMin = 30
+
+    /// A drink less than this many minutes before a reminder answers it: that
+    /// reminder stays quiet (no notification, no relock) and the next one
+    /// still comes. Half the interval, so the reminder after is never closer
+    /// than the reminder skipped; between `minimumBreakMin` and 30 minutes.
+    /// For every interval the app offers (1 h, 1 h 30, 2 h) that is 30.
+    public var answerWindowMin: Int {
+        min(Self.maximumAnswerWindowMin, max(Self.minimumBreakMin, intervalMin / 2))
+    }
+
+    /// The reminder a drink at `drink` answers: the first slot strictly
+    /// after it and less than `answerWindowMin` away, if any. The ritual, a
+    /// glass logged by hand and a pour from the watch or a widget all count.
+    public func reminderAnswered(byDrinkAt drink: MinuteOfDay) -> MinuteOfDay? {
+        reminderSlots.first { $0.value > drink.value && $0.value < drink.value + answerWindowMin }
+    }
 
     /// When an unlock earned at `now` ends: at a reminder, so every reminder
-    /// finds the apps locked (an unlock counted from the drink would run
-    /// past the next one). The first reminder at least `minimumBreakMin`
-    /// away; nil when there's none left today (the window's end relocks).
+    /// that rings finds the apps locked (an unlock counted from the drink
+    /// would run past the next one). The first reminder the drink doesn't
+    /// answer (`answerWindowMin` away or more), the same one the
+    /// notifications keep; nil when there's none left today (the window's
+    /// end relocks).
     public func unlockEnd(after now: MinuteOfDay) -> MinuteOfDay? {
-        reminderSlots.first { $0.value >= now.value + Self.minimumBreakMin }
+        reminderSlots.first { $0.value >= now.value + answerWindowMin }
     }
 
     /// Minutes from midnight past which a bedtime is late enough that the user

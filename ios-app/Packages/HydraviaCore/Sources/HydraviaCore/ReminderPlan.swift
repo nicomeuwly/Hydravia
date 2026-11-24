@@ -15,14 +15,18 @@ public enum ReminderPlan {
     public static let budget = 60
 
     /// The coming reminders, earliest first: today's still ahead (none once
-    /// the goal is reached), then the following days', up to `budget`.
+    /// the goal is reached), then the following days', up to `budget`. The
+    /// reminder `lastDrink` answered (`answeredDate`) is left out: drinking
+    /// just before a reminder skips it, the following ones still come.
     public static func fireDates(
         window: ActiveWindow,
         now: Date,
         goalReachedToday: Bool,
+        lastDrink: Date? = nil,
         calendar: Calendar,
         budget: Int = budget
     ) -> [Date] {
+        let answered = lastDrink.flatMap { answeredDate(byDrinkAt: $0, window: window, calendar: calendar) }
         let calendar = calendar.gregorianInSameTimeZone
         let slots = window.reminderSlots
         guard !slots.isEmpty, budget > 0 else { return [] }
@@ -41,11 +45,20 @@ public enum ReminderPlan {
                       calendar.component(.hour, from: date) == slot.hour,
                       calendar.component(.minute, from: date) == slot.minute
                 else { continue }
+                guard date != answered else { continue }
                 dates.append(date)
                 if dates.count == budget { return dates }
             }
         }
         return dates
+    }
+
+    /// The reminder a drink at `drink` answers
+    /// (`ActiveWindow.reminderAnswered`), on the drink's day.
+    public static func answeredDate(byDrinkAt drink: Date, window: ActiveWindow, calendar: Calendar) -> Date? {
+        let calendar = calendar.gregorianInSameTimeZone
+        guard let slot = window.reminderAnswered(byDrinkAt: MinuteOfDay(drink, calendar: calendar)) else { return nil }
+        return calendar.date(bySettingHour: slot.hour, minute: slot.minute, second: 0, of: drink)
     }
 
     /// "hydration-reminder-2026-11-05-0930": the day is in the identifier so

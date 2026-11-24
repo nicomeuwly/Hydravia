@@ -71,25 +71,28 @@ final class ReminderService: NSObject {
     /// per slot for the coming days (`ReminderPlan`), none left today once
     /// `goalReachedToday`. `enabled == false` (user choice, no permission)
     /// just clears them. `ritual` (Hydravia Pro) picks the copy and makes a
-    /// tap open the unlock ritual; free reminders open the app.
+    /// tap open the unlock ritual; free reminders open the app. The reminder
+    /// `lastDrink` answered (drunk just before it) is left out.
     ///
     /// Serialised: a newer call cancels the one in flight and waits for it,
     /// so the latest settings always win.
-    func reschedule(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool) async {
+    func reschedule(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool, lastDrink: Date?) async {
         let previous = rescheduleTask
         previous?.cancel()
         let task = Task {
             await previous?.value
             guard !Task.isCancelled else { return }
-            await self.apply(window: window, enabled: enabled, ritual: ritual, goalReachedToday: goalReachedToday)
+            await self.apply(window: window, enabled: enabled, ritual: ritual,
+                             goalReachedToday: goalReachedToday, lastDrink: lastDrink)
         }
         rescheduleTask = task
         await task.value
     }
 
-    private func apply(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool) async {
+    private func apply(window: ActiveWindow, enabled: Bool, ritual: Bool, goalReachedToday: Bool, lastDrink: Date?) async {
         let granted = enabled ? await permission() == .granted : false
-        let wanted = granted ? requests(for: window, ritual: ritual, goalReachedToday: goalReachedToday) : []
+        let wanted = granted
+            ? requests(for: window, ritual: ritual, goalReachedToday: goalReachedToday, lastDrink: lastDrink) : []
         guard !Task.isCancelled else { return }
 
         // Remove only what is no longer wanted (this also drops the daily
@@ -120,11 +123,12 @@ final class ReminderService: NSObject {
     /// every return to the foreground, so a language change catches up.
     /// Triggers carry no time zone: they follow the device's, so 08:00 stays
     /// 08:00 wall-clock after travelling.
-    private func requests(for window: ActiveWindow, ritual: Bool, goalReachedToday: Bool) -> [UNNotificationRequest] {
+    private func requests(for window: ActiveWindow, ritual: Bool, goalReachedToday: Bool, lastDrink: Date?) -> [UNNotificationRequest] {
         let bodies = ritual ? Self.bodies : Self.freeBodies
         let calendar = Calendar.autoupdatingCurrent
         let slots = window.reminderSlots.map { $0.hour * 60 + $0.minute }
-        let dates = ReminderPlan.fireDates(window: window, now: .now, goalReachedToday: goalReachedToday, calendar: calendar)
+        let dates = ReminderPlan.fireDates(window: window, now: .now, goalReachedToday: goalReachedToday,
+                                           lastDrink: lastDrink, calendar: calendar)
         return dates.map { date in
             let parts = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
             // Rotate by slot, so a slot keeps its copy from one day to the next.
@@ -192,6 +196,17 @@ final class ReminderService: NSObject {
         let prefix = ReminderPlan.dayPrefix(for: .now, calendar: .autoupdatingCurrent)
         let today = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(prefix) }
         center.removePendingNotificationRequests(withIdentifiers: today)
+    }
+
+    /// A glass drunk while the app is away (a pour from the watch): drops
+    /// the reminder it answered now, without waiting for the next
+    /// reschedule (which leaves it out too).
+    func skipReminder(answeredBy drink: Date, window: ActiveWindow) {
+        let calendar = Calendar.autoupdatingCurrent
+        guard let date = ReminderPlan.answeredDate(byDrinkAt: drink, window: window, calendar: calendar),
+              date > .now
+        else { return }
+        center.removePendingNotificationRequests(withIdentifiers: [ReminderPlan.identifier(for: date, calendar: calendar)])
     }
 
     // MARK: Delivered reminders
