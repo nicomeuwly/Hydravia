@@ -322,16 +322,31 @@ private struct FillableGlass: View {
                 GlassShape()
                     .inset(by: 0)
                     .stroke(.white, lineWidth: 2.5)
-                Capsule()
-                    .fill(.white.opacity(0.45))
-                    .frame(width: 6)
-                    .padding(.vertical, 22)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 18)
+                GlassHighlight()
+                    .stroke(.white.opacity(0.45), style: StrokeStyle(lineWidth: 6, lineCap: .round))
             }
             .shadow(color: Palette.primaryDark.opacity(0.10), radius: 10, y: 6)
         }
         .accessibilityHidden(true)
+    }
+}
+
+/// The highlight down the left side: a stroke that follows the glass's
+/// tapered wall, a constant distance inside it.
+private nonisolated struct GlassHighlight: Shape {
+    func path(in rect: CGRect) -> Path {
+        let taper = rect.width * 0.12
+        let corner: CGFloat = 18
+        let inset: CGFloat = 21
+        let wallHeight = rect.height - corner
+        // x of the left wall at a given height, as in GlassShape.
+        func wallX(_ y: CGFloat) -> CGFloat { rect.minX + taper * (y - rect.minY) / wallHeight }
+        let top = rect.minY + 25
+        let bottom = rect.minY + wallHeight - 10
+        var path = Path()
+        path.move(to: CGPoint(x: wallX(top) + inset, y: top))
+        path.addLine(to: CGPoint(x: wallX(bottom) + inset, y: bottom))
+        return path
     }
 }
 
