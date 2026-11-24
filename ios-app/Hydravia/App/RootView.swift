@@ -172,12 +172,14 @@ struct RootView: View {
         }
         // The shield shows today's progress; every drink, goal change or new
         // day hands it fresh numbers.
-        .onChange(of: ShieldProgress(revision: hydration.revision, goalMl: settings.dailyGoalMl), initial: true) {
+        .onChange(of: ShieldProgress(revision: hydration.revision, goalMl: settings.dailyGoalMl,
+                                     units: settings.unitSystem), initial: true) {
             let goal = settings.dailyGoalMl
             blocker.shareProgress(
                 consumedMl: hydration.todayTotalMl,
                 goalMl: goal,
-                streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today)
+                streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today),
+                imperialUnits: settings.unitSystem == .imperial
             )
             // The widgets read the same store: show the new total at once.
             WidgetCenter.shared.reloadAllTimelines()
@@ -203,12 +205,13 @@ struct RootView: View {
     private var widgetState: WidgetState {
         WidgetState(
             goalMl: settings.dailyGoalMl,
-            quickAddMl: QuickAdd.amount(last: lastQuickAddMl, favorites: settings.settings.favoriteAmountsMl),
-            favoritesMl: settings.settings.favoriteAmountsMl,
+            quickAddMl: QuickAdd.amount(last: lastQuickAddMl, favorites: settings.favoriteAmountsMl),
+            favoritesMl: settings.favoriteAmountsMl,
             window: settings.settings.window,
             remindersOn: areRemindersEnabled,
             isPro: store.hasPro,
-            proUntil: store.isPremium ? Blocker.proUntil : nil
+            proUntil: store.isPremium ? Blocker.proUntil : nil,
+            unitSystem: settings.unitSystem
         )
     }
 
@@ -220,6 +223,7 @@ struct RootView: View {
     private struct ShieldProgress: Equatable {
         let revision: Int
         let goalMl: Int
+        let units: UnitSystem
     }
 }
 

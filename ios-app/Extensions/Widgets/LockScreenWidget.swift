@@ -35,10 +35,10 @@ struct LockScreenWidgetView: View {
             }
             .gaugeStyle(.accessoryCircularCapacity)
             .widgetAccentable()
-            .accessibilityLabel(Text(.widgetOfToday(entry.consumedMl.formatted(), entry.goalMl.formatted())))
+            .accessibilityLabel(Text(.widgetOfToday(entry.consumedText, entry.goalText)))
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 2) {
-                Text(.widgetOfToday(entry.consumedMl.formatted(), entry.goalMl.formatted()))
+                Text(.widgetOfToday(entry.consumedText, entry.goalText))
                     .font(.brand(.bold, size: 15, relativeTo: .headline))
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
@@ -57,7 +57,7 @@ struct LockScreenWidgetView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         default:
             Label {
-                Text(.widgetOfToday(entry.consumedMl.formatted(), entry.goalMl.formatted()))
+                Text(.widgetOfToday(entry.consumedText, entry.goalText))
             } icon: {
                 Image(systemName: "drop.fill")
             }

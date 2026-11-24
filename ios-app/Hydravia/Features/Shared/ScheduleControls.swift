@@ -205,15 +205,18 @@ struct IntervalPicker: View {
 
 // MARK: - Weight
 
+/// One row per kilogram, the unit the goal is computed from. In imperial the
+/// rows read in pounds (66, 68, 71 lb…): every row is a weight that is
+/// really stored, so the wheel never jumps back after a pick.
 struct WeightPicker: View {
     static let range = UserSettings.weightRangeKg
     @Binding var weightKg: Int
+    @Environment(SettingsStore.self) private var settings
 
     var body: some View {
         Picker(selection: $weightKg) {
             ForEach(Self.range, id: \.self) { kg in
-                Text(Measurement(value: Double(kg), unit: UnitMass.kilograms),
-                     format: .measurement(width: .abbreviated, usage: .asProvided))
+                Text(verbatim: settings.unitSystem.weight(kg: kg))
                     .tag(kg)
             }
         } label: {

@@ -218,25 +218,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         }
       }
@@ -248,25 +248,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         }
       }
@@ -368,25 +368,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         }
       }

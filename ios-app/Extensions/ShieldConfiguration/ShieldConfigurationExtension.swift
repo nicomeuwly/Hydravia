@@ -60,7 +60,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
         let remaining = progress.goalMl - progress.consumedMl
         if remaining <= 0 { return Blocker.string("shield.progress.done") }
         if progress.consumedMl == 0 && progress.streak < 2 { return Blocker.string("shield.progress.first") }
-        let amount = remaining.formatted()
+        let amount = Blocker.amount(ml: remaining)
         if progress.streak >= 2 {
             return String(format: Blocker.string("shield.progress.streak"), progress.streak, amount)
         }

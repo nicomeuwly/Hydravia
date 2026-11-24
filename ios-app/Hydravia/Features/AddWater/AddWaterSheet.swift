@@ -1,3 +1,4 @@
+import HydraviaCore
 import HydraviaData
 import SwiftUI
 
@@ -32,15 +33,28 @@ struct AddWaterSheet: View {
     private static let dragStep = 50
     private static let nudgeStep = 10
 
-    private var favorites: [Int] { settings.settings.favoriteAmountsMl }
+    private var favorites: [Int] { settings.favoriteAmountsMl }
+    private var units: UnitSystem { settings.unitSystem }
+
+    /// The largest amount that can be typed, in the user's units: 2 000 ml,
+    /// or 67 oz (1 981 ml) in imperial.
+    private var maxTypedMl: Int {
+        switch units {
+        case .metric: Self.maxCustomMl
+        case .imperial: units.ml(fromInput: Int(UnitSystem.fluidOunces(fromMl: Double(Self.maxCustomMl))))
+        }
+    }
+
+    /// The smallest glass the drag and the − button go down to: 50 ml or 1 oz.
+    private var minimumMl: Int { units == .metric ? Self.dragStep : units.ml(fromInput: 1) }
 
     /// What the button pours: the typed amount while typing, else the glass.
     private var current: Int {
-        if isTyping { return Int(typed) ?? 0 }
+        if isTyping { return units.ml(fromInput: Int(typed) ?? 0) }
         return amount ?? QuickAdd.amount(last: lastAmountMl, favorites: favorites)
     }
 
-    private var isValid: Bool { (1...Self.maxCustomMl).contains(current) }
+    private var isValid: Bool { (1...maxTypedMl).contains(current) }
 
     var body: some View {
         VStack(spacing: Spacing.xl) {
@@ -53,9 +67,9 @@ struct AddWaterSheet: View {
             amountLabel
 
             HStack(spacing: Spacing.md) {
-                nudgeButton("minus", delta: -Self.nudgeStep, label: .commonDecrease)
+                nudgeButton("minus", steps: -1, label: .commonDecrease)
                 glassArea
-                nudgeButton("plus", delta: Self.nudgeStep, label: .commonIncrease)
+                nudgeButton("plus", steps: 1, label: .commonIncrease)
             }
 
             favoriteChips
@@ -63,15 +77,15 @@ struct AddWaterSheet: View {
             VStack(spacing: Spacing.sm) {
                 if showsRangeError {
                     // Silently ignoring "9999" reads as a broken button.
-                    Text(.addWaterOutOfRange(Self.maxCustomMl))
+                    Text(.addWaterOutOfRange(units.volume(ml: maxTypedMl)))
                         .font(.brandFootnote)
                         .foregroundStyle(Palette.error)
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
                 Button(action: pour) {
                     Label {
-                        Text(.addWaterAddAmount(current.formatted()))
-                            .contentTransition(.numericText(value: Double(current)))
+                        Text(.addWaterAddAmount(units.volume(ml: current)))
+                            .contentTransition(.numericText(value: units.displayVolume(ml: current)))
                     } icon: {
                         Image(systemName: "drop.fill")
                     }
@@ -129,15 +143,15 @@ struct AddWaterSheet: View {
                     }
             } else {
                 Button(action: startTyping) {
-                    Text(current, format: .number)
-                        .contentTransition(.numericText(value: Double(current)))
+                    Text(verbatim: units.volumeNumber(ml: current))
+                        .contentTransition(.numericText(value: units.displayVolume(ml: current)))
                         .underline(pattern: .dot, color: Palette.textTertiary.opacity(0.5))
                 }
                 .buttonStyle(.pressable)
                 .accessibilityLabel(Text(.addWaterTypeAmount))
-                .accessibilityValue("\(current.formatted()) \(String(localized: .commonMl))")
+                .accessibilityValue(Text(verbatim: units.volume(ml: current)))
             }
-            Text(.commonMl)
+            Text(verbatim: units.volumeSymbol)
                 .font(.brand(.medium, size: 22, relativeTo: .title3))
                 .foregroundStyle(Palette.textSecondary)
                 .accessibilityHidden(true)
@@ -157,7 +171,7 @@ struct AddWaterSheet: View {
     /// Back from the field: a valid number becomes the glass's amount.
     private func finishTyping() {
         guard isTyping else { return }
-        if let ml = Int(typed), (1...Self.maxCustomMl).contains(ml) {
+        if let value = Int(typed), value > 0, case let ml = units.ml(fromInput: value), ml <= maxTypedMl {
             withAnimation(reduceMotion ? nil : Motion.gentle) { amount = ml }
         }
         isTyping = false
@@ -178,8 +192,8 @@ struct AddWaterSheet: View {
                             if isTyping { fieldFocused = false; isTyping = false }
                             showsRangeError = false
                             let fraction = min(max(1 - value.location.y / height, 0), 1)
-                            let steps = (fraction * Double(Self.glassMl) / Double(Self.dragStep)).rounded()
-                            let ml = max(Self.dragStep, Int(steps) * Self.dragStep)
+                            let ml = max(minimumMl, units.snapped(ml: fraction * Double(Self.glassMl),
+                                                                  metricStep: Self.dragStep))
                             if ml != amount {
                                 withAnimation(reduceMotion ? nil : .interactiveSpring(response: 0.25, dampingFraction: 0.8)) {
                                     amount = ml
@@ -191,18 +205,20 @@ struct AddWaterSheet: View {
         .frame(height: 190)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(.addWaterA11YGlass))
-        .accessibilityValue("\(current.formatted()) \(String(localized: .commonMl))")
+        .accessibilityValue(Text(verbatim: units.volume(ml: current)))
         .accessibilityAdjustableAction { direction in
+            // 50 ml or 2 oz a swipe.
+            let steps = units == .metric ? Self.dragStep / Self.nudgeStep : 2
             switch direction {
-            case .increment: nudge(Self.dragStep)
-            case .decrement: nudge(-Self.dragStep)
+            case .increment: nudge(steps)
+            case .decrement: nudge(-steps)
             @unknown default: break
             }
         }
     }
 
-    private func nudgeButton(_ symbol: String, delta: Int, label: LocalizedStringResource) -> some View {
-        Button { nudge(delta) } label: {
+    private func nudgeButton(_ symbol: String, steps: Int, label: LocalizedStringResource) -> some View {
+        Button { nudge(steps) } label: {
             Image(systemName: symbol)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(Palette.primaryDark)
@@ -215,10 +231,12 @@ struct AddWaterSheet: View {
         .accessibilityLabel(Text(label))
     }
 
-    private func nudge(_ delta: Int) {
+    /// Moves the glass by `steps` of 10 ml, or of 1 oz in imperial.
+    private func nudge(_ steps: Int) {
         if isTyping { fieldFocused = false; finishTyping() }
         showsRangeError = false
-        let next = min(max(current + delta, Self.nudgeStep), Self.maxCustomMl)
+        let moved = units.stepped(ml: current, by: steps, metricStep: Self.nudgeStep)
+        let next = min(max(moved, units == .metric ? Self.nudgeStep : minimumMl), maxTypedMl)
         withAnimation(reduceMotion ? nil : Motion.gentle) { amount = next }
     }
 
@@ -236,7 +254,7 @@ struct AddWaterSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         BottleGlyph(fill: BottleGlyph.fill(forMl: ml), width: 12, height: 18)
-                        Text("\(ml.formatted()) \(String(localized: .commonMl))")
+                        Text(verbatim: units.volume(ml: ml))
                             .font(.brand(.bold, size: 15, relativeTo: .subheadline))
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
@@ -258,10 +276,10 @@ struct AddWaterSheet: View {
     private func pour() {
         if isTyping { fieldFocused = false }
         let ml = current
-        guard (1...Self.maxCustomMl).contains(ml) else {
+        guard (1...maxTypedMl).contains(ml) else {
             showsRangeError = true
             // VoiceOver users don't see the red text appear.
-            AccessibilityNotification.Announcement(String(localized: .addWaterOutOfRange(Self.maxCustomMl))).post()
+            AccessibilityNotification.Announcement(String(localized: .addWaterOutOfRange(units.volume(ml: maxTypedMl)))).post()
             return
         }
         do {

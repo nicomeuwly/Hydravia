@@ -58,13 +58,15 @@ struct SettingsView: View {
     }
     #endif
 
+    private var units: UnitSystem { settings.unitSystem }
+
     var body: some View {
         let current = settings.settings
 
         NavigationStack {
             Form {
                 Section {
-                    row(.settingsDailyGoal, value: "\(settings.dailyGoalMl.formatted()) \(String(localized: .commonMl))") {
+                    row(.settingsDailyGoal, value: units.volume(ml: settings.dailyGoalMl)) {
                         editor = .weight
                     }
                     row(.settingsActiveHours, value: "\(current.window.wake.formatted) – \(current.window.sleep.formatted)") {
@@ -75,9 +77,17 @@ struct SettingsView: View {
                         editor = .interval
                     }
                     row(.settingsFavoriteAmounts,
-                        value: "\(current.favoriteAmountsMl.map { $0.formatted() }.joined(separator: " · ")) \(String(localized: .commonMl))") {
+                        value: "\(settings.favoriteAmountsMl.map { units.volumeNumber(ml: $0) }.joined(separator: " · ")) \(units.volumeSymbol)") {
                         editor = .favorites
                     }
+                    Picker(selection: Bindable(settings).settings.unitPreference) {
+                        Text(.settingsUnitsAutomatic).tag(UnitPreference.automatic)
+                        Text(.settingsUnitsMetric).tag(UnitPreference.metric)
+                        Text(.settingsUnitsImperial).tag(UnitPreference.imperial)
+                    } label: {
+                        Text(.settingsUnits)
+                    }
+                    .tint(Palette.textSecondary)
                 } header: {
                     Text(.settingsSectionHydration)
                 }
@@ -118,10 +128,8 @@ struct SettingsView: View {
                                 case .loading:
                                     ProgressView()
                                 case .known(let celsius):
-                                    // °C or °F per the user's region.
-                                    Text(Measurement(value: celsius, unit: UnitTemperature.celsius),
-                                         format: .measurement(width: .abbreviated, usage: .weather,
-                                                              numberFormatStyle: .number.precision(.fractionLength(0))))
+                                    // °C or °F with the units chosen above.
+                                    Text(verbatim: units.temperature(celsius: celsius))
                                 case .unavailable:
                                     Text(verbatim: "–")
                                 }
@@ -267,7 +275,7 @@ struct SettingsView: View {
                     DraftSheet(title: .settingsWeightModalTitle, value: current.weightKg, detent: .medium) { draft in
                         VStack(spacing: Spacing.sm) {
                             WeightPicker(weightKg: draft)
-                            Text("\(HydrationGoal.dailyMl(weightKg: draft.wrappedValue).formatted()) \(String(localized: .commonMl))")
+                            Text(verbatim: units.volume(ml: HydrationGoal.dailyMl(weightKg: draft.wrappedValue)))
                                 .font(.cardTitle)
                                 .foregroundStyle(Palette.primaryDark)
                                 .contentTransition(.numericText())
@@ -286,7 +294,7 @@ struct SettingsView: View {
                         IntervalPicker(minutes: draft)
                     } onSave: { settings.settings.window.intervalMin = $0 }
                 case .favorites:
-                    DraftSheet(title: .settingsFavoriteAmounts, value: current.favoriteAmountsMl, detent: .fraction(0.62)) { draft in
+                    DraftSheet(title: .settingsFavoriteAmounts, value: settings.favoriteAmountsMl, detent: .fraction(0.62)) { draft in
                         FavoriteAmountsEditor(amounts: draft)
                     } onSave: { settings.settings.favoriteAmountsMl = $0 }
                 }

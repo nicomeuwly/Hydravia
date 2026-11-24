@@ -59,25 +59,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eigene Menge in Millilitern"
+            "value" : "Eigene Menge"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom amount in milliliters"
+            "value" : "Custom amount"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cantidad personalizada en mililitros"
+            "value" : "Cantidad personalizada"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quantité personnalisée en millilitres"
+            "value" : "Quantité personnalisée"
           }
         }
       }
@@ -118,54 +118,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib eine Menge zwischen 1 und %1$lld ml ein."
+            "value" : "Gib eine Menge zwischen 1 und %1$@ ein."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter an amount between 1 and %1$lld ml."
+            "value" : "Enter an amount between 1 and %1$@."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Introduce una cantidad entre 1 y %1$lld ml."
+            "value" : "Introduce una cantidad entre 1 y %1$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisis une quantité entre 1 et %1$lld ml."
-          }
-        }
-      }
-    },
-    "addWater.placeholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andere Menge (ml)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other amount (ml)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otra cantidad (ml)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autre quantité (ml)"
+            "value" : "Saisis une quantité entre 1 et %1$@."
           }
         }
       }
@@ -462,35 +433,6 @@
         }
       }
     },
-    "common.ml" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ml"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ml"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ml"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ml"
-          }
-        }
-      }
-    },
     "common.now" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -767,25 +709,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ø %1$@ L"
+            "value" : "Ø %1$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "avg. %1$@ L"
+            "value" : "avg. %1$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "med. %1$@ L"
+            "value" : "med. %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "moy. %1$@ L"
+            "value" : "moy. %1$@"
           }
         }
       }
@@ -1088,25 +1030,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%1$@ ml über dem Ziel"
+            "value" : "+%1$@ über dem Ziel"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%1$@ ml past your goal"
+            "value" : "+%1$@ past your goal"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%1$@ ml por encima del objetivo"
+            "value" : "+%1$@ por encima del objetivo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%1$@ ml au-delà de l’objectif"
+            "value" : "+%1$@ au-delà de l’objectif"
           }
         }
       }
@@ -1118,25 +1060,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "noch %1$@ ml"
+            "value" : "noch %1$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml to go"
+            "value" : "%1$@ to go"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "faltan %1$@ ml"
+            "value" : "faltan %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "il reste %1$@ ml"
+            "value" : "il reste %1$@"
           }
         }
       }
@@ -5672,25 +5614,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es sind gerade %1$lld°C"
+            "value" : "Es sind gerade %1$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It's %1$lld°C right now"
+            "value" : "It's %1$@ right now"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ahora mismo hay %1$lld°C"
+            "value" : "Ahora mismo hay %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il fait %1$lld°C actuellement"
+            "value" : "Il fait %1$@ actuellement"
           }
         }
       }
@@ -5701,25 +5643,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Gewicht in Kilogramm wählen"
+            "value" : "Wähle dein Gewicht"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select your weight in kilograms"
+            "value" : "Select your weight"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selecciona tu peso en kilogramos"
+            "value" : "Selecciona tu peso"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sélectionner ton poids en kilogrammes"
+            "value" : "Choisis ton poids"
           }
         }
       }
@@ -6969,25 +6911,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml hinzufügen"
+            "value" : "%1$@ hinzufügen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add %1$@ ml"
+            "value" : "Add %1$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir %1$@ ml"
+            "value" : "Añadir %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter %1$@ ml"
+            "value" : "Ajouter %1$@"
           }
         }
       }
@@ -6999,25 +6941,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml hinzugefügt"
+            "value" : "%1$@ hinzugefügt"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml added"
+            "value" : "%1$@ added"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml añadidos"
+            "value" : "Has añadido %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml ajoutés"
+            "value" : "C’est noté : %1$@"
           }
         }
       }
@@ -7059,25 +7001,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml hinzufügen"
+            "value" : "%1$@ hinzufügen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add %1$@ ml"
+            "value" : "Add %1$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir %1$@ ml"
+            "value" : "Añadir %1$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter %1$@ ml"
+            "value" : "Ajouter %1$@"
           }
         }
       }
@@ -7940,6 +7882,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jusqu'à %1$lld apps à l'unité. Une catégorie entière compte pour une, quel que soit son nombre d'apps ; décocher une de ses apps la transforme en apps à l'unité."
+          }
+        }
+      }
+    },
+    "settings.units" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einheiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Units"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidades"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unités"
+          }
+        }
+      }
+    },
+    "settings.unitsAutomatic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automático"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatique"
+          }
+        }
+      }
+    },
+    "settings.unitsMetric" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metrisch (ml, kg)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metric (ml, kg)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Métrico (ml, kg)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Métrique (ml, kg)"
+          }
+        }
+      }
+    },
+    "settings.unitsImperial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "US (oz, lb)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "US (oz, lb)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EE. UU. (oz, lb)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "US (oz, lb)"
           }
         }
       }

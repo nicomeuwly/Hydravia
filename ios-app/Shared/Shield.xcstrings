@@ -153,25 +153,25 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch %1$@ ml bis zu deinem Tagesziel."
+            "value": "Noch %1$@ bis zu deinem Tagesziel."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ ml to go for today's goal."
+            "value": "%1$@ to go for today's goal."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Te faltan %1$@ ml para tu objetivo de hoy."
+            "value": "Te faltan %1$@ para tu objetivo de hoy."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Encore %1$@ ml pour ton objectif du jour."
+            "value": "Encore %1$@ pour ton objectif du jour."
           }
         }
       }
@@ -183,25 +183,25 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "🔥 %1$d Tage in Folge · heute noch %2$@ ml."
+            "value": "🔥 %1$d Tage in Folge · heute noch %2$@."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "🔥 %1$d-day streak · %2$@ ml to go today."
+            "value": "🔥 %1$d-day streak · %2$@ to go today."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "🔥 Racha de %1$d días · hoy te faltan %2$@ ml."
+            "value": "🔥 Racha de %1$d días · hoy te faltan %2$@."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "🔥 Série de %1$d jours · encore %2$@ ml aujourd'hui."
+            "value": "🔥 Série de %1$d jours · encore %2$@ aujourd'hui."
           }
         }
       }

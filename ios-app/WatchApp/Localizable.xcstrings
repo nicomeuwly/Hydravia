@@ -8,25 +8,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "/ %@ ml"
+            "value" : "/ %@"
           }
         }
       }
@@ -38,25 +38,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml von %2$@ ml getrunken"
+            "value" : "%1$@ von %2$@ getrunken"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml drunk of %2$@ ml"
+            "value" : "%1$@ drunk of %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml bebidos de %2$@ ml"
+            "value" : "Has bebido %1$@ de %2$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ml bus sur %2$@ ml"
+            "value" : "Tu as bu %1$@ sur %2$@"
           }
         }
       }
@@ -68,25 +68,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ ml"
+            "value" : "+%@"
           }
         }
       }
@@ -338,25 +338,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ / %2$@ ml"
+            "value" : "%1$@ / %2$@"
           }
         }
       }

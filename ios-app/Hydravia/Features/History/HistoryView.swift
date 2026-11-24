@@ -36,7 +36,7 @@ struct HistoryView: View {
                 // Both cards as tall as the taller one (large text sizes).
                 .fixedSize(horizontal: false, vertical: true)
 
-                WeekChartCard(totals: streakTotals, goalMl: goal, today: today)
+                WeekChartCard(totals: streakTotals, goalMl: goal, today: today, units: settings.unitSystem)
 
                 let best = Streak.best(streakTotals, goalMl: goal, today: today)
                 HStack {

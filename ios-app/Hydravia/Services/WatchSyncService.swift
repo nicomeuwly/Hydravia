@@ -70,6 +70,7 @@ final class WatchSyncService: NSObject {
         }
         // A complication on the watch face: wake the watch app to redraw it.
         let face = "\(snapshot.day)-\(snapshot.consumedMl)-\(snapshot.state.goalMl)-\(snapshot.state.hasPro(at: .now))"
+            + "-\(snapshot.state.unitSystem)"
         if session.isComplicationEnabled, session.remainingComplicationUserInfoTransfers > 0, face != lastComplication {
             session.transferCurrentComplicationUserInfo([WatchSnapshot.key: data])
             lastComplication = face
@@ -100,7 +101,8 @@ final class WatchSyncService: NSObject {
         blocker.shareProgress(
             consumedMl: hydration.todayTotalMl,
             goalMl: goal,
-            streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today)
+            streak: Streak.current(hydration.streakTotals, goalMl: goal, today: hydration.today),
+            imperialUnits: settings.unitSystem == .imperial
         )
         if hydration.todayTotalMl >= goal {
             Task { await reminders.restForToday() }

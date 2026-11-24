@@ -1,3 +1,4 @@
+import HydraviaCore
 import HydraviaData
 import SwiftUI
 
@@ -22,7 +23,7 @@ struct QuickAddBar: View {
     private static let confirmationSeconds = 3
 
     private var amount: Int {
-        QuickAdd.amount(last: lastAmountMl, favorites: settings.settings.favoriteAmountsMl)
+        QuickAdd.amount(last: lastAmountMl, favorites: settings.favoriteAmountsMl)
     }
 
     var body: some View {
@@ -67,7 +68,7 @@ struct QuickAddBar: View {
     private var quickAddButton: some View {
         Button(action: pour) {
             Label {
-                Text(.homeQuickAdd(amount.formatted()))
+                Text(.homeQuickAdd(settings.unitSystem.volume(ml: amount)))
                     .contentTransition(.numericText(value: Double(amount)))
             } icon: {
                 Image(systemName: "drop.fill")
@@ -83,7 +84,7 @@ struct QuickAddBar: View {
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Palette.secondaryBlue)
                 .accessibilityHidden(true)
-            Text(.homeAdded(added.ml.formatted()))
+            Text(.homeAdded(settings.unitSystem.volume(ml: added.ml)))
                 .font(.brand(.bold, size: 17, relativeTo: .headline))
                 .foregroundStyle(Palette.primaryDark)
                 .lineLimit(1)
@@ -114,7 +115,7 @@ struct QuickAddBar: View {
                                        blocker: blocker, reminders: reminders)) != nil
         else { return }
         pours += 1
-        AccessibilityNotification.Announcement(String(localized: .homeAdded(ml.formatted()))).post()
+        AccessibilityNotification.Announcement(String(localized: .homeAdded(settings.unitSystem.volume(ml: ml)))).post()
     }
 
     private func undo(_ added: AppRouter.ManualAdd) {
