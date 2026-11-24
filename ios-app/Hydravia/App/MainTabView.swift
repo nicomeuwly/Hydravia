@@ -127,6 +127,8 @@ private enum TabBarStyle {
     }
 }
 
+#if DEBUG
 #Preview {
     MainTabView().injecting(AppDependencies.preview())
 }
+#endif

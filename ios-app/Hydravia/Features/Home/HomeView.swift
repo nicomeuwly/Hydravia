@@ -270,6 +270,8 @@ private struct StatsCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     HomeView().injecting(AppDependencies.preview(todayMl: [500, 750]))
 }
+#endif

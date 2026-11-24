@@ -453,12 +453,14 @@ struct BottleGlyph: View {
     }
 }
 
+#if DEBUG
 #Preview {
     Color.clear.sheet(isPresented: .constant(true)) {
         AddWaterSheet()
     }
     .injecting(AppDependencies.preview())
 }
+#endif
 
 private extension View {
     @ViewBuilder

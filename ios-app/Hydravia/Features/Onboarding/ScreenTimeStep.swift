@@ -71,6 +71,8 @@ struct ScreenTimeStep: View {
     }
 }
 
+#if DEBUG
 #Preview {
     ScreenTimeStep {}.injecting(AppDependencies.preview(onboardingDone: false, todayMl: []))
 }
+#endif

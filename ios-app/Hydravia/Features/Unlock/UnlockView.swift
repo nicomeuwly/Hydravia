@@ -329,6 +329,8 @@ private extension AnyTransition {
     }
 }
 
+#if DEBUG
 #Preview {
     UnlockView().injecting(AppDependencies.preview(todayMl: [800]))
 }
+#endif

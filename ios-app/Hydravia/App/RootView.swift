@@ -227,10 +227,14 @@ struct RootView: View {
     }
 }
 
+#if DEBUG
 #Preview("App") {
     RootView().injecting(AppDependencies.preview())
 }
+#endif
 
+#if DEBUG
 #Preview("First launch") {
     RootView().injecting(AppDependencies.preview(onboardingDone: false, todayMl: []))
 }
+#endif

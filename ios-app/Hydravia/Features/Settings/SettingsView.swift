@@ -476,6 +476,8 @@ private struct DraftSheet<Value: Equatable, Content: View>: View {
     }
 }
 
+#if DEBUG
 #Preview {
     SettingsView().injecting(AppDependencies.preview())
 }
+#endif

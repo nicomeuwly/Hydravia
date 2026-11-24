@@ -450,6 +450,8 @@ private extension String {
     var capitalizedFirst: String { prefix(1).uppercased() + dropFirst() }
 }
 
+#if DEBUG
 #Preview {
     EntryLogSheet().injecting(AppDependencies.preview(todayMl: [250, 500, 330]))
 }
+#endif

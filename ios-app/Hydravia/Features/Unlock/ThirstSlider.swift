@@ -145,9 +145,11 @@ struct ThirstSlider: View {
     }
 }
 
+#if DEBUG
 #Preview {
     @Previewable @State var feeling = Feeling.fine
     ThirstSlider(feeling: $feeling)
         .padding(26)
         .background(Palette.waterDeep)
 }
+#endif

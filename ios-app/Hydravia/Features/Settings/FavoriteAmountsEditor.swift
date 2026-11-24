@@ -91,6 +91,7 @@ private struct AmountStepperCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     @Previewable @State var amounts = [200, 330, 500]
     FavoriteAmountsEditor(amounts: $amounts)
@@ -98,3 +99,4 @@ private struct AmountStepperCard: View {
         .background(Palette.background)
         .injecting(AppDependencies.preview())
 }
+#endif

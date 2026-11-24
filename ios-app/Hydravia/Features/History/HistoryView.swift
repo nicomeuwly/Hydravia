@@ -150,6 +150,8 @@ private struct StatCard: View {
     }
 }
 
+#if DEBUG
 #Preview {
     HistoryView().injecting(AppDependencies.preview(todayMl: [800, 500]))
 }
+#endif

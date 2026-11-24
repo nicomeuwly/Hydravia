@@ -160,6 +160,8 @@ struct OnboardingScaffold<Content: View>: View {
     }
 }
 
+#if DEBUG
 #Preview {
     OnboardingFlowView().injecting(AppDependencies.preview(onboardingDone: false, todayMl: []))
 }
+#endif
