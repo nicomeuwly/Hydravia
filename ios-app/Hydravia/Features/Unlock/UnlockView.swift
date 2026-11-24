@@ -12,6 +12,7 @@ struct UnlockView: View {
     @Environment(AppRouter.self) private var router
     @Environment(\.reminders) private var reminders
     @Environment(BlockerService.self) private var blocker
+    @Environment(StoreService.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -76,7 +77,15 @@ struct UnlockView: View {
         .onChange(of: level) { old, new in
             physics.setLevel(new, splash: new > old && !reduceMotion)
         }
-        .task { temperature = await WeatherService.shared.currentTemperature() }
+        // The weather tunes the dose with Pro only: on the free plan the
+        // location is never read and nothing is fetched.
+        .task(id: store.hasPro) {
+            guard Dose.adjustsForWeather(hasPro: store.hasPro) else {
+                temperature = nil
+                return
+            }
+            temperature = await WeatherService.shared.currentTemperature()
+        }
         .onChange(of: temperature) {
             // The weather can land after the answer: keep the dose honest.
             guard stage == .dose else { return }
@@ -286,7 +295,7 @@ struct UnlockView: View {
             windowEnd: Dose.windowEnd(sleep: window.sleep, now: now, calendar: .autoupdatingCurrent),
             intervalMin: window.intervalMin,
             feeling: value,
-            temperatureC: temperature
+            temperatureC: Dose.temperature(temperature, hasPro: store.hasPro)
         ))
     }
 

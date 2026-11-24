@@ -23,7 +23,7 @@ struct PaywallView: View {
     @State private var isPurchasing = false
     @State private var showsError = false
     @State private var showsPending = false
-    @State private var restoreResult: Bool?
+    @State private var restoreResult: StoreService.RestoreOutcome?
     @State private var isRestoring = false
     @State private var isRetrying = false
 
@@ -44,7 +44,7 @@ struct PaywallView: View {
         .onChange(of: store.isEligibleForTrial) { _, eligible in
             if eligible != true { stage = .offer }
         }
-        .alert(Text(.paywallSubscribe), isPresented: $showsPending) {
+        .alert(Text(.paywallPendingTitle), isPresented: $showsPending) {
             Button(role: .cancel) { onFinish() } label: { Text(.commonOk) }
         } message: {
             Text(.paywallPending)
@@ -54,14 +54,7 @@ struct PaywallView: View {
         } message: {
             Text(.paywallErrorBody)
         }
-        .alert(Text(restoreResult == true ? .settingsRestoredTitle : .settingsNoPurchaseTitle),
-               isPresented: Binding { restoreResult != nil } set: { if !$0 { restoreResult = nil } }) {
-            Button(role: .cancel) {
-                if restoreResult == true { onFinish() }
-            } label: { Text(.commonOk) }
-        } message: {
-            Text(restoreResult == true ? .settingsRestoredBody : .settingsNoPurchaseBody)
-        }
+        .restoreAlert($restoreResult, onRestored: onFinish)
         .sensoryFeedback(.selection, trigger: selectedID)
     }
 
@@ -140,7 +133,7 @@ struct PaywallView: View {
                 if offersTrial {
                     // The trial is the subscriptions': faded, not removed, when
                     // the lifetime purchase is picked, so the cards don't jump.
-                    TrialTimeline(chargeDate: chargeDate)
+                    TrialTimeline(chargeDate: chargeDate, trialDays: trialDays, price: chargedPrice)
                         .opacity(isLifetime ? 0.35 : 1)
                         .animation(Motion.press, value: isLifetime)
                 }
@@ -165,8 +158,8 @@ struct PaywallView: View {
                     // the selected card (App Review requirement).
                     if let billing {
                         Text(billing)
-                            .font(.brandFootnote)
-                            .foregroundStyle(Palette.textSecondary)
+                            .font(.brand(.medium, size: 15, relativeTo: .subheadline))
+                            .foregroundStyle(Palette.textPrimary)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -319,6 +312,21 @@ struct PaywallView: View {
         return calendar.date(byAdding: component, value: period.value, to: .now) ?? .now
     }
 
+    /// The day the first charge falls on, counted like the timeline ("Day 7").
+    private var trialDays: Int {
+        let calendar = Calendar.autoupdatingCurrent
+        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: .now),
+                                           to: calendar.startOfDay(for: chargeDate)).day ?? 7
+        return max(1, days)
+    }
+
+    /// What the trial turns into: the selected subscription's price (the
+    /// yearly one while the lifetime card, which has no trial, is picked).
+    private var chargedPrice: String {
+        let subscription = isLifetime ? store.yearly : selectedProduct
+        return subscription?.displayPrice ?? ""
+    }
+
     /// "7 days free, then €19.99 per year. Renews automatically…"
     private var billing: String? {
         guard let product = selectedProduct else { return nil }
@@ -450,16 +458,19 @@ private struct PlanCard: View {
     }
 }
 
-/// Today / day 5 / day 7 — what happens, and when. Risk reduction beats
-/// persuasion.
+/// Today / the day the trial ends — what happens, when, and for how much.
+/// Risk reduction beats persuasion. The day comes from the product's real
+/// trial period, never a hardcoded week.
 private struct TrialTimeline: View {
     let chargeDate: Date
+    let trialDays: Int
+    let price: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             step(icon: "lock.open.fill", title: .paywallTimelineToday, text: Text(.paywallTimelineTodayText), isLast: false)
-            step(icon: "star.fill", title: .paywallTimelineDay7,
-                 text: Text(.paywallTimelineDay7Text(chargeDate.formatted(.dateTime.day().month(.wide)))),
+            step(icon: "star.fill", title: .paywallTimelineDay(trialDays),
+                 text: Text(.paywallTimelineChargeText(price, chargeDate.formatted(.dateTime.day().month(.wide)))),
                  isLast: true)
         }
     }

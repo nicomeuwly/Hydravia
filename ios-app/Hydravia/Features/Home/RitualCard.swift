@@ -61,7 +61,7 @@ struct RitualCard: View {
         guard notificationsEnabled else { return String(localized: .homeRemindersOff) }
         let calendar = Calendar.autoupdatingCurrent
         if goalReached {
-            guard let first = window.reminderSlots.first else { return "—" }
+            guard let first = window.reminderSlots.first else { return "–" }
             return String(localized: .homeTomorrowAt(Self.format(first, calendar: calendar, now: now)))
         }
         let answered = lastDrink.flatMap { window.reminderAnswered(byDrinkAt: MinuteOfDay($0, calendar: calendar)) }
@@ -71,7 +71,7 @@ struct RitualCard: View {
         case .tomorrow(let minute):
             return String(localized: .homeTomorrowAt(Self.format(minute, calendar: calendar, now: now)))
         case .none:
-            return "—"
+            return "–"
         }
     }
 

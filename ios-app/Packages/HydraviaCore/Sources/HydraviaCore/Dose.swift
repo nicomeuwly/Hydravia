@@ -64,6 +64,16 @@ public enum Dose {
     /// "Very thirsty".
     public static let baseMaximumMl = maximumMl / multiplier(for: .veryThirsty)
 
+    /// Tuning the dose to the weather is a Pro feature; how thirsty the user
+    /// feels counts on every plan. On the free plan the app neither reads the
+    /// location nor fetches the weather.
+    public static func adjustsForWeather(hasPro: Bool) -> Bool { hasPro }
+
+    /// The temperature the dose may use: the reading with Pro, none without.
+    public static func temperature(_ reading: Double?, hasPro: Bool) -> Double? {
+        adjustsForWeather(hasPro: hasPro) ? reading : nil
+    }
+
     public static func ml(for input: DoseInput) -> Int {
         let remaining = Double(max(0, input.goalMl - input.drunkMl))
         // Whole milliseconds, like the TypeScript engine: sub-millisecond clock

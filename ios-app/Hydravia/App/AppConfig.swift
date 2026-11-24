@@ -15,6 +15,16 @@ enum AppConfig {
     static let simulatesFreePlanKey = "dev.simulatesFreePlan"
 
     /// Legal pages on the landing site (also given to App Store Connect).
-    static let termsURL = URL(string: "https://hydravia.app/terms")!
-    static let privacyURL = URL(string: "https://hydravia.app/privacy")!
+    /// French pages at the root, English ones (for every other language)
+    /// under /en, following the language the app is shown in.
+    static var termsURL: URL { legalURL("terms") }
+    static var privacyURL: URL { legalURL("privacy") }
+
+    private static var showsFrench: Bool {
+        Bundle.main.preferredLocalizations.first?.hasPrefix("fr") == true
+    }
+
+    private static func legalURL(_ page: String) -> URL {
+        URL(string: "https://www.hydravia.app/\(showsFrench ? "" : "en/")\(page)")!
+    }
 }
