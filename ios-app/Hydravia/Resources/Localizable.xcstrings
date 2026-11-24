@@ -7210,6 +7210,360 @@
           }
         }
       }
+    },
+    "blocker.countApps" : {
+      "comment" : "Settings, blocked apps value: the number of single apps picked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld App"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Apps"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld app"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld apps"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld app"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld apps"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld app"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld apps"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "blocker.countCategories" : {
+      "comment" : "Settings, blocked apps value: the number of whole categories picked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Kategorie"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Kategorien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld category"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld categories"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld categoría"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld categorías"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld catégorie"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld catégories"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "blocker.countSites" : {
+      "comment" : "Settings, blocked apps value: the number of websites picked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Website"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Websites"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld website"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld websites"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld web"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld webs"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld site"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sites"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "blocker.tooManyTitle" : {
+      "comment" : "Alert title (and Settings hint) when the pick holds more single apps or websites than Screen Time can lock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu viele einzelne Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many single apps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiadas apps sueltas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop d'apps à l'unité"
+          }
+        }
+      }
+    },
+    "blocker.tooManyBody" : {
+      "comment" : "Alert body: %1$lld is the most single apps, %2$lld the most websites Screen Time can lock (50).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS erlaubt Hydravia, bis zu %1$lld Apps und %2$lld Websites einzeln zu sperren. Wählst du eine App in einer Kategorie ab, wird der Rest dieser Kategorie zu einzelnen Apps. Wähle lieber ganze Kategorien: Jede zählt nur einmal, egal wie viele Apps sie enthält."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS lets Hydravia lock up to %1$lld apps and %2$lld websites one by one. Unchecking an app inside a category turns the rest of that category into single apps. Select whole categories instead: each one counts once, however many apps it holds."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS permite a Hydravia bloquear hasta %1$lld apps y %2$lld webs sueltas. Si desmarcas una app dentro de una categoría, el resto de esa categoría pasa a ser apps sueltas. Mejor selecciona categorías enteras: cada una cuenta una sola vez, tenga las apps que tenga."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS permet à Hydravia de bloquer jusqu'à %1$lld apps et %2$lld sites à l'unité. Décocher une app dans une catégorie transforme le reste de cette catégorie en apps séparées. Sélectionne plutôt des catégories entières : chacune compte pour une, quel que soit son nombre d'apps."
+          }
+        }
+      }
+    },
+    "blocker.editSelection" : {
+      "comment" : "Alert button: reopens the app picker on the pick that was too big.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit selection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar selección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la sélection"
+          }
+        }
+      }
+    },
+    "blocker.pickerFooter" : {
+      "comment" : "Footer of the system app picker (Pro and onboarding). %1$lld is the most single apps Screen Time can lock (50).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bis zu %1$lld einzelne Apps. Eine ganze Kategorie zählt einmal, egal wie viele Apps sie enthält; wählst du eine ihrer Apps ab, wird sie zu einzelnen Apps."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to %1$lld single apps. A whole category counts once, however many apps it holds; unchecking one of its apps turns it into single apps."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasta %1$lld apps sueltas. Una categoría entera cuenta una vez, tenga las apps que tenga; si desmarcas una de sus apps, pasa a ser apps sueltas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jusqu'à %1$lld apps à l'unité. Une catégorie entière compte pour une, quel que soit son nombre d'apps ; décocher une de ses apps la transforme en apps à l'unité."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

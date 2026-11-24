@@ -11,6 +11,7 @@ struct ScreenTimeStep: View {
     @State private var isPicking = false
     @State private var picked = FamilyActivitySelection()
     @State private var isRequesting = false
+    @State private var showsTooMany = false
 
     var body: some View {
         OnboardingScaffold(step: .screenTime, title: .screenTimeTitleIos, subtitle: .screenTimeBodyIos,
@@ -23,12 +24,21 @@ struct ScreenTimeStep: View {
                 explainer(3, .screenTimeStep3Ios)
             }
         }
-        .familyActivityPicker(isPresented: $isPicking, selection: $picked)
+        // Any pick is kept here, even past the free plan (the paywall comes
+        // next), but not one Screen Time can't shield in full.
+        .hydraviaActivityPicker(isPresented: $isPicking, selection: $picked, isPro: true)
         .onChange(of: isPicking) { _, open in
             guard !open else { return }
+            guard blocker.canEnforce(picked) else {
+                showsTooMany = true
+                return
+            }
             blocker.setSelection(picked)
             onNext()
         }
+        // Editing reopens the picker on the pick that was too big; cancelling
+        // moves on with the previous pick (apps can be chosen in Settings).
+        .tooManyAppsAlert(isPresented: $showsTooMany, onEdit: { isPicking = true }, onCancel: onNext)
     }
 
     private func explainer(_ number: Int, _ text: LocalizedStringResource) -> some View {

@@ -1,4 +1,5 @@
 import FamilyControls
+import HydraviaCore
 import SwiftUI
 import UIKit
 
@@ -29,7 +30,7 @@ struct ScreenTimeSection: View {
                         if blocker.selectionCount == 0 {
                             Text(.settingsChooseApps).foregroundStyle(Palette.primaryDark)
                         } else {
-                            Text(blocker.selectionCount, format: .number)
+                            Text(selectionSummary)
                         }
                     } label: {
                         Text(.settingsBlockedApps)
@@ -37,6 +38,8 @@ struct ScreenTimeSection: View {
                             Text(.settingsNoAppsSelected)
                         } else if blocker.needsAppChoice {
                             Text(.blockerFreeLimitTitle)
+                        } else if blocker.needsSmallerSelection {
+                            Text(.blockerTooManyTitle)
                         }
                     }
                 }
@@ -57,6 +60,18 @@ struct ScreenTimeSection: View {
         } message: {
             Text(.settingsBlockerDeniedBody)
         }
+    }
+
+    /// "13 categories", "92 apps", "2 categories, 4 apps and 1 website":
+    /// a category is one line in the picker however many apps it holds, so
+    /// a single total would read as a number of apps.
+    private var selectionSummary: String {
+        let size = blocker.selectionSize
+        var parts: [String] = []
+        if size.categories > 0 { parts.append(String(localized: .blockerCountCategories(size.categories))) }
+        if size.apps > 0 { parts.append(String(localized: .blockerCountApps(size.apps))) }
+        if size.webDomains > 0 { parts.append(String(localized: .blockerCountSites(size.webDomains))) }
+        return parts.formatted(.list(type: .and))
     }
 
     private var accessBinding: Binding<Bool> {

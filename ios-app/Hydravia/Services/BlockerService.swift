@@ -25,6 +25,28 @@ final class BlockerService {
 
     var selectionCount: Int { Blocker.selectionCount(selection) }
 
+    /// The saved pick, counted by kind (what Settings shows).
+    var selectionSize: BlockSelectionSize { Self.size(of: selection) }
+
+    static func size(of selection: FamilyActivitySelection) -> BlockSelectionSize {
+        BlockSelectionSize(apps: selection.applicationTokens.count,
+                           categories: selection.categoryTokens.count,
+                           webDomains: selection.webDomainTokens.count)
+    }
+
+    /// Screen Time can shield all of `selection` (at most 50 single apps,
+    /// 50 websites and 50 categories). A bigger pick would leave some of
+    /// the picked apps free, so the picker doesn't save it.
+    func canEnforce(_ selection: FamilyActivitySelection) -> Bool {
+        Self.size(of: selection).isEnforceable
+    }
+
+    /// A pick saved before the picker checked the limit is too big: only
+    /// part of it is shielded until the user trims it.
+    var needsSmallerSelection: Bool {
+        authorization == .granted && !selectionSize.isEnforceable
+    }
+
     /// Hydravia Pro (or a dev build), as last handed over by `RootView`.
     private(set) var isPro = false
 

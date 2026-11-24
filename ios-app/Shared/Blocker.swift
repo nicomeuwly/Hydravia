@@ -128,6 +128,8 @@ nonisolated enum Blocker {
         return calendar.isDate(reached, inSameDayAs: date)
     }
 
+    /// Apps, categories and websites added up. Not a number of apps: with
+    /// everything picked it is the dozen or so categories.
     static func selectionCount(_ selection: FamilyActivitySelection) -> Int {
         selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
@@ -185,10 +187,30 @@ nonisolated enum Blocker {
     static func raiseShield() {
         let selection = selection
         let store = store
-        store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
+        store.shield.applications = selection.applicationTokens.isEmpty ? nil : capped(selection.applicationTokens)
         store.shield.applicationCategories = selection.categoryTokens.isEmpty
-            ? nil : .specific(selection.categoryTokens)
-        store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : selection.webDomainTokens
+            ? nil : .specific(capped(selection.categoryTokens))
+        store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : capped(selection.webDomainTokens)
+    }
+
+    /// Screen Time shields at most 50 tokens of each kind (Apple's
+    /// `ShieldSettings` documentation); `BlockSelectionSize.shieldLimit` in
+    /// HydraviaCore, which the extensions don't link, holds the same rule.
+    static let shieldTokenLimit = 50
+
+    /// The picker refuses to save a pick past the limit, but one saved
+    /// before that guard can still be larger. Handing the system more than
+    /// it holds shields an unpredictable part of it, and a `Set`'s order
+    /// changes with every process: the app and the monitor would each
+    /// leave different apps free. Keep the same tokens every time instead,
+    /// ordered by their (opaque but stable) encoding.
+    private static func capped<Token: Encodable & Hashable>(_ tokens: Set<Token>) -> Set<Token> {
+        guard tokens.count > shieldTokenLimit else { return tokens }
+        let encoder = JSONEncoder()
+        let ordered = tokens
+            .map { (token: $0, key: (try? encoder.encode($0)) ?? Data()) }
+            .sorted { $0.key.lexicographicallyPrecedes($1.key) }
+        return Set(ordered.prefix(shieldTokenLimit).map(\.token))
     }
 
     static func lowerShield() {
