@@ -93,6 +93,7 @@ struct HomeView: View {
                 reminderFired: router.reminderFired,
                 goalReached: hydration.todayTotalMl >= settings.dailyGoalMl,
                 window: settings.settings.window,
+                lastDrink: hydration.todayEntries.map(\.createdAt).max(),
                 onChooseApp: { isPickingApps = true },
                 onUnlock: router.presentUnlock
             )

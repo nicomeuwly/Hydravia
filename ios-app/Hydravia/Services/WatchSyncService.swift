@@ -92,8 +92,11 @@ final class WatchSyncService: NSObject {
         }
         // The app may be in the background (woken by the watch): what
         // RootView does on a drink is done here too. The shield follows the
-        // goal, and a goal reached drops today's reminders.
+        // goal, and a goal reached drops today's reminders. A pour just
+        // before a reminder answers it: no notification, no relock there.
         let goal = settings.dailyGoalMl
+        let window = settings.settings.window
+        blocker.extendUnlock(window: window, drinkAt: pour.createdAt)
         blocker.shareProgress(
             consumedMl: hydration.todayTotalMl,
             goalMl: goal,
@@ -101,6 +104,8 @@ final class WatchSyncService: NSObject {
         )
         if hydration.todayTotalMl >= goal {
             Task { await reminders.restForToday() }
+        } else {
+            reminders.skipReminder(answeredBy: pour.createdAt, window: window)
         }
         WidgetCenter.shared.reloadAllTimelines()
     }

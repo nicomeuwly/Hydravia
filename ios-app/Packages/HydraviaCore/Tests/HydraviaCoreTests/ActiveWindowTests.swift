@@ -42,10 +42,36 @@ struct ActiveWindowTests {
         #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 20)) == MinuteOfDay(hour: 11, minute: 0))
     }
 
-    @Test func anUnlockLastsAtLeastTheMinimumBreak() {
-        // Drank at 10:50: 11:00 is too close, the break runs to 12:00.
+    @Test func anUnlockRunsPastTheReminderTheDrinkAnswered() {
+        // Drank at 10:50 or 10:31: 11:00 is answered, the break runs to 12:00.
         #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 50)) == MinuteOfDay(hour: 12, minute: 0))
-        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 45)) == MinuteOfDay(hour: 11, minute: 0))
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 31)) == MinuteOfDay(hour: 12, minute: 0))
+        // 10:30 is half an hour away: 11:00 still rings and relocks.
+        #expect(window.unlockEnd(after: MinuteOfDay(hour: 10, minute: 30)) == MinuteOfDay(hour: 11, minute: 0))
+    }
+
+    @Test func theAnswerWindowIsHalfTheIntervalBetween15And30Minutes() {
+        #expect(window.answerWindowMin == 30)
+        #expect(ActiveWindow(wake: window.wake, sleep: window.sleep, intervalMin: 90).answerWindowMin == 30)
+        #expect(ActiveWindow(wake: window.wake, sleep: window.sleep, intervalMin: 120).answerWindowMin == 30)
+        #expect(ActiveWindow(wake: window.wake, sleep: window.sleep, intervalMin: 40).answerWindowMin == 20)
+        #expect(ActiveWindow(wake: window.wake, sleep: window.sleep, intervalMin: 20).answerWindowMin == 15)
+    }
+
+    @Test func aDrinkJustBeforeAReminderAnswersIt() {
+        #expect(window.reminderAnswered(byDrinkAt: MinuteOfDay(hour: 10, minute: 40)) == MinuteOfDay(hour: 11, minute: 0))
+        #expect(window.reminderAnswered(byDrinkAt: MinuteOfDay(hour: 10, minute: 59)) == MinuteOfDay(hour: 11, minute: 0))
+        // Too early, or right on a reminder that already rang: nothing skipped.
+        #expect(window.reminderAnswered(byDrinkAt: MinuteOfDay(hour: 10, minute: 30)) == nil)
+        #expect(window.reminderAnswered(byDrinkAt: MinuteOfDay(hour: 10, minute: 0)) == nil)
+        // After the day's last reminder.
+        #expect(window.reminderAnswered(byDrinkAt: MinuteOfDay(hour: 21, minute: 50)) == nil)
+    }
+
+    @Test func nextReminderSkipsTheAnsweredOne() {
+        let now = MinuteOfDay(hour: 10, minute: 40)
+        let answered = window.reminderAnswered(byDrinkAt: now)
+        #expect(window.nextReminder(after: now, skipping: answered) == .today(MinuteOfDay(hour: 12, minute: 0)))
     }
 
     @Test func noUnlockEndAfterTheLastReminder() {
