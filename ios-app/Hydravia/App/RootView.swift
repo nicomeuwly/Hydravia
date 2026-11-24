@@ -117,6 +117,12 @@ struct RootView: View {
             router.reminderFired = false
             Task { await reminders?.clearDeliveredReminders() }
         }
+        // A goal lowered under today's water is not a goal reached: no
+        // celebration when the home screen comes back.
+        .onChange(of: settings.dailyGoalMl) { _, goal in
+            guard hydration.todayTotalMl >= goal else { return }
+            GoalCelebration.markShown(on: hydration.today)
+        }
         .onReceive(Self.dayOrZoneChanges) { _ in
             hydration.refresh()
             // The lock's window is wall-clock time: re-register it in the new

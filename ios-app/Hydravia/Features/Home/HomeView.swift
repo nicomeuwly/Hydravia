@@ -52,19 +52,39 @@ struct HomeView: View {
         .onAppear {
             // The first appearance rises from empty: a quiet "pour" intro.
             physics.setLevel(waterLevel, splash: false)
+            celebrateIfOwed()
         }
         .onChange(of: waterLevel) { old, new in
             physics.setLevel(new, splash: new > old && !reduceMotion && isWaterActive)
         }
+        // Water poured while watching.
         .onChange(of: progress) { old, new in
-            // Only for water poured while watching — not a goal edited in
-            // Settings, or a celebration replaying when the tab comes back.
-            guard old < 1, new >= 1, isWaterActive else { return }
-            Haptics.celebrate()
-            guard !reduceMotion else { return }
-            celebrations += 1
-            physics.celebrate()
+            guard old < 1, new >= 1 else { return }
+            celebrateIfOwed()
         }
+        // Back on screen: the ritual closing (the goal reached by the
+        // reminder's dose), the app reopened after a widget or watch pour,
+        // or the tab selected again.
+        .task(id: isWaterActive) {
+            guard isWaterActive else { return }
+            // Lets the ritual's cover finish sliding away and the store
+            // re-read a pour made elsewhere.
+            try? await Task.sleep(for: .milliseconds(450))
+            guard !Task.isCancelled else { return }
+            celebrateIfOwed()
+        }
+    }
+
+    /// Today's goal is reached and its celebration hasn't been seen yet. A
+    /// goal lowered in Settings below today's water counts as seen (see
+    /// `RootView`): editing a number is not a goal reached.
+    private func celebrateIfOwed() {
+        guard isWaterActive, progress >= 1, !GoalCelebration.wasShown(on: hydration.today) else { return }
+        GoalCelebration.markShown(on: hydration.today)
+        Haptics.celebrate()
+        guard !reduceMotion else { return }
+        celebrations += 1
+        physics.celebrate()
     }
 
     // MARK: Foreground

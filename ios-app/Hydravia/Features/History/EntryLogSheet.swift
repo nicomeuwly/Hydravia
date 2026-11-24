@@ -285,8 +285,6 @@ private struct SwipeToDeleteRow<Content: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var offset: CGFloat = 0
     @State private var width: CGFloat = 0
-    /// Decided on the first movement: a vertical drag is the scroll's.
-    @State private var isHorizontal: Bool?
     /// Past the full-swipe threshold: releasing deletes.
     @State private var isArmed = false
 
@@ -340,36 +338,37 @@ private struct SwipeToDeleteRow<Content: View>: View {
         }
         .clipShape(shape)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
-        .simultaneousGesture(drag)
+        .gesture(pan)
         .onChange(of: openRow) { _, open in
-            if open != id, offset != 0, isHorizontal == nil { close() }
+            if open != id, offset != 0 { close() }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: isArmed) { _, armed in armed }
         .accessibilityElement(children: .combine)
         .accessibilityAction(named: Text(.entriesDelete), onDelete)
     }
 
-    private var drag: some Gesture {
-        DragGesture(minimumDistance: 12)
-            .onChanged { value in
-                if isHorizontal == nil {
-                    isHorizontal = abs(value.translation.width) > abs(value.translation.height)
-                    if isHorizontal == true, openRow != id { openRow = nil }
-                }
-                guard isHorizontal == true else { return }
+    /// A UIKit pan rather than a SwiftUI `DragGesture`: a drag gesture on
+    /// every row of a `ScrollView` sometimes took the touch from the scroll
+    /// (the list then wouldn't scroll), and a drag the scroll cancelled never
+    /// ended, leaving the row's direction stuck. This pan only begins for a
+    /// sideways movement, so a vertical one always stays the scroll's.
+    private var pan: HorizontalPan {
+        HorizontalPan(
+            onBegan: {
+                if openRow != id { openRow = nil }
+            },
+            onChanged: { translation in
                 let base = isOpen ? -buttonWidth : 0
-                let raw = base + value.translation.width
+                let raw = base + translation
                 // A little give to the right, none past the left edge.
                 offset = raw > 0 ? raw * 0.15 : max(raw, -width)
                 let armed = -offset > width * 0.55
                 if armed != isArmed {
                     withAnimation(reduceMotion ? nil : Motion.press) { isArmed = armed }
                 }
-            }
-            .onEnded { value in
-                defer { isHorizontal = nil }
-                guard isHorizontal == true else { return }
-                let predicted = (isOpen ? -buttonWidth : 0) + value.predictedEndTranslation.width
+            },
+            onEnded: { predictedTranslation in
+                let predicted = (isOpen ? -buttonWidth : 0) + predictedTranslation
                 if isArmed || (predicted < -width * 0.9 && -offset > buttonWidth) {
                     deleteNow()
                 } else if -offset > buttonWidth * 0.5 || predicted < -buttonWidth * 1.5 {
@@ -378,7 +377,9 @@ private struct SwipeToDeleteRow<Content: View>: View {
                 } else {
                     close()
                 }
-            }
+            },
+            onCancelled: { close() }
+        )
     }
 
     private func close() {
@@ -397,6 +398,51 @@ private struct SwipeToDeleteRow<Content: View>: View {
             offset = -width
         } completion: {
             onDelete()
+        }
+    }
+}
+
+/// A sideways pan for a row inside a vertical `ScrollView`. It refuses to
+/// begin unless the finger moves more sideways than up or down, so it never
+/// competes with the scroll for a vertical drag.
+private struct HorizontalPan: UIGestureRecognizerRepresentable {
+    let onBegan: () -> Void
+    let onChanged: (CGFloat) -> Void
+    /// Where the movement would end, its momentum included.
+    let onEnded: (CGFloat) -> Void
+    let onCancelled: () -> Void
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator { Coordinator() }
+
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
+        let pan = UIPanGestureRecognizer()
+        pan.delegate = context.coordinator
+        return pan
+    }
+
+    func handleUIGestureRecognizerAction(_ recognizer: UIPanGestureRecognizer, context: Context) {
+        let translation = recognizer.translation(in: recognizer.view).x
+        switch recognizer.state {
+        case .began:
+            onBegan()
+            onChanged(translation)
+        case .changed:
+            onChanged(translation)
+        case .ended:
+            // About what SwiftUI's predicted end translation adds for a flick.
+            onEnded(translation + recognizer.velocity(in: recognizer.view).x * 0.25)
+        case .cancelled, .failed:
+            onCancelled()
+        default:
+            break
+        }
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = recognizer as? UIPanGestureRecognizer else { return true }
+            let velocity = pan.velocity(in: pan.view)
+            return abs(velocity.x) > abs(velocity.y)
         }
     }
 }
