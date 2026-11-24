@@ -137,55 +137,6 @@ struct IntervalStep: View {
     }
 }
 
-// MARK: - Location
-
-struct LocationStep: View {
-    let onNext: () -> Void
-    @Environment(LocationPermission.self) private var location
-    @State private var waitingForAnswer = false
-
-    var body: some View {
-        OnboardingScaffold(step: .location, title: .locationTitle, subtitle: .locationBody,
-                           primary: .commonContinue, onPrimary: allow) {
-            HStack(spacing: Spacing.md) {
-                Image(systemName: "sun.max.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Palette.amber)
-                    .frame(width: 44, height: 44)
-                    .background(Palette.amber.opacity(0.12), in: .rect(cornerRadius: Radius.sm, style: .continuous))
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(.locationToday)
-                        .font(.brandCaption)
-                        .foregroundStyle(Palette.textSecondary)
-                    Text(.locationExample)
-                        .font(.bodyEmphasis)
-                        .foregroundStyle(Palette.textPrimary)
-                    Text(.locationDoseBadge)
-                        .font(.brand(.bold, size: 11, relativeTo: .caption2))
-                        .kerning(0.8)
-                        .foregroundStyle(Palette.amberDeep)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Palette.amber.opacity(0.15), in: .capsule)
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(Spacing.lg)
-            .background(.white, in: .rect(cornerRadius: Radius.xl, style: .continuous))
-        }
-        // The system prompt answers asynchronously: move on once it has.
-        .onChange(of: location.status) { _, new in
-            if waitingForAnswer, new != .notDetermined { onNext() }
-        }
-    }
-
-    private func allow() {
-        guard location.status == .notDetermined else { return onNext() }
-        waitingForAnswer = true
-        location.requestOrOpenSettings()
-    }
-}
-
 // MARK: - Notifications
 
 /// Explains reminders, then "Continue" shows the system prompt: declining

@@ -3,13 +3,13 @@ import HydraviaData
 import SwiftUI
 
 /// The ordered first-run flow:
-/// welcome → weight → schedule → interval → location → Screen Time →
+/// welcome → weight → schedule → interval → Screen Time →
 /// notifications (→ recovery, after a decline) → goal reveal → paywall. Permission steps never offer a way
 /// to skip their system prompt: declining happens in the prompt itself. Every
 /// answer is saved as soon as it's given.
 struct OnboardingFlowView: View {
     enum Step: Hashable {
-        case weight, schedule, interval, location, screenTime, notifications, notificationsRecover, goalReveal, paywall
+        case weight, schedule, interval, screenTime, notifications, notificationsRecover, goalReveal, paywall
 
         /// Position in the progress bar (the goal reveal has no bar).
         var progressIndex: Int? {
@@ -17,14 +17,13 @@ struct OnboardingFlowView: View {
             case .weight: 1
             case .schedule: 2
             case .interval: 3
-            case .location: 4
-            case .screenTime: 5
-            case .notifications, .notificationsRecover: 6
+            case .screenTime: 4
+            case .notifications, .notificationsRecover: 5
             case .goalReveal, .paywall: nil
             }
         }
 
-        static let progressCount = 6
+        static let progressCount = 5
     }
 
     @State private var path: [Step] = []
@@ -49,9 +48,7 @@ struct OnboardingFlowView: View {
         case .schedule:
             ScheduleStep { path.append(.interval) }
         case .interval:
-            IntervalStep { path.append(.location) }
-        case .location:
-            LocationStep { path.append(.screenTime) }
+            IntervalStep { path.append(.screenTime) }
         case .screenTime:
             ScreenTimeStep { path.append(.notifications) }
         case .notifications:
