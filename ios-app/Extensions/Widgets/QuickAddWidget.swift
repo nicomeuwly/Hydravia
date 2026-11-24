@@ -101,7 +101,7 @@ struct QuickAddWidgetView: View {
                 ForEach(amounts, id: \.self) { ml in
                     Button(intent: AddWaterIntent(amountMl: ml)) {
                         Label {
-                            Text(.widgetAdd(ml.formatted()))
+                            Text(.widgetAdd(entry.amountText(ml)))
                         } icon: {
                             Image(systemName: "drop.fill")
                         }

@@ -41,6 +41,7 @@ nonisolated enum Blocker {
         static let hasPro = "blocker.hasPro.v1"
         static let notificationsUsable = "blocker.notificationsUsable.v1"
         static let trialUntil = "blocker.trialUntil.v1"
+        static let imperialUnits = "blocker.imperialUnits.v1"
         /// Also written by the quick-add widget (which doesn't compile this
         /// file): keep the two in step.
         static let goalReachedOn = "blocker.goalReachedOn.v1"
@@ -133,6 +134,23 @@ nonisolated enum Blocker {
     static var notificationsUsable: Bool {
         get { defaults?.object(forKey: Key.notificationsUsable) as? Bool ?? true }
         set { defaults?.set(newValue, forKey: Key.notificationsUsable) }
+    }
+
+    /// The app's resolved units, mirrored for the shield's copy (the
+    /// extensions here don't link HydraviaCore). False until the app says.
+    static var imperialUnits: Bool {
+        get { defaults?.bool(forKey: Key.imperialUnits) ?? false }
+        set { defaults?.set(newValue, forKey: Key.imperialUnits) }
+    }
+
+    /// "350 ml", or "12 oz" in imperial: the same rounding as HydraviaCore's
+    /// `UnitSystem` (US fluid ounces, a tenth under 10 oz). Keep the two in
+    /// step.
+    static func amount(ml: Int, imperial: Bool = imperialUnits) -> String {
+        guard imperial else { return "\(ml.formatted()) ml" }
+        let oz = Double(ml) / 29.5735
+        let shown = abs(oz) < 9.95 ? (oz * 10).rounded() / 10 : oz.rounded()
+        return "\(shown.formatted(.number.precision(.fractionLength(0...1)))) oz"
     }
 
     /// The end of the running "Try the lock now", if any.

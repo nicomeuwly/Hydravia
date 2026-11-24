@@ -1,3 +1,4 @@
+import HydraviaCore
 import HydraviaData
 import SwiftUI
 
@@ -37,7 +38,8 @@ struct TodayView: View {
             ProgressRing(
                 progress: model.local.progress(at: now),
                 consumedMl: model.local.todayMl(at: now),
-                goalMl: model.local.state.goalMl
+                goalMl: model.local.state.goalMl,
+                units: model.local.state.unitSystem
             )
             .frame(maxHeight: .infinity)
             StatusLine(local: model.local, now: now)
@@ -51,14 +53,15 @@ struct TodayView: View {
         ScrollView {
             VStack(spacing: 8) {
                 // The count stays in sight while pouring.
-                Text(.watchTotal(model.local.todayMl(at: now).formatted(), model.local.state.goalMl.formatted()))
+                Text(.watchTotal(model.local.state.unitSystem.volumeNumber(ml: model.local.todayMl(at: now)),
+                                 model.local.state.unitSystem.volume(ml: model.local.state.goalMl)))
                     .font(.brand(.bold, size: 17, relativeTo: .headline))
                     .monospacedDigit()
                     .contentTransition(.numericText(value: Double(model.local.todayMl(at: now))))
                     .animation(.snappy, value: model.local.todayMl(at: now))
                     .frame(maxWidth: .infinity)
                 if model.hasPro {
-                    PourButtons(amounts: model.favoritesMl) { model.pour($0) }
+                    PourButtons(amounts: model.favoritesMl, units: model.local.state.unitSystem) { model.pour($0) }
                 } else {
                     Note(icon: "lock.fill", title: Text(.watchProTitle), detail: Text(.watchProBody))
                 }
@@ -74,6 +77,7 @@ private struct ProgressRing: View {
     let progress: Double
     let consumedMl: Int
     let goalMl: Int
+    let units: UnitSystem
 
     private var reached: Bool { consumedMl >= goalMl }
 
@@ -89,7 +93,7 @@ private struct ProgressRing: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(.watchProgressLabel(consumedMl.formatted(), goalMl.formatted())))
+        .accessibilityLabel(Text(.watchProgressLabel(units.volume(ml: consumedMl), units.volume(ml: goalMl))))
     }
 
     private func ring(side: CGFloat) -> some View {
@@ -110,14 +114,14 @@ private struct ProgressRing: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(WatchPalette.foam)
                     .contentTransition(.symbolEffect(.replace))
-                Text(consumedMl.formatted())
+                Text(units.volumeNumber(ml: consumedMl))
                     .font(.brand(.bold, size: 30, relativeTo: .title))
                     .monospacedDigit()
-                    .contentTransition(.numericText(value: Double(consumedMl)))
+                    .contentTransition(.numericText(value: units.displayVolume(ml: consumedMl)))
                     .animation(.snappy, value: consumedMl)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
-                Text(.watchOfGoal(goalMl.formatted()))
+                Text(.watchOfGoal(units.volume(ml: goalMl)))
                     .font(.brand(.semiBold, size: 13, relativeTo: .caption))
                     .foregroundStyle(.secondary)
                     .minimumScaleFactor(0.7)
@@ -160,6 +164,7 @@ private struct StatusLine: View {
 /// The favourite amounts, one tap each.
 private struct PourButtons: View {
     let amounts: [Int]
+    let units: UnitSystem
     let pour: (Int) -> Void
 
     var body: some View {
@@ -167,7 +172,7 @@ private struct PourButtons: View {
             ForEach(amounts, id: \.self) { ml in
                 Button { pour(ml) } label: {
                     Label {
-                        Text(.watchAdd(ml.formatted()))
+                        Text(.watchAdd(units.volume(ml: ml)))
                     } icon: {
                         Image(systemName: "drop.fill")
                     }

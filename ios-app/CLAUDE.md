@@ -81,6 +81,14 @@ node Scripts/generate-strings.mjs
   Settings › "Try the lock now" (`LockTrial`, `Blocker.trialUntil`) shields
   for a minute at any hour; the ritual or the monitor's `hydravia.trial`
   interval ends it.
+- Units: storage is always metric (ml, kg, °C). `UnitSystem` (HydraviaCore)
+  converts and formats for display and input (US fl oz, lb, °F);
+  `UserSettings.unitPreference` (Automatic follows the region's measurement
+  system: only `.us` is imperial). The resolved system travels in
+  `WidgetState.unitSystem` (widgets, watch, complications) and
+  `Blocker.imperialUnits` (shield copy, formatted by `Blocker.amount`).
+  Never append a hardcoded "ml" to an amount: catalog values take the
+  formatted amount as a placeholder.
 - `Entitlements/` — App Group for every target, Family Controls for the app
   and the Screen Time extensions, Time Sensitive Notifications for the app
   and `ShieldAction` (its "Drink now" notification).

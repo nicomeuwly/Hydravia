@@ -103,7 +103,8 @@ struct HomeView: View {
 
             Spacer()
 
-            StatsCard(consumedMl: hydration.todayTotalMl, goalMl: settings.dailyGoalMl, celebrations: celebrations)
+            StatsCard(consumedMl: hydration.todayTotalMl, goalMl: settings.dailyGoalMl, units: settings.unitSystem,
+                      celebrations: celebrations)
 
             Spacer()
 
@@ -228,6 +229,7 @@ private struct StreakPill: View {
 private struct StatsCard: View {
     let consumedMl: Int
     let goalMl: Int
+    let units: UnitSystem
     /// Bumped when the goal is reached: the card swells proudly, then settles.
     let celebrations: Int
 
@@ -236,17 +238,17 @@ private struct StatsCard: View {
     var body: some View {
         VStack(spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(consumedMl, format: .number)
+                Text(verbatim: units.volumeNumber(ml: consumedMl))
                     .font(.displayNumber)
                     .kerning(-1.5)
                     .foregroundStyle(Palette.primaryDark)
-                    .contentTransition(.numericText(value: Double(consumedMl)))
-                Text("/ \(goalMl.formatted()) \(String(localized: .commonMl))")
+                    .contentTransition(.numericText(value: units.displayVolume(ml: consumedMl)))
+                Text(verbatim: "/ \(units.volume(ml: goalMl))")
                     .font(.brand(.medium, size: 18, relativeTo: .headline))
                     .foregroundStyle(Palette.textSecondary)
             }
-            Text(over > 0 ? String(localized: .homeOver(over.formatted()))
-                          : String(localized: .homeRemaining((-over).formatted())))
+            Text(over > 0 ? String(localized: .homeOver(units.volume(ml: over)))
+                          : String(localized: .homeRemaining(units.volume(ml: -over))))
                 .font(.brand(.semiBold, size: 13.5, relativeTo: .subheadline))
                 .foregroundStyle(over > 0 ? Palette.primaryDark : Palette.textSecondary)
                 .contentTransition(.numericText())

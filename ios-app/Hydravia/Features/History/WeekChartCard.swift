@@ -10,6 +10,7 @@ struct WeekChartCard: View {
     let totals: [DayTotal]
     let goalMl: Int
     let today: LocalDay
+    let units: UnitSystem
 
     /// The week on screen, by its first day. `nil` until the pager settles
     /// on the current week.
@@ -47,7 +48,7 @@ struct WeekChartCard: View {
         let byDay = Dictionary(totals.map { ($0.day, $0.totalMl) }, uniquingKeysWith: +)
         let days = WeekChart.days(from: shown, byDay: byDay, calendar: calendar)
         let drunk = days.filter { $0.totalMl > 0 }
-        let averageLiters = drunk.isEmpty ? 0 : Double(drunk.map(\.totalMl).reduce(0, +)) / Double(drunk.count) / 1000
+        let averageMl = drunk.isEmpty ? 0 : drunk.map(\.totalMl).reduce(0, +) / drunk.count
 
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .center, spacing: Spacing.sm) {
@@ -56,7 +57,7 @@ struct WeekChartCard: View {
                         .font(.brand(.bold, size: 15, relativeTo: .headline))
                         .foregroundStyle(Palette.textPrimary)
                         .contentTransition(.opacity)
-                    Text(.historyAverage(averageLiters.formatted(.number.precision(.fractionLength(1)))))
+                    Text(.historyAverage(units.dailyVolume(ml: averageMl)))
                         .font(.brand(.regular, size: 13.5, relativeTo: .subheadline))
                         .foregroundStyle(Palette.textSecondary)
                         .contentTransition(.numericText())
@@ -84,6 +85,7 @@ struct WeekChartCard: View {
                             title: title(for: start, current: current),
                             goalMl: goalMl,
                             today: today,
+                            units: units,
                             grown: grown
                         )
                         .padding(.horizontal, Spacing.xl)
@@ -164,6 +166,7 @@ private struct WeekChart: View {
     let title: String
     let goalMl: Int
     let today: LocalDay
+    let units: UnitSystem
     let grown: Bool
 
     static func days(from start: LocalDay, byDay: [LocalDay: Int], calendar: Calendar) -> [Day] {
@@ -174,9 +177,7 @@ private struct WeekChart: View {
         }
     }
 
-    static func amount(_ ml: Int) -> String {
-        "\(ml.formatted()) \(String(localized: .commonMl))"
-    }
+    private func amount(_ ml: Int) -> String { units.volume(ml: ml) }
 
     /// Top of the chart: room above the goal line for over-achieving days.
     private var ceiling: Double { Double(goalMl) * 1.4 }
@@ -193,8 +194,8 @@ private struct WeekChart: View {
                 // The empty rail every day sits in, even future ones.
                 BarMark(
                     x: .value(String(localized: .chartDay), day.date, unit: .day),
-                    yStart: .value(String(localized: .commonMl), 0),
-                    yEnd: .value(String(localized: .commonMl), ceiling),
+                    yStart: .value(units.volumeSymbol, 0),
+                    yEnd: .value(units.volumeSymbol, ceiling),
                     width: .fixed(18)
                 )
                 .clipShape(.capsule)
@@ -203,19 +204,19 @@ private struct WeekChart: View {
                 // skipping it; days to come and filled days stay silent.
                 .accessibilityHidden(day.totalMl > 0 || day.day > today)
                 .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
-                .accessibilityValue(Self.amount(0))
+                .accessibilityValue(amount(0))
 
                 if day.totalMl > 0 {
                     BarMark(
                         x: .value(String(localized: .chartDay), day.date, unit: .day),
-                        yStart: .value(String(localized: .commonMl), 0),
-                        yEnd: .value(String(localized: .commonMl), grown ? barHeight(day.totalMl) : 0),
+                        yStart: .value(units.volumeSymbol, 0),
+                        yEnd: .value(units.volumeSymbol, grown ? barHeight(day.totalMl) : 0),
                         width: .fixed(18)
                     )
                     .clipShape(.capsule)
                     .foregroundStyle(day.day == today ? Palette.primaryDark : Palette.secondaryBlue)
                     .accessibilityLabel(Text(day.date, format: .dateTime.weekday(.wide)))
-                    .accessibilityValue(Self.amount(day.totalMl))
+                    .accessibilityValue(amount(day.totalMl))
                 }
             }
 
@@ -223,7 +224,7 @@ private struct WeekChart: View {
                 .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
                 .foregroundStyle(Palette.amber.opacity(0.8))
                 .accessibilityLabel(Text(.settingsDailyGoal))
-                .accessibilityValue(Self.amount(goalMl))
+                .accessibilityValue(amount(goalMl))
                 .annotation(position: .top, alignment: .trailing) {
                     Image(systemName: "flag.fill")
                         .font(.system(size: 9))
@@ -247,11 +248,11 @@ private struct WeekChart: View {
         // Audio Graphs: VoiceOver can play the week as tones.
         .accessibilityChartDescriptor(WeekChartDescriptor(
             title: title,
-            unit: String(localized: .commonMl),
+            unit: units.volumeSymbol,
             days: days.filter { $0.day <= today }.map {
-                ($0.date.formatted(.dateTime.weekday(.wide)), $0.totalMl)
+                ($0.date.formatted(.dateTime.weekday(.wide)), units.displayVolume(ml: $0.totalMl))
             },
-            goalMl: goalMl
+            goal: units.displayVolume(ml: goalMl)
         ))
     }
 }
@@ -261,19 +262,20 @@ private struct WeekChart: View {
 private nonisolated struct WeekChartDescriptor: AXChartDescriptorRepresentable {
     let title: String
     let unit: String
-    let days: [(name: String, ml: Int)]
-    let goalMl: Int
+    /// In the user's units (millilitres or fluid ounces), like `goal`.
+    let days: [(name: String, amount: Double)]
+    let goal: Double
 
     func makeChartDescriptor() -> AXChartDescriptor {
         let unit = unit
-        let top = Double(max(goalMl, days.map(\.ml).max() ?? 0, 1))
+        let top = max(goal, days.map(\.amount).max() ?? 0, 1)
         let xAxis = AXCategoricalDataAxisDescriptor(title: title, categoryOrder: days.map(\.name))
         let yAxis = AXNumericDataAxisDescriptor(
-            title: unit, range: 0...top, gridlinePositions: [Double(goalMl)]
-        ) { "\(Int($0).formatted()) \(unit)" }
+            title: unit, range: 0...top, gridlinePositions: [goal]
+        ) { "\($0.formatted(.number.precision(.fractionLength(0...1)))) \(unit)" }
         let series = AXDataSeriesDescriptor(
             name: title, isContinuous: false,
-            dataPoints: days.map { AXDataPoint(x: $0.name, y: Double($0.ml)) }
+            dataPoints: days.map { AXDataPoint(x: $0.name, y: $0.amount) }
         )
         return AXChartDescriptor(title: title, summary: nil, xAxis: xAxis, yAxis: yAxis,
                                  additionalAxes: [], series: [series])

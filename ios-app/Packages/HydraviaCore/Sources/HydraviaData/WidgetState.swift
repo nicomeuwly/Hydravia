@@ -17,9 +17,12 @@ public struct WidgetState: Codable, Equatable, Sendable {
     /// When the subscription last seen by the app runs out (plus a renewal
     /// margin). Nil with Pro: no known end (a dev build).
     public var proUntil: Date?
+    /// The app's resolved units, so widgets, the watch and its
+    /// complications show amounts the way the app does.
+    public var unitSystem: UnitSystem
 
     public init(goalMl: Int, quickAddMl: Int, favoritesMl: [Int], window: ActiveWindow,
-                remindersOn: Bool, isPro: Bool, proUntil: Date?) {
+                remindersOn: Bool, isPro: Bool, proUntil: Date?, unitSystem: UnitSystem = .metric) {
         self.goalMl = goalMl
         self.quickAddMl = quickAddMl
         self.favoritesMl = favoritesMl
@@ -27,6 +30,24 @@ public struct WidgetState: Codable, Equatable, Sendable {
         self.remindersOn = remindersOn
         self.isPro = isPro
         self.proUntil = proUntil
+        self.unitSystem = unitSystem
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case goalMl, quickAddMl, favoritesMl, window, remindersOn, isPro, proUntil, unitSystem
+    }
+
+    // Shared by an older app (or watch) without units: metric, as before.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        goalMl = try container.decode(Int.self, forKey: .goalMl)
+        quickAddMl = try container.decode(Int.self, forKey: .quickAddMl)
+        favoritesMl = try container.decode([Int].self, forKey: .favoritesMl)
+        window = try container.decode(ActiveWindow.self, forKey: .window)
+        remindersOn = try container.decode(Bool.self, forKey: .remindersOn)
+        isPro = try container.decode(Bool.self, forKey: .isPro)
+        proUntil = try container.decodeIfPresent(Date.self, forKey: .proUntil)
+        unitSystem = (try? container.decodeIfPresent(UnitSystem.self, forKey: .unitSystem)) ?? .metric
     }
 
     /// Pro at `date`: a subscription that lapsed since the app last ran
@@ -37,15 +58,20 @@ public struct WidgetState: Codable, Equatable, Sendable {
 
     /// Before the app first shares anything (a widget added before the app
     /// was ever opened since the update): the defaults of a new user.
-    public static let placeholder = WidgetState(
-        goalMl: UserSettings.defaults.dailyGoalMl,
-        quickAddMl: 250,
-        favoritesMl: UserSettings.defaults.favoriteAmountsMl,
-        window: UserSettings.defaults.window,
-        remindersOn: false,
-        isPro: false,
-        proUntil: nil
-    )
+    public static let placeholder: WidgetState = {
+        let units = UserSettings.defaults.unitPreference.resolved(for: Locale.current.measurementSystem)
+        let favorites = UserSettings.defaults.favoriteAmountsMl(for: units)
+        return WidgetState(
+            goalMl: UserSettings.defaults.dailyGoalMl,
+            quickAddMl: favorites[favorites.count / 2],
+            favoritesMl: favorites,
+            window: UserSettings.defaults.window,
+            remindersOn: false,
+            isPro: false,
+            proUntil: nil,
+            unitSystem: units
+        )
+    }()
 
     private static let key = "widget.state.v1"
 

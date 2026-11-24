@@ -83,7 +83,7 @@ struct WeightStep: View {
                         .kerning(1.2)
                         .foregroundStyle(Palette.textSecondary)
                     Spacer()
-                    Text("\(settings.dailyGoalMl.formatted()) \(String(localized: .commonMl))")
+                    Text(verbatim: settings.unitSystem.volume(ml: settings.dailyGoalMl))
                         .font(.cardTitle)
                         .foregroundStyle(Palette.primaryDark)
                         .contentTransition(.numericText(value: Double(settings.dailyGoalMl)))
@@ -317,11 +317,11 @@ struct GoalRevealStep: View {
                         .kerning(1.2)
                         .foregroundStyle(Palette.textSecondary)
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(shownGoal, format: .number)
+                        Text(verbatim: settings.unitSystem.volumeNumber(ml: shownGoal))
                             .font(.displayNumber)
                             .foregroundStyle(Palette.primaryDark)
                             .contentTransition(.numericText(value: Double(shownGoal)))
-                        Text(.commonMl)
+                        Text(verbatim: settings.unitSystem.volumeSymbol)
                             .font(.brand(.medium, size: 18, relativeTo: .headline))
                             .foregroundStyle(Palette.textSecondary)
                     }
@@ -331,7 +331,7 @@ struct GoalRevealStep: View {
                 .glassCard(radius: Radius.xl, legibility: 0.85)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(.goalRevealGoalLabel))
-                .accessibilityValue("\(settings.dailyGoalMl.formatted()) \(String(localized: .commonMl))")
+                .accessibilityValue(Text(verbatim: settings.unitSystem.volume(ml: settings.dailyGoalMl)))
             }
             .frame(maxWidth: .infinity)
             .frame(height: 280)

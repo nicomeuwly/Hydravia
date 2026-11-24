@@ -86,4 +86,41 @@ struct SettingsStoreTests {
         SettingsStore(defaults: defaults).settings.favoriteAmountsMl = [150, 250, 750]
         #expect(SettingsStore(defaults: defaults).settings.favoriteAmountsMl == [150, 250, 750])
     }
+
+    @Test func unitsFollowTheRegionUntilChosen() {
+        let defaults = freshDefaults()
+        let us = SettingsStore(defaults: defaults, locale: Locale(identifier: "en_US"))
+        #expect(us.settings.unitPreference == .automatic)
+        #expect(us.unitSystem == .imperial)
+        #expect(SettingsStore(defaults: freshDefaults(), locale: Locale(identifier: "fr_CH")).unitSystem == .metric)
+        us.settings.unitPreference = .metric
+        #expect(us.unitSystem == .metric)
+        #expect(SettingsStore(defaults: defaults, locale: Locale(identifier: "en_US")).settings.unitPreference == .metric)
+    }
+
+    @Test func untouchedPresetsBecomeWholeOunces() {
+        let store = SettingsStore(defaults: freshDefaults(), locale: Locale(identifier: "en_US"))
+        #expect(store.favoriteAmountsMl == [237, 355, 473])
+        #expect(store.settings.favoriteAmountsMl == UserSettings.defaultFavoriteAmountsMl)
+        store.settings.favoriteAmountsMl = [266, 355, 473]
+        #expect(store.favoriteAmountsMl == [266, 355, 473])
+        store.settings.unitPreference = .metric
+        #expect(store.favoriteAmountsMl == [266, 355, 473])
+    }
+
+    @Test func ounceAmountsStayOffTheTenMillilitreGrid() {
+        let store = SettingsStore(defaults: freshDefaults())
+        store.settings.favoriteAmountsMl = [237, 355, 473]
+        #expect(store.settings.favoriteAmountsMl == [237, 355, 473])
+        store.settings.favoriteAmountsMl = [238, 356, 474]
+        #expect(store.settings.favoriteAmountsMl == [240, 360, 470])
+    }
+
+    @Test func anUnknownUnitFallsBackToAutomatic() {
+        let defaults = freshDefaults()
+        defaults.set(Data(#"{"weightKg": 80, "unitPreference": "nautical"}"#.utf8), forKey: SettingsStore.storageKey)
+        let store = SettingsStore(defaults: defaults)
+        #expect(store.settings.weightKg == 80)
+        #expect(store.settings.unitPreference == .automatic)
+    }
 }

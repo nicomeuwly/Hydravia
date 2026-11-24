@@ -16,6 +16,14 @@ struct HydrationEntry: TimelineEntry {
     var isGoalReached: Bool { consumedMl >= goalMl }
     var hasPro: Bool { state.hasPro(at: date) }
 
+    // In the app's units (ml or oz): the widget views don't import
+    // HydraviaCore.
+    /// Today's count, the number alone ("1,250", "42").
+    var consumedText: String { state.unitSystem.volumeNumber(ml: consumedMl) }
+    /// The goal with its unit ("2,300 ml", "78 oz").
+    var goalText: String { state.unitSystem.volume(ml: goalMl) }
+    func amountText(_ ml: Int) -> String { state.unitSystem.volume(ml: ml) }
+
     static let preview = HydrationEntry(
         date: .now, consumedMl: 1250,
         state: WidgetState(goalMl: 2300, quickAddMl: 330, favoritesMl: [200, 330, 500],

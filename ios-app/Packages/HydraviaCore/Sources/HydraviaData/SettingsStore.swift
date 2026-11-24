@@ -12,8 +12,10 @@ public struct UserSettings: Codable, Equatable, Sendable {
     public var onboardingDone: Bool
     /// The three amounts the add-water sheet offers, smallest first.
     public var favoriteAmountsMl: [Int]
+    /// Millilitres or fluid ounces on screen; storage stays metric.
+    public var unitPreference: UnitPreference
 
-    public static let defaultFavoriteAmountsMl = [200, 330, 500]
+    public static let defaultFavoriteAmountsMl = UnitSystem.metric.defaultFavoritesMl
     public static let favoriteCount = 3
     public static let favoriteRangeMl = 50...1000
     public static let favoriteStepMl = 10
@@ -27,7 +29,8 @@ public struct UserSettings: Codable, Equatable, Sendable {
         ),
         notificationsEnabled: false,
         onboardingDone: false,
-        favoriteAmountsMl: defaultFavoriteAmountsMl
+        favoriteAmountsMl: defaultFavoriteAmountsMl,
+        unitPreference: .automatic
     )
 
     public init(
@@ -35,13 +38,21 @@ public struct UserSettings: Codable, Equatable, Sendable {
         window: ActiveWindow,
         notificationsEnabled: Bool,
         onboardingDone: Bool,
-        favoriteAmountsMl: [Int] = UserSettings.defaultFavoriteAmountsMl
+        favoriteAmountsMl: [Int] = UserSettings.defaultFavoriteAmountsMl,
+        unitPreference: UnitPreference = .automatic
     ) {
         self.weightKg = weightKg
         self.window = window
         self.notificationsEnabled = notificationsEnabled
         self.onboardingDone = onboardingDone
         self.favoriteAmountsMl = favoriteAmountsMl
+        self.unitPreference = unitPreference
+    }
+
+    /// The presets as the screens offer them: untouched metric defaults
+    /// become 8 / 12 / 16 oz for imperial, rather than 6.8 / 11 / 17 oz.
+    public func favoriteAmountsMl(for system: UnitSystem) -> [Int] {
+        favoriteAmountsMl == Self.defaultFavoriteAmountsMl ? system.defaultFavoritesMl : favoriteAmountsMl
     }
 
     public var dailyGoalMl: Int { HydrationGoal.dailyMl(weightKg: weightKg) }
@@ -58,7 +69,8 @@ public struct UserSettings: Codable, Equatable, Sendable {
         return copy
     }
 
-    /// Exactly three amounts, each within range on the 10 ml grid, smallest
+    /// Exactly three amounts, each within range on the 10 ml grid (or on a
+    /// whole fluid ounce, as the imperial stepper sets them), smallest
     /// first. Missing ones come from the defaults.
     static func sanitizedFavorites(_ amounts: [Int]) -> [Int] {
         var list = Array(amounts.prefix(favoriteCount))
@@ -67,14 +79,18 @@ public struct UserSettings: Codable, Equatable, Sendable {
         }
         let range = favoriteRangeMl, step = favoriteStepMl
         return list
-            .map { min(max(($0 + step / 2) / step * step, range.lowerBound), range.upperBound) }
+            .map { amount in
+                let ounce = UnitSystem.ml(fromFluidOunces: UnitSystem.fluidOunces(fromMl: Double(amount)).rounded())
+                let snapped = ounce == amount ? amount : (amount + step / 2) / step * step
+                return min(max(snapped, range.lowerBound), range.upperBound)
+            }
             .sorted()
     }
 
     // Every field falls back to its default when absent, so adding a setting
     // in a later version never wipes the ones a user already chose.
     private enum CodingKeys: String, CodingKey {
-        case weightKg, window, notificationsEnabled, onboardingDone, favoriteAmountsMl
+        case weightKg, window, notificationsEnabled, onboardingDone, favoriteAmountsMl, unitPreference
     }
 
     public init(from decoder: any Decoder) throws {
@@ -87,6 +103,9 @@ public struct UserSettings: Codable, Equatable, Sendable {
         onboardingDone = try container.decodeIfPresent(Bool.self, forKey: .onboardingDone) ?? fallback.onboardingDone
         favoriteAmountsMl = try container.decodeIfPresent([Int].self, forKey: .favoriteAmountsMl)
             ?? fallback.favoriteAmountsMl
+        // An unknown raw value (a later version's option) falls back too.
+        unitPreference = (try? container.decodeIfPresent(UnitPreference.self, forKey: .unitPreference))
+            ?? fallback.unitPreference
     }
 }
 
@@ -110,13 +129,16 @@ public final class SettingsStore {
     }
 
     @ObservationIgnored private let defaults: UserDefaults
+    /// Where "Automatic" units come from: the region's measurement system.
+    @ObservationIgnored private let locale: Locale
     @ObservationIgnored private let logger = Logger(subsystem: "com.nicomeuwly.hydravia", category: "Settings")
     static let storageKey = "userSettings.v1"
 
     /// `.standard` on purpose: no extension reads these settings. If one ever
     /// must, switch to the App Group suite and copy the value over once.
-    public init(defaults: UserDefaults = .standard) {
+    public init(defaults: UserDefaults = .standard, locale: Locale = .autoupdatingCurrent) {
         self.defaults = defaults
+        self.locale = locale
         var loaded = UserSettings.defaults
         if let data = defaults.data(forKey: Self.storageKey) {
             do {
@@ -130,6 +152,13 @@ public final class SettingsStore {
     }
 
     public var dailyGoalMl: Int { settings.dailyGoalMl }
+
+    /// The units every screen formats with, the preference resolved
+    /// against the region.
+    public var unitSystem: UnitSystem { settings.unitPreference.resolved(for: locale.measurementSystem) }
+
+    /// The add-water presets in the current units.
+    public var favoriteAmountsMl: [Int] { settings.favoriteAmountsMl(for: unitSystem) }
 
     private func persist() {
         do {

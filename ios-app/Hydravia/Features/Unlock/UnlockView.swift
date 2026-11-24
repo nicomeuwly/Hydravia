@@ -156,7 +156,7 @@ struct UnlockView: View {
 
             if let temperature {
                 Label {
-                    Text(.unlockTemperature(Int(temperature.rounded())))
+                    Text(.unlockTemperature(settings.unitSystem.temperature(celsius: temperature)))
                 } icon: {
                     Image(systemName: "sun.max.fill")
                 }
@@ -184,12 +184,12 @@ struct UnlockView: View {
                 .foregroundStyle(.white.opacity(0.75))
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(shownDose, format: .number)
+                Text(verbatim: settings.unitSystem.volumeNumber(ml: shownDose))
                     .font(.brand(.bold, size: 96, relativeTo: .largeTitle))
                     .kerning(-4)
                     .foregroundStyle(.white)
                     .contentTransition(.numericText(value: Double(shownDose)))
-                Text(.commonMl)
+                Text(verbatim: settings.unitSystem.volumeSymbol)
                     .font(.brand(.regular, size: 30, relativeTo: .title))
                     .foregroundStyle(.white.opacity(0.78))
             }
@@ -198,7 +198,7 @@ struct UnlockView: View {
             .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             // The final dose, not the count-up frame VoiceOver happens to catch.
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("\(dose.formatted()) \(String(localized: .commonMl))"))
+            .accessibilityLabel(Text(verbatim: settings.unitSystem.volume(ml: dose)))
             .accessibilityFocused($stageFocused)
 
             if saveFailures > 0 {
@@ -245,7 +245,7 @@ struct UnlockView: View {
                 .symbolEffect(.bounce, value: checkBounce)
                 .accessibilityHidden(true)
 
-            Text("+\(dose.formatted()) \(String(localized: .commonMl))")
+            Text(verbatim: "+\(settings.unitSystem.volume(ml: dose))")
                 .font(.brand(.bold, size: 44, relativeTo: .largeTitle))
                 .kerning(-1.5)
                 .foregroundStyle(.white)

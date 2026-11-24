@@ -23,6 +23,17 @@ struct WidgetStateTests {
         #expect(WidgetState.load(from: defaults) == state)
     }
 
+    @Test func stateFromAnOlderAppIsMetric() throws {
+        var legacy = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(state)) as? [String: Any])
+        legacy["unitSystem"] = nil
+        let decoded = try JSONDecoder().decode(WidgetState.self, from: JSONSerialization.data(withJSONObject: legacy))
+        #expect(decoded.unitSystem == .metric)
+        var imperial = state
+        imperial.unitSystem = .imperial
+        let roundTrip = try JSONDecoder().decode(WidgetState.self, from: JSONEncoder().encode(imperial))
+        #expect(roundTrip.unitSystem == .imperial)
+    }
+
     @Test func proEndsWithTheSubscriptionEvenIfTheAppDidntRun() {
         #expect(state.hasPro(at: Date(timeIntervalSince1970: 999)))
         #expect(!state.hasPro(at: Date(timeIntervalSince1970: 1_000)))

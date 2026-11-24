@@ -79,13 +79,13 @@ struct AmountLabel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(entry.consumedMl.formatted())
+            Text(entry.consumedText)
                 .font(.brand(.bold, size: size, relativeTo: .title))
                 .foregroundStyle(tint)
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
                 .contentTransition(.numericText(value: Double(entry.consumedMl)))
-            Text(.widgetOfGoal(entry.goalMl.formatted()))
+            Text(.widgetOfGoal(entry.goalText))
                 .font(.brand(.semiBold, size: 13, relativeTo: .caption))
                 .foregroundStyle(secondary)
                 .lineLimit(1)

@@ -30,9 +30,11 @@ struct Entry: TimelineEntry {
     let progress: Double
     let nextReminder: Date?
     let goalReached: Bool
+    let units: UnitSystem
 
     init(date: Date, local: WatchLocalState) {
         self.date = date
+        units = local.state.unitSystem
         consumedMl = local.todayMl(at: date)
         goalMl = local.state.goalMl
         progress = local.progress(at: date)
@@ -90,13 +92,13 @@ struct ComplicationView: View {
                     Gauge(value: fill) {
                         Text(verbatim: "")
                     } currentValueLabel: {
-                        Text(entry.consumedMl.formatted())
+                        Text(entry.units.volumeNumber(ml: entry.consumedMl))
                     }
                     .tint(Self.tint)
                 }
         case .accessoryInline:
             Label {
-                Text(.complicationInline(entry.consumedMl.formatted(), entry.goalMl.formatted()))
+                Text(.complicationInline(entry.units.volumeNumber(ml: entry.consumedMl), entry.units.volume(ml: entry.goalMl)))
             } icon: {
                 Image(systemName: "drop.fill")
             }
@@ -105,7 +107,7 @@ struct ComplicationView: View {
                 Label { Text(verbatim: "Hydravia") } icon: { Image(systemName: "drop.fill") }
                     .font(.headline)
                     .widgetAccentable()
-                Text(.complicationInline(entry.consumedMl.formatted(), entry.goalMl.formatted()))
+                Text(.complicationInline(entry.units.volumeNumber(ml: entry.consumedMl), entry.units.volume(ml: entry.goalMl)))
                     .font(.body.weight(.semibold))
                     .monospacedDigit()
                 Gauge(value: fill) { EmptyView() }

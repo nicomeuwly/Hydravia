@@ -9,6 +9,7 @@ import SwiftUI
 /// tedious.
 struct EntryLogSheet: View {
     @Environment(HydrationStore.self) private var hydration
+    @Environment(SettingsStore.self) private var settings
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -126,7 +127,7 @@ struct EntryLogSheet: View {
                 .font(.brand(.bold, size: 15, relativeTo: .headline))
                 .foregroundStyle(Palette.textPrimary)
             Spacer()
-            Text(Self.amount(group.totalMl))
+            Text(verbatim: settings.unitSystem.volume(ml: group.totalMl))
                 .font(.brand(.semiBold, size: 14, relativeTo: .subheadline))
                 .foregroundStyle(Palette.textSecondary)
                 .monospacedDigit()
@@ -168,10 +169,6 @@ struct EntryLogSheet: View {
         let sameYear = Calendar.autoupdatingCurrent.isDate(group.date, equalTo: .now, toGranularity: .year)
         let style = Date.FormatStyle.dateTime.weekday(.wide).day().month(.wide)
         return (sameYear ? group.date.formatted(style) : group.date.formatted(style.year())).capitalizedFirst
-    }
-
-    static func amount(_ ml: Int) -> String {
-        "\(ml.formatted()) \(String(localized: .commonMl))"
     }
 
     // MARK: - Delete and undo
@@ -240,6 +237,7 @@ struct EntryLogSheet: View {
 /// One entry: time, amount, and where it came from.
 private struct EntryRow: View {
     let item: EntryLogSheet.Item
+    @Environment(SettingsStore.self) private var settings
 
     var body: some View {
         let isRitual = item.source == .unlock
@@ -251,7 +249,7 @@ private struct EntryRow: View {
                 .background(Palette.backgroundElement, in: .circle)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(EntryLogSheet.amount(item.amountMl))
+                Text(verbatim: settings.unitSystem.volume(ml: item.amountMl))
                     .font(.bodyEmphasis)
                     .foregroundStyle(Palette.textPrimary)
                 Text(isRitual ? .entriesSourceUnlock : .entriesSourceManual)
