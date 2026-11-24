@@ -1,6 +1,7 @@
 import Combine
 import FamilyControls
 import HydraviaCore
+import ManagedSettings
 import Observation
 import OSLog
 
@@ -50,17 +51,81 @@ final class BlockerService {
     /// Hydravia Pro (or a dev build), as last handed over by `RootView`.
     private(set) var isPro = false
 
-    /// Whether the plan covers `selection`: one app on the free plan,
-    /// anything with Pro.
+    /// Whether the plan covers all of `selection`: one app on the free plan,
+    /// anything with Pro. The picker only saves such a pick.
     func covers(_ selection: FamilyActivitySelection) -> Bool {
         isPro || Blocker.isWithinFreeLimit(selection)
     }
 
-    /// The saved selection is past the free limit (picked during a trial, or
-    /// before onboarding's paywall): the lock waits for the user to pick the
-    /// one app the free plan locks, or for Pro.
+    /// What the lock shields of the saved pick on the current plan.
+    var coverage: LockCoverage { selectionSize.coverage(isPro: isPro) }
+
+    /// The saved selection is past the free limit with no single app in it
+    /// (categories or websites only): nothing the free plan can lock, so
+    /// the lock waits for the user to pick one app, or for Pro.
     var needsAppChoice: Bool {
-        authorization == .granted && selectionCount > 0 && !covers(selection)
+        authorization == .granted && selectionCount > 0 && coverage == .none
+    }
+
+    /// Several apps picked on the free plan: only this one is locked (the
+    /// first, in a stable order). Nil when the whole pick is locked.
+    var freePlanLockedApp: ApplicationToken? {
+        guard authorization == .granted, coverage == .firstApp else { return nil }
+        return Blocker.shieldedTokens(of: selection, isPro: false).applications.first
+    }
+
+    /// iOS lets Hydravia show notifications (as last checked by `RootView`).
+    /// The lock only engages with them: every reminder and the shield's
+    /// "Drink now" go through one.
+    private(set) var notificationsUsable = Blocker.notificationsUsable
+
+    // MARK: Try the lock now
+
+    /// The end of the running test, if any.
+    private(set) var trialUntil: Date?
+    @ObservationIgnored private var trialTimer: Task<Void, Never>?
+
+    var trialAvailability: LockTrial.Availability {
+        LockTrial.availability(screenTimeGranted: authorization == .granted, selection: selectionSize, isPro: isPro)
+    }
+
+    /// Shields the picked apps for a minute, now, whatever the hour: the
+    /// whole chain (shield → "Drink now" → ritual → unlock) without waiting
+    /// for a reminder. The ritual ends it early.
+    func startTrial(now: Date = .now) {
+        guard trialAvailability == .available else { return }
+        let until = LockTrial.end(startingAt: now)
+        do {
+            try Blocker.startTrial(until: until)
+        } catch {
+            // The shield is up anyway; only the monitor's fallback is missing,
+            // and the timer below and every return to the app cover it.
+            logger.error("Could not schedule the end of the test: \(error.localizedDescription, privacy: .public)")
+        }
+        trialUntil = until
+        trialTimer?.cancel()
+        trialTimer = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(max(0, until.timeIntervalSinceNow) + 0.5))
+            guard !Task.isCancelled else { return }
+            self?.endTrialIfOver()
+        }
+    }
+
+    func endTrial() {
+        trialTimer?.cancel()
+        trialTimer = nil
+        trialUntil = nil
+        Blocker.endTrial()
+    }
+
+    /// The monitor or the clock may have ended the test while the app was
+    /// away: picks that up.
+    private func endTrialIfOver() {
+        if Blocker.isTrialActive() {
+            trialUntil = Blocker.trialUntil
+        } else if trialUntil != nil || Blocker.trialUntil != nil {
+            endTrial()
+        }
     }
 
     /// The last schedule handed over by `RootView`, re-applied when the
@@ -77,6 +142,7 @@ final class BlockerService {
         // simply not have loaded the status yet (see `readAuthorization`).
         authorization = status == .notDetermined && Blocker.isEnabled ? .granted : status
         selection = Blocker.selection
+        trialUntil = Blocker.isTrialActive() ? Blocker.trialUntil : nil
         // The real status arrives a moment after launch.
         statusUpdates = AuthorizationCenter.shared.$authorizationStatus
             .receive(on: DispatchQueue.main)
@@ -153,10 +219,19 @@ final class BlockerService {
     /// and only while the ritual is on.
     /// `force` re-registers the schedule even if nothing it depends on
     /// changed (a new time zone).
-    func sync(window: ActiveWindow, enabled: Bool, isPro: Bool, force: Bool = false) {
+    /// `notificationsUsable`: what iOS allows right now (nil keeps the last
+    /// known answer).
+    func sync(window: ActiveWindow, enabled: Bool, isPro: Bool, notificationsUsable: Bool? = nil,
+              force: Bool = false) {
         self.window = window
         wanted = enabled
         self.isPro = isPro
+        if let notificationsUsable {
+            self.notificationsUsable = notificationsUsable
+            Blocker.notificationsUsable = notificationsUsable
+        }
+        Blocker.hasProFlag = isPro
+        endTrialIfOver()
         // Permission can be revoked in iOS Settings while the app is away.
         readAuthorization()
         if force { scheduled = nil }
@@ -168,6 +243,8 @@ final class BlockerService {
     /// least `ActiveWindow.answerWindowMin` away). After the day's last
     /// reminder, free until bedtime.
     func unlockAfterDrinking(window: ActiveWindow, now: Date = .now) {
+        // The ritual done during "Try the lock now" ends the test too.
+        endTrial()
         grantUnlock(until: Self.unlockEnd(window: window, drinkAt: now))
     }
 
@@ -222,7 +299,8 @@ final class BlockerService {
         if let window {
             Blocker.window = (window.wake.value, window.sleep.value)
         }
-        Blocker.isEnabled = wanted && authorization == .granted && covers(selection)
+        Blocker.isEnabled = LockGate.isEngaged(remindersWanted: wanted, screenTimeGranted: authorization == .granted,
+                                               notificationsUsable: notificationsUsable, coverage: coverage)
         // Re-registering a running schedule restarts it, so only touch it
         // when what it depends on changed.
         let schedule = "\(Blocker.isEnabled)-\(selectionCount > 0)-\(window?.wake.value ?? -1)-\(window?.sleep.value ?? -1)"

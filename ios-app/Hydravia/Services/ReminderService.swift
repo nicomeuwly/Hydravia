@@ -15,6 +15,10 @@ final class ReminderService: NSObject {
     /// unrelated one-shots (like the trial-end heads-up).
     nonisolated static let identifierPrefix = ReminderPlan.identifierPrefix
     nonisolated static let trialEndIdentifier = "trial-end-reminder"
+    /// The notice after the plan's last reminder ("open Hydravia to keep
+    /// your reminders going"). Outside the reminder prefix: delivered, it
+    /// isn't a reminder to answer.
+    nonisolated static let continueIdentifier = "reminders-continue"
     nonisolated static let unlockRoute = "unlock"
 
     private let center = UNUserNotificationCenter.current()
@@ -52,6 +56,14 @@ final class ReminderService: NSObject {
         case .authorized, .provisional, .ephemeral: .granted
         default: .denied
         }
+    }
+
+    /// Whether a notification would really appear: allowed, with alerts on.
+    /// The Screen Time lock only engages then.
+    func canAlert() async -> Bool {
+        let settings = await center.notificationSettings()
+        return [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus)
+            && settings.alertSetting == .enabled
     }
 
     /// Shows the system prompt. iOS only ever shows it once — callers check
@@ -117,6 +129,37 @@ final class ReminderService: NSObject {
             }
         }
         lastRitual = ritual
+        await scheduleContinueNotice(after: wanted.isEmpty ? nil : window, goalReachedToday: goalReachedToday,
+                                     lastDrink: lastDrink)
+    }
+
+    /// The plan holds 60 reminders, about four days: without the app opened
+    /// (or a background refresh) in between, they would just stop. One last
+    /// notice right after them says so. Nil `window`: no reminders, no
+    /// notice.
+    private func scheduleContinueNotice(after window: ActiveWindow?, goalReachedToday: Bool, lastDrink: Date?) async {
+        let calendar = Calendar.autoupdatingCurrent
+        guard let window,
+              let date = ReminderPlan.continuationDate(window: window, now: .now, goalReachedToday: goalReachedToday,
+                                                       lastDrink: lastDrink, calendar: calendar)
+        else {
+            center.removePendingNotificationRequests(withIdentifiers: [Self.continueIdentifier])
+            return
+        }
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: .notifReminderTitle)
+        content.body = String(localized: .notifContinueBody)
+        content.sound = .default
+        content.threadIdentifier = "hydration"
+        let parts = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        do {
+            try await center.add(UNNotificationRequest(
+                identifier: Self.continueIdentifier, content: content,
+                trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)
+            ))
+        } catch {
+            logger.error("Could not schedule the continue notice: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Copy is resolved now, in the current language; the app reschedules on
@@ -217,6 +260,13 @@ final class ReminderService: NSObject {
     func hasUnansweredReminder() async -> Bool {
         let delivered = await center.deliveredNotifications()
         return delivered.contains { $0.request.identifier.hasPrefix(Self.identifierPrefix) }
+    }
+
+    /// "Try the lock now" ended without the ritual: its "Drink now"
+    /// notification no longer stands for a reminder to answer.
+    func clearShieldNotification() {
+        center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
+        center.removePendingNotificationRequests(withIdentifiers: [Blocker.shieldNotificationIdentifier])
     }
 
     /// Called once the dose is drunk: the delivered reminders are answered.

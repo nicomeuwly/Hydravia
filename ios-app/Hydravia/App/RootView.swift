@@ -70,6 +70,12 @@ struct RootView: View {
     /// A banner seen but not tapped still means "time to drink" — and so
     /// does a shield standing over the user's apps.
     private func checkUnansweredReminder() async {
+        // "Try the lock now" shields whatever the goal: opening the app by
+        // hand (notifications off) must still lead to the ritual.
+        if blocker.trialUntil != nil && blocker.isShieldUp {
+            router.reminderFired = true
+            return
+        }
         guard !isGoalReachedToday else { return }
         if await reminders?.hasUnansweredReminder() == true || blocker.isShieldUp || reminderPassedSinceLastDrink {
             router.reminderFired = true
@@ -108,6 +114,8 @@ struct RootView: View {
         // miss a cold start) and on every return to the foreground.
         .task { await checkUnansweredReminder() }
         .onChange(of: scenePhase) { _, phase in
+            // Leaving the app: ask iOS to top the reminders up while away.
+            if phase == .background, settings.settings.onboardingDone { BackgroundRefresh.schedule() }
             guard phase == .active else { return }
             hydration.refresh()
             Task { await checkUnansweredReminder() }
@@ -118,8 +126,13 @@ struct RootView: View {
             // Wait for the App Store's answer: rescheduling on a not-yet-known
             // entitlement would wipe a subscriber's reminders at every launch.
             guard scenePhase == .active, store.hasLoadedEntitlements else { return }
-            // The Screen Time lock follows the same window and switch.
-            blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro)
+            // The Screen Time lock follows the same window and switch, and
+            // only engages while iOS really shows notifications (permission
+            // can be turned off in iOS Settings while the app is away).
+            let notificationsUsable = await reminders?.canAlert() ?? false
+            guard !Task.isCancelled else { return }
+            blocker.sync(window: settings.settings.window, enabled: areRemindersEnabled, isPro: isPro,
+                         notificationsUsable: notificationsUsable)
             // A glass just before the reminder ending the current unlock
             // answers it: no relock there, and no notification below.
             if let lastDrink {
@@ -127,6 +140,14 @@ struct RootView: View {
             }
             await reminders?.reschedule(window: settings.settings.window, enabled: areRemindersEnabled,
                                         ritual: true, goalReachedToday: isGoalReachedToday, lastDrink: lastDrink)
+        }
+        // "Try the lock now" ran out without the ritual: what it lit up
+        // was only a test.
+        .onChange(of: blocker.trialUntil) { _, until in
+            guard until == nil, !blocker.isShieldUp else { return }
+            router.reminderFired = false
+            reminders?.clearShieldNotification()
+            Task { await checkUnansweredReminder() }
         }
         // Goal reached: the reminder that was due is answered for today.
         .onChange(of: isGoalReachedToday) { _, reached in

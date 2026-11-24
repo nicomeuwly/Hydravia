@@ -3,8 +3,9 @@ import SwiftUI
 
 /// The ritual's status on the home screen.
 ///
-/// - More apps picked than the free plan locks (a trial ended): the way to
-///   pick the one app it covers. The lock waits until then.
+/// - Only categories or websites picked on the free plan (a trial ended):
+///   the way to pick the one app it covers. The lock waits until then. (A
+///   pick with several apps keeps locking its first one.)
 /// - A reminder fired: "Drink your dose →", the way into the unlock.
 /// - Today's goal reached: reminders and lock rest until tomorrow's first
 ///   reminder (dimmed, not tappable).

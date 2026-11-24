@@ -793,6 +793,7 @@
 				DEVELOPMENT_TEAM = WLUNP8LN7D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Hydravia-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
@@ -834,6 +835,7 @@
 				DEVELOPMENT_TEAM = WLUNP8LN7D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Hydravia-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Hydravia;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";

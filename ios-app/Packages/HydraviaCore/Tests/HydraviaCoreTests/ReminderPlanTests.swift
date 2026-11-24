@@ -81,6 +81,24 @@ struct ReminderPlanTests {
         #expect(dates == dates.sorted())
     }
 
+    @Test func continuationIsTheSlotAfterTheLastReminder() {
+        let now = date(5, 14, 30)
+        let dates = ReminderPlan.fireDates(window: window, now: now, goalReachedToday: false, calendar: calendar)
+        let next = ReminderPlan.continuationDate(window: window, now: now, goalReachedToday: false, calendar: calendar)
+        #expect(dates.count == ReminderPlan.budget)
+        // 7 left today, 14 a day for three days, 11 on the 9th: the 60th
+        // is the 9th at 18:00, the 61st at 19:00.
+        #expect(dates.last == date(9, 18))
+        #expect(next == date(9, 19))
+        #expect(next.map { $0 > dates.last! } == true)
+    }
+
+    @Test func continuationFollowsASmallerBudget() {
+        let next = ReminderPlan.continuationDate(window: window, now: date(5, 14, 30), goalReachedToday: false,
+                                                 calendar: calendar, budget: 3)
+        #expect(next == date(5, 18))
+    }
+
     @Test func identifiersCarryTheDay() {
         #expect(ReminderPlan.identifier(for: date(5, 9, 30), calendar: calendar) == "hydration-reminder-2026-11-05-0930")
         #expect(ReminderPlan.identifier(for: date(5, 9, 30), calendar: calendar)

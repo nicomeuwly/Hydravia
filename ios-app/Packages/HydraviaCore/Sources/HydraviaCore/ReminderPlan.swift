@@ -53,6 +53,24 @@ public enum ReminderPlan {
         return dates
     }
 
+    /// Where the plan would go on past its `budget`: the slot right after
+    /// its last reminder. A notice there ("open Hydravia to keep your
+    /// reminders going") stops the reminders from ending in silence when
+    /// the app hasn't been opened for days. Nil when the plan can't fill
+    /// its budget (no slots).
+    public static func continuationDate(
+        window: ActiveWindow,
+        now: Date,
+        goalReachedToday: Bool,
+        lastDrink: Date? = nil,
+        calendar: Calendar,
+        budget: Int = budget
+    ) -> Date? {
+        let dates = fireDates(window: window, now: now, goalReachedToday: goalReachedToday,
+                              lastDrink: lastDrink, calendar: calendar, budget: budget + 1)
+        return dates.count == budget + 1 ? dates.last : nil
+    }
+
     /// The reminder a drink at `drink` answers
     /// (`ActiveWindow.reminderAnswered`), on the drink's day.
     public static func answeredDate(byDrinkAt drink: Date, window: ActiveWindow, calendar: Calendar) -> Date? {

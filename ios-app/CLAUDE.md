@@ -70,8 +70,20 @@ node Scripts/generate-strings.mjs
   a new day and the goal being reached or lost. Once today's goal is reached, today's reminders go and
   the lock rests (`Blocker.goalReachedOn`, also written by `AddWaterIntent`)
   until the next day; a raised goal or a deleted glass brings both back.
+  A final `reminders-continue` notice sits after the plan's last reminder,
+  and a `BGAppRefreshTask` (`BackgroundRefresh`, declared in
+  `Hydravia-Info.plist`, merged with the generated plist) tops the plan up
+  while the app stays closed.
+- The lock only engages while iOS really shows notifications (`LockGate`;
+  `RootView` re-checks on every activation and mirrors it as
+  `Blocker.notificationsUsable` for the shield's copy). On the free plan a
+  pick with several apps shields its first app (`LockCoverage`).
+  Settings › "Try the lock now" (`LockTrial`, `Blocker.trialUntil`) shields
+  for a minute at any hour; the ritual or the monitor's `hydravia.trial`
+  interval ends it.
 - `Entitlements/` — App Group for every target, Family Controls for the app
-  and the Screen Time extensions.
+  and the Screen Time extensions, Time Sensitive Notifications for the app
+  and `ShieldAction` (its "Drink now" notification).
   Screen Time only works on a real device; on the simulator authorization
   fails and the lock stays off.
 

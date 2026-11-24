@@ -13,9 +13,10 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     private static let subtitle = UIColor(red: 0.765, green: 0.890, blue: 0.965, alpha: 1)
 
     private func configuration(name: String?) -> ShieldConfiguration {
-        // The system can still show the shield for a moment after an unlock,
-        // while ManagedSettings catches up.
-        if Blocker.isUnlocked(at: .now) {
+        // The system can still show the shield for a moment after an unlock
+        // (or a widget pour reaching the goal), while ManagedSettings
+        // catches up.
+        if Blocker.isOnBreak(at: .now) || !Blocker.shouldShield() {
             return ShieldConfiguration(
                 backgroundBlurStyle: nil,
                 backgroundColor: Self.background,
@@ -30,6 +31,9 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
 
         let appName = name ?? Blocker.string("shield.thisApp")
         var subtitle = String(format: Blocker.string("shield.subtitle"), appName)
+        // Notifications off: "Drink now" can't post the one that opens the
+        // ritual, so the way through is opening Hydravia by hand.
+        if !Blocker.notificationsUsable { subtitle += "\n\n" + Blocker.string("shield.subtitle.openApp") }
         if let line = Self.progressLine() { subtitle += "\n\n" + line }
         return ShieldConfiguration(
             backgroundBlurStyle: nil,
