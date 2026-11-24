@@ -3711,6 +3711,36 @@
         }
       }
     },
+    "settings.weatherAttribution" : {
+      "comment" : "Settings › Weather footer. Open-Meteo CC BY 4.0 attribution; the Markdown link opens open-meteo.com.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wetterdaten: [Open-Meteo.com](https://open-meteo.com/)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weather data: [Open-Meteo.com](https://open-meteo.com/)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos meteorológicos: [Open-Meteo.com](https://open-meteo.com/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données météo : [Open-Meteo.com](https://open-meteo.com/)"
+          }
+        }
+      }
+    },
     "settings.dailyGoal" : {
       "extractionState" : "manual",
       "localizations" : {

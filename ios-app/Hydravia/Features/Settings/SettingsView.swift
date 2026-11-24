@@ -130,6 +130,12 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text(.settingsSectionWeather)
+                } footer: {
+                    // Open-Meteo data is CC BY 4.0: credit it, with a link.
+                    Text(AttributedString(localized: .settingsWeatherAttribution))
+                        .font(.brandFootnote)
+                        .foregroundStyle(Palette.textSecondary)
+                        .tint(Palette.accentCyan)
                 }
 
                 Section {
