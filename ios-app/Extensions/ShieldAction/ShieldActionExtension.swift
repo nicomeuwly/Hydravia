@@ -74,6 +74,8 @@ final class ShieldActionExtension: ShieldActionDelegate {
         content.userInfo = ["route": Blocker.unlockRoute]
         content.threadIdentifier = "hydration"
         // Asked for from inside a blocked app: show it even under a Focus.
+        // Extension profiles can't carry the time-sensitive entitlement, so
+        // iOS may deliver this as .active; asking costs nothing.
         content.interruptionLevel = .timeSensitive
 
         center.removeDeliveredNotifications(withIdentifiers: [Blocker.shieldNotificationIdentifier])
