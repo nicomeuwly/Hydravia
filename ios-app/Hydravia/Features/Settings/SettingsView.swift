@@ -14,7 +14,7 @@ struct SettingsView: View {
     @Environment(StoreService.self) private var store
     @Environment(BlockerService.self) private var blocker
     @State private var managesSubscription = false
-    @State private var restoreResult: Bool?
+    @State private var restoreResult: StoreService.RestoreOutcome?
     @State private var isRestoring = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationPermission: ReminderService.Permission = .notDetermined
@@ -71,7 +71,7 @@ struct SettingsView: View {
                         editor = .schedule
                     }
                     row(.settingsReminderInterval,
-                        value: ReminderInterval(rawValue: current.window.intervalMin)?.shortLabel ?? "—") {
+                        value: ReminderInterval(rawValue: current.window.intervalMin)?.shortLabel ?? "–") {
                         editor = .interval
                     }
                     row(.settingsFavoriteAmounts,
@@ -97,35 +97,50 @@ struct SettingsView: View {
                 ScreenTimeSection()
 
                 Section {
-                    // Shows the real permission; flipping it asks once, then
-                    // opens iOS Settings, where the switch actually lives.
-                    Toggle(isOn: Binding {
-                        location.status == .granted
-                    } set: { _ in
-                        location.requestOrOpenSettings()
-                    }) {
-                        Text(.settingsLocationAccess)
-                        if location.status != .granted {
-                            Text(.settingsLocationDenied)
-                        }
-                    }
-                    .tint(Palette.accentCyan)
-
-                    if location.status == .granted {
-                        LabeledContent {
-                            switch weather {
-                            case .loading:
-                                ProgressView()
-                            case .known(let celsius):
-                                // °C or °F per the user's region.
-                                Text(Measurement(value: celsius, unit: UnitTemperature.celsius),
-                                     format: .measurement(width: .abbreviated, usage: .weather,
-                                                          numberFormatStyle: .number.precision(.fractionLength(0))))
-                            case .unavailable:
-                                Text(verbatim: "—")
+                    if store.hasPro {
+                        // Shows the real permission; flipping it asks once, then
+                        // opens iOS Settings, where the switch actually lives.
+                        Toggle(isOn: Binding {
+                            location.status == .granted
+                        } set: { _ in
+                            location.requestOrOpenSettings()
+                        }) {
+                            Text(.settingsLocationAccess)
+                            if location.status != .granted {
+                                Text(.settingsLocationDenied)
                             }
-                        } label: {
-                            Text(.settingsCurrentWeather)
+                        }
+                        .tint(Palette.accentCyan)
+
+                        if location.status == .granted {
+                            LabeledContent {
+                                switch weather {
+                                case .loading:
+                                    ProgressView()
+                                case .known(let celsius):
+                                    // °C or °F per the user's region.
+                                    Text(Measurement(value: celsius, unit: UnitTemperature.celsius),
+                                         format: .measurement(width: .abbreviated, usage: .weather,
+                                                              numberFormatStyle: .number.precision(.fractionLength(0))))
+                                case .unavailable:
+                                    Text(verbatim: "–")
+                                }
+                            } label: {
+                                Text(.settingsCurrentWeather)
+                            }
+                        }
+                    } else {
+                        // Pro feature: the location is never asked for or
+                        // read on the free plan; the row leads to the paywall.
+                        Button { router.sheet = .paywall } label: {
+                            LabeledContent {
+                                Label { Text(verbatim: "Pro") } icon: { Image(systemName: "lock.fill") }
+                                    .font(.brand(.bold, size: 12, relativeTo: .caption))
+                                    .foregroundStyle(Palette.primaryDark)
+                            } label: {
+                                Text(.settingsWeatherDose).foregroundStyle(Palette.textPrimary)
+                                Text(.settingsWeatherProSub)
+                            }
                         }
                     }
                 } header: {
@@ -242,8 +257,8 @@ struct SettingsView: View {
                 // Refreshed on return from iOS Settings.
                 notificationPermission = await reminders?.permission() ?? .notDetermined
             }
-            .task(id: location.status) {
-                guard location.status == .granted else { return }
+            .task(id: location.status == .granted && Dose.adjustsForWeather(hasPro: store.hasPro)) {
+                guard location.status == .granted, Dose.adjustsForWeather(hasPro: store.hasPro) else { return }
                 weather = await WeatherService.shared.currentTemperature().map(Weather.known) ?? .unavailable
             }
             .sheet(item: $editor) { editor in
@@ -287,12 +302,7 @@ struct SettingsView: View {
             .sensoryFeedback(.success, trigger: deleted) { _, new in new }
             // Apple's own sheet: change plan, cancel, see renewal date.
             .manageSubscriptionsSheet(isPresented: $managesSubscription)
-            .alert(Text(restoreResult == true ? .settingsRestoredTitle : .settingsNoPurchaseTitle),
-                   isPresented: Binding { restoreResult != nil } set: { if !$0 { restoreResult = nil } }) {
-                Button(role: .cancel) {} label: { Text(.commonOk) }
-            } message: {
-                Text(restoreResult == true ? .settingsRestoredBody : .settingsNoPurchaseBody)
-            }
+            .restoreAlert($restoreResult)
         }
     }
 

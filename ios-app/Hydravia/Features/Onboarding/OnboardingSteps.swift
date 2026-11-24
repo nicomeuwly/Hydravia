@@ -306,7 +306,7 @@ struct GoalRevealStep: View {
             AnyLayout(typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Spacing.md))
                                                     : AnyLayout(HStackLayout(spacing: Spacing.md))) {
                 metric("\(window.reminderSlots.count)", label: .goalRevealRemindersPerDay)
-                metric(ReminderInterval(rawValue: window.intervalMin)?.shortLabel ?? "—", label: .goalRevealPace)
+                metric(ReminderInterval(rawValue: window.intervalMin)?.shortLabel ?? "–", label: .goalRevealPace)
                 metric(window.wake.formatted, label: .goalRevealStart)
             }
 

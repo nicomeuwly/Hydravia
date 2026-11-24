@@ -30,11 +30,18 @@ private struct StartupErrorView: View {
     let error: any Error
 
     var body: some View {
-        ContentUnavailableView(
-            "Hydravia",
-            systemImage: "exclamationmark.triangle",
-            description: Text(error.localizedDescription)
-        )
+        ContentUnavailableView {
+            Label { Text(.startupErrorTitle) } icon: { Image(systemName: "exclamationmark.triangle") }
+        } description: {
+            VStack(spacing: Spacing.md) {
+                Text(.startupErrorBody)
+                // The system's wording, small: useful for a support request.
+                Text(verbatim: error.localizedDescription)
+                    .font(.brandCaption)
+                    .foregroundStyle(Palette.textTertiary)
+                    .textSelection(.enabled)
+            }
+        }
         .onAppear {
             Logger(subsystem: "com.nicomeuwly.hydravia", category: "Startup")
                 .fault("Store failed to open: \(error.localizedDescription, privacy: .public)")

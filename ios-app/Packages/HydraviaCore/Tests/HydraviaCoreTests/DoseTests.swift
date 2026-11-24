@@ -143,4 +143,21 @@ struct DoseTests {
         let end = Dose.windowEnd(sleep: MinuteOfDay(hour: 22, minute: 0), now: Self.at(23), calendar: Self.utc)
         #expect(end == Self.at(22).addingTimeInterval(24 * 3600))
     }
+
+    @Test func weatherAdjustmentIsProOnly() {
+        #expect(Dose.adjustsForWeather(hasPro: true))
+        #expect(!Dose.adjustsForWeather(hasPro: false))
+        #expect(Dose.temperature(35, hasPro: true) == 35)
+        #expect(Dose.temperature(35, hasPro: false) == nil)
+    }
+
+    @Test func freePlanDoseIgnoresTheHeatButKeepsTheFeeling() {
+        let busy: (inout DoseInput) -> Void = { $0.now = Self.at(14) }
+        let pro = dose { busy(&$0); $0.feeling = .veryThirsty; $0.temperatureC = Dose.temperature(35, hasPro: true) }
+        let free = dose { busy(&$0); $0.feeling = .veryThirsty; $0.temperatureC = Dose.temperature(35, hasPro: false) }
+        let freeFine = dose { busy(&$0); $0.temperatureC = Dose.temperature(35, hasPro: false) }
+        #expect(free == dose { busy(&$0); $0.feeling = .veryThirsty })
+        #expect(pro > free)
+        #expect(free > freeFine)
+    }
 }

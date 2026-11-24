@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Merged into the generated Info.plist (GENERATE_INFOPLIST_FILE): keys
+	     Xcode has no INFOPLIST_KEY_ build setting for. Kept outside the
+	     synchronized Hydravia/ folder so it isn't copied as a resource. -->
+	<!-- The weather needs a town, not an address: ask for approximate
+	     location by default. -->
+	<key>NSLocationDefaultAccuracyReduced</key>
+	<true/>
+</dict>
+</plist>

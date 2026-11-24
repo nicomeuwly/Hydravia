@@ -20,6 +20,8 @@ final class StoreService {
     static let productIDs: Set<String> = [yearlyID, monthlyID, lifetimeID]
 
     enum Outcome { case success, cancelled, pending, failed }
+    /// What an explicit "Restore" found.
+    enum RestoreOutcome: Equatable { case restored, nothingFound, failed }
 
     private(set) var yearly: Product?
     private(set) var monthly: Product?
@@ -53,6 +55,11 @@ final class StoreService {
     @ObservationIgnored private let reminders: ReminderService
     @ObservationIgnored private var updates: Task<Void, Never>?
     @ObservationIgnored private var refreshing: Task<Void, Never>?
+    /// The verified transaction of a purchase made in this session. The
+    /// entitlement list can lag a moment behind a purchase: while this one
+    /// is unrevoked and unexpired (a lifetime purchase never expires), a
+    /// refresh that doesn't list it yet must not demote the buyer.
+    @ObservationIgnored private var purchased: Transaction?
     @ObservationIgnored private let logger = Logger(subsystem: "com.nicomeuwly.hydravia", category: "Store")
 
     init(reminders: ReminderService) {
@@ -139,6 +146,13 @@ final class StoreService {
             }
         }
 
+        if let purchased, Self.isStillValid(purchased) {
+            if !active { logger.info("Entitlements lag behind a verified purchase; keeping Pro") }
+            active = true
+            if purchased.productID == Self.lifetimeID { lifetime = true }
+            if let date = purchased.expirationDate { expiresAt = max(expiresAt ?? date, date) }
+        }
+
         // An unverifiable answer (tampered or not-yet-verifiable receipt,
         // odd offline states) must not demote a known subscriber: keep the
         // last verified state rather than wipe their reminders.
@@ -200,8 +214,11 @@ final class StoreService {
             }
             await transaction.finish()
             // The user was charged and Apple verified it: they are premium,
-            // even if the entitlement list lags a moment behind.
+            // even if the entitlement list lags a moment behind (kept until
+            // it expires or is revoked, see `readEntitlements`).
+            purchased = transaction
             isPremium = true
+            if transaction.productID == Self.lifetimeID { hasLifetime = true }
             await refreshEntitlements()
             return .success
         case .userCancelled:
@@ -215,20 +232,33 @@ final class StoreService {
     }
 
     /// Restores purchases. Only meant for an explicit tap: it may ask the user
-    /// to sign in to their Apple Account.
-    func restore() async -> Bool {
+    /// to sign in to their Apple Account. Whatever Pro the device already
+    /// knows counts as restored; otherwise a failed sync (offline, sign-in
+    /// cancelled) is an error, not "nothing found".
+    func restore() async -> RestoreOutcome {
+        var syncFailed = false
         do {
             try await AppStore.sync()
         } catch {
+            syncFailed = true
             logger.error("Restore failed: \(error.localizedDescription, privacy: .public)")
         }
         await refreshEntitlements()
-        return isPremium
+        if isPremium { return .restored }
+        return syncFailed ? .failed : .nothingFound
+    }
+
+    private static func isStillValid(_ transaction: Transaction) -> Bool {
+        guard transaction.revocationDate == nil else { return false }
+        guard let expiry = transaction.expirationDate else { return true }
+        return expiry > .now
     }
 
     private func handle(_ result: VerificationResult<Transaction>) async {
         switch result {
         case .verified(let transaction):
+            // A refund or revocation of this session's purchase lands here.
+            if transaction.id == purchased?.id { purchased = transaction }
             await transaction.finish()
         case .unverified(_, let error):
             logger.error("Unverified transaction update: \(error.localizedDescription, privacy: .public)")

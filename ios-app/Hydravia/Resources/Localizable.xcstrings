@@ -65,7 +65,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom amount in millilitres"
+            "value" : "Custom amount in milliliters"
           }
         },
         "es" : {
@@ -136,7 +136,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entre une quantité entre 1 et %1$lld ml."
+            "value" : "Saisis une quantité entre 1 et %1$lld ml."
           }
         }
       }
@@ -195,6 +195,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter de l'eau"
+          }
+        }
+      }
+    },
+    "chart.day" : {
+      "comment" : "Chart axis label (VoiceOver)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour"
+          }
+        }
+      }
+    },
+    "chart.goal" : {
+      "comment" : "Chart goal line label (VoiceOver)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif"
           }
         }
       }
@@ -905,35 +965,6 @@
         }
       }
     },
-    "home.a11yActivateRitual" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ritual aktivieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn on the ritual"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activar el ritual"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activer le rituel"
-          }
-        }
-      }
-    },
     "home.a11yNextReminder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1371,7 +1402,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les 1 h"
+            "value" : "Toutes les heures"
           }
         }
       }
@@ -1382,25 +1413,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle 1,5 Std."
+            "value" : "Alle 90 Minuten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Every 1 h 30"
+            "value" : "Every 90 minutes"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cada 1 h 30"
+            "value" : "Cada 90 minutos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les 1 h 30"
+            "value" : "Toutes les 90 minutes"
           }
         }
       }
@@ -1411,7 +1442,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle 2 Std."
+            "value" : "Alle 2 Stunden"
           }
         },
         "en" : {
@@ -1429,7 +1460,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les 2 h"
+            "value" : "Toutes les 2 heures"
           }
         }
       }
@@ -1899,7 +1930,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Petit rappel avant la fin de ton essai. Tu peux annuler en 2 taps, ou ne rien faire pour continuer."
+            "value" : "Petit rappel avant la fin de ton essai. Tu peux annuler en deux gestes, ou ne rien faire pour continuer."
           }
         }
       }
@@ -2493,25 +2524,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menge passend zu Wetter und Durst"
+            "value" : "Die Menge passend zum Wetter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A dose tuned to the weather and your thirst"
+            "value" : "A dose tuned to the weather"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dosis ajustada al clima y a tu sed"
+            "value" : "La dosis ajustada al clima"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quantité adaptée à la météo et à ta soif"
+            "value" : "La dose ajustée à la météo"
           }
         }
       }
@@ -2634,6 +2665,35 @@
         }
       }
     },
+    "paywall.pendingTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente"
+          }
+        }
+      }
+    },
     "paywall.perMonth" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2746,36 +2806,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuel"
-          }
-        }
-      }
-    },
-    "paywall.planYearlyPerMonth" : {
-      "comment" : "Arguments: price",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "also %1$@ €/Monat"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "that is %1$@ €/month"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "es decir %1$@ €/mes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "soit %1$@ €/mois"
           }
         }
       }
@@ -2983,61 +3013,62 @@
         }
       }
     },
-    "paywall.timelineDay7" : {
+    "paywall.timelineChargeText" : {
+      "comment" : "Arguments: price, date",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tag 7"
+            "value" : "Erste Abbuchung: %1$@ am %2$@, nur wenn du bleibst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Day 7"
+            "value" : "First charge: %1$@ on %2$@, only if you stay."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Día 7"
+            "value" : "Primer cobro: %1$@ el %2$@, solo si te quedas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jour 7"
+            "value" : "Premier prélèvement : %1$@ le %2$@, seulement si tu restes."
           }
         }
       }
     },
-    "paywall.timelineDay7Text" : {
-      "comment" : "Arguments: date",
+    "paywall.timelineDay" : {
+      "comment" : "Arguments: day the trial ends",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erste Abbuchung am %1$@, nur wenn du bleibst."
+            "value" : "Tag %1$lld"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "First charge on %1$@, only if you stay."
+            "value" : "Day %1$lld"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primer cobro el %1$@, solo si te quedas."
+            "value" : "Día %1$lld"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premier prélèvement le %1$@, seulement si tu restes."
+            "value" : "Jour %1$lld"
           }
         }
       }
@@ -3078,25 +3109,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voller Zugriff: alle deine Apps gesperrt und angepasste Mengen."
+            "value" : "Voller Zugriff: alle deine Apps gesperrt und die Menge passend zum Wetter."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Full access: all your apps locked and adapted doses."
+            "value" : "Full access: all your apps locked and a dose tuned to the weather."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acceso completo: todas tus apps bloqueadas y las dosis adaptadas."
+            "value" : "Acceso completo: todas tus apps bloqueadas y la dosis ajustada al clima."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accès complet : toutes tes apps verrouillées et les quantités adaptées."
+            "value" : "Accès complet : toutes tes apps verrouillées et la dose ajustée à la météo."
           }
         }
       }
@@ -3282,7 +3313,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wann bist du aktiv?"
+            "value" : "Wann bist du wach?"
           }
         },
         "en" : {
@@ -3294,13 +3325,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Cuándo estás activo?"
+            "value" : "¿Cuál es tu horario?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quand es-tu actif ?"
+            "value" : "Quand es-tu debout ?"
           }
         }
       }
@@ -3711,6 +3742,64 @@
         }
       }
     },
+    "settings.restoreFailedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Käufe konnten nicht geprüft werden. Prüfe deine Internetverbindung und deinen Apple Account und versuche es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your purchases couldn't be checked. Check your internet connection and Apple Account, then try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron comprobar tus compras. Revisa tu conexión a internet y tu cuenta de Apple, y vuelve a intentarlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes achats n'ont pas pu être vérifiés. Vérifie ta connexion Internet et ton compte Apple, puis réessaie."
+          }
+        }
+      }
+    },
+    "settings.restoreFailedTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederherstellung fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't restore"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo restaurar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restauration impossible"
+          }
+        }
+      }
+    },
     "settings.weatherAttribution" : {
       "comment" : "Settings › Weather footer. Open-Meteo CC BY 4.0 attribution; the Markdown link opens open-meteo.com.",
       "extractionState" : "manual",
@@ -4009,25 +4098,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle deine Apps gesperrt, angepasste Mengen und Widgets"
+            "value" : "Alle deine Apps gesperrt, die Menge passend zum Wetter und Widgets"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All your apps locked, adapted doses and widgets"
+            "value" : "All your apps locked, a dose tuned to the weather and widgets"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todas tus apps bloqueadas, cantidades adaptadas y widgets"
+            "value" : "Todas tus apps bloqueadas, la dosis ajustada al clima y widgets"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes tes apps verrouillées, les quantités adaptées et les widgets"
+            "value" : "Toutes tes apps verrouillées, la dose ajustée à la météo et les widgets"
           }
         }
       }
@@ -4185,25 +4274,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kein aktives Abo zum Wiederherstellen."
+            "value" : "Auf diesem Apple Account gibt es keinen Hydravia-Pro-Kauf zum Wiederherstellen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No active subscription to restore."
+            "value" : "No Hydravia Pro purchase to restore on this Apple Account."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No hay suscripción activa que restaurar."
+            "value" : "No hay ninguna compra de Hydravia Pro que restaurar en esta cuenta de Apple."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucun abonnement actif à restaurer."
+            "value" : "Aucun achat Hydravia Pro à restaurer sur ce compte Apple."
           }
         }
       }
@@ -4563,25 +4652,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Abo ist aktiv."
+            "value" : "Hydravia Pro ist aktiv."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your subscription is active."
+            "value" : "Hydravia Pro is active."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu suscripción está activa."
+            "value" : "Hydravia Pro está activo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ton abonnement est actif."
+            "value" : "Hydravia Pro est actif."
           }
         }
       }
@@ -4906,6 +4995,65 @@
         }
       }
     },
+    "settings.weatherDose" : {
+      "comment" : "Settings row on the free plan: the Pro weather adjustment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menge passend zum Wetter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dose tuned to the weather"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosis ajustada al clima"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dose ajustée à la météo"
+          }
+        }
+      }
+    },
+    "settings.weatherProSub" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Hydravia Pro"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With Hydravia Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Hydravia Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec Hydravia Pro"
+          }
+        }
+      }
+    },
     "settings.weightModalTitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4931,6 +5079,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ton poids"
+          }
+        }
+      }
+    },
+    "startup.errorBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten konnten nicht geöffnet werden. Schließe die App und öffne sie erneut. Wenn das weiter passiert, starte dein iPhone neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data couldn't be opened. Close the app and open it again. If it keeps happening, restart your iPhone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron abrir tus datos. Cierra la app y vuelve a abrirla. Si sigue pasando, reinicia tu iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes données n'ont pas pu être ouvertes. Ferme l'app puis rouvre-la. Si le problème continue, redémarre ton iPhone."
+          }
+        }
+      }
+    },
+    "startup.errorTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hydravia konnte nicht starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hydravia couldn't start"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hydravia no pudo iniciarse"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hydravia n'a pas pu démarrer"
           }
         }
       }
@@ -6415,7 +6621,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Favourite amounts"
+            "value" : "Favorite amounts"
           }
         },
         "es" : {
@@ -6474,7 +6680,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Favourite amount %1$lld"
+            "value" : "Favorite amount %1$lld"
           }
         },
         "es" : {

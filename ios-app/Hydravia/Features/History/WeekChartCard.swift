@@ -192,9 +192,9 @@ private struct WeekChart: View {
             ForEach(days) { day in
                 // The empty rail every day sits in, even future ones.
                 BarMark(
-                    x: .value("Day", day.date, unit: .day),
-                    yStart: .value("ml", 0),
-                    yEnd: .value("ml", ceiling),
+                    x: .value(String(localized: .chartDay), day.date, unit: .day),
+                    yStart: .value(String(localized: .commonMl), 0),
+                    yEnd: .value(String(localized: .commonMl), ceiling),
                     width: .fixed(18)
                 )
                 .clipShape(.capsule)
@@ -207,9 +207,9 @@ private struct WeekChart: View {
 
                 if day.totalMl > 0 {
                     BarMark(
-                        x: .value("Day", day.date, unit: .day),
-                        yStart: .value("ml", 0),
-                        yEnd: .value("ml", grown ? barHeight(day.totalMl) : 0),
+                        x: .value(String(localized: .chartDay), day.date, unit: .day),
+                        yStart: .value(String(localized: .commonMl), 0),
+                        yEnd: .value(String(localized: .commonMl), grown ? barHeight(day.totalMl) : 0),
                         width: .fixed(18)
                     )
                     .clipShape(.capsule)
@@ -219,7 +219,7 @@ private struct WeekChart: View {
                 }
             }
 
-            RuleMark(y: .value("Goal", goalMl))
+            RuleMark(y: .value(String(localized: .chartGoal), goalMl))
                 .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
                 .foregroundStyle(Palette.amber.opacity(0.8))
                 .accessibilityLabel(Text(.settingsDailyGoal))
