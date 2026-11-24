@@ -36,8 +36,8 @@ const updated = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', {
   .legal {
     padding-block: clamp(40px, 6vw, 72px) clamp(64px, 9vw, 96px);
   }
-  .inner {
-    max-width: 780px;
+  .inner > * {
+    max-width: var(--readw);
   }
   .back {
     display: inline-block;

@@ -458,7 +458,7 @@ const wavePath =
 
 <!-- ═══ Privacy ═══ -->
 <section class="privacy">
-  <div class="wrap privacy-in">
+  <div class="wrap narrow">
     <h2 data-reveal>{t(lang, 'privacy.title')}</h2>
     <ul>
       {
@@ -577,13 +577,15 @@ const wavePath =
     color: var(--accent-cyan);
     margin: 0 0 12px;
   }
+  /* One container width site-wide; reading sections only narrow their
+     content, so every section starts on the same left edge. */
+  .narrow > * {
+    max-width: var(--readw);
+  }
   .sec-title {
     font-size: clamp(28px, 4.4vw, 42px);
     margin-bottom: 44px;
     max-width: 20ch;
-  }
-  .narrow {
-    max-width: 760px;
   }
   section {
     padding-block: clamp(64px, 9vw, 108px);
@@ -789,6 +791,7 @@ const wavePath =
     position: relative;
     display: flex;
     justify-content: center;
+    padding-bottom: 60px;
   }
   .float {
     width: 100%;
@@ -816,11 +819,15 @@ const wavePath =
     filter: blur(30px);
     opacity: 0.8;
   }
+  /* Below the phone, never over the screenshot. Centred with auto margins:
+     the entry animation owns transform. */
   .chip {
     position: absolute;
-    left: max(0px, calc(50% - 210px));
-    bottom: 16%;
-    margin: 0;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    bottom: 0;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1269,9 +1276,6 @@ const wavePath =
   .privacy {
     background: var(--white);
   }
-  .privacy-in {
-    max-width: 860px;
-  }
   .privacy h2 {
     font-size: clamp(26px, 3.8vw, 36px);
     margin-bottom: 28px;
@@ -1441,10 +1445,6 @@ const wavePath =
     }
     .how-shots :global(.shot-a) {
       transform: none;
-    }
-    .chip {
-      left: 0;
-      bottom: 8%;
     }
   }
 
