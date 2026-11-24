@@ -191,7 +191,8 @@ struct LocationStep: View {
 /// Explains reminders, then "Continue" shows the system prompt: declining
 /// happens there, never on our screen (App Review guideline 5.1.1(iv)).
 struct NotificationsStep: View {
-    let onNext: () -> Void
+    /// Called with the answer: a decline leads to the recovery screen.
+    let onNext: (Bool) -> Void
     @Environment(SettingsStore.self) private var settings
     @Environment(\.reminders) private var reminders
 
@@ -211,8 +212,93 @@ struct NotificationsStep: View {
             case .denied: granted = false
             }
             settings.settings.notificationsEnabled = granted
-            onNext()
+            onNext(granted)
         }
+    }
+}
+
+/// After a decline: what reminders change over a week, and, plainly, that
+/// the app lock goes through them. iOS won't ask twice, so the way back is
+/// the app's page in iOS Settings; coming back with notifications allowed
+/// moves on by itself. Continuing without them stays one tap away.
+struct NotificationsRecoverStep: View {
+    let onNext: () -> Void
+    @Environment(SettingsStore.self) private var settings
+    @Environment(\.reminders) private var reminders
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var finished = false
+
+    var body: some View {
+        OnboardingScaffold(step: .notificationsRecover, title: .notifRecoverTitle, subtitle: .notifRecoverBody,
+                           primary: .settingsOpenSettings, secondary: .notifRecoverSkip,
+                           onPrimary: LocationPermission.openSettings, onSecondary: finish) {
+            VStack(alignment: .leading, spacing: Spacing.xl) {
+                HStack(spacing: Spacing.md) {
+                    week(.notifRecoverWithReminders, days: 6, level: 0.86, muted: false)
+                    week(.notifRecoverWithoutReminders, days: 2, level: 0.22, muted: true)
+                }
+                Label {
+                    Text(.notifRecoverLock)
+                        .font(.brandFootnote)
+                        .foregroundStyle(Palette.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } icon: {
+                    Image(systemName: "lock.fill")
+                        .foregroundStyle(Palette.primaryDark)
+                }
+                .padding(Spacing.lg)
+                .background(Palette.backgroundElement, in: .rect(cornerRadius: Radius.lg, style: .continuous))
+            }
+        }
+        // Back from iOS Settings with notifications allowed: reminders on,
+        // and on with the flow.
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                guard await reminders?.permission() == .granted else { return }
+                settings.settings.notificationsEnabled = true
+                finish()
+            }
+        }
+    }
+
+    private func finish() {
+        guard !finished else { return }
+        finished = true
+        onNext()
+    }
+
+    private func week(_ label: LocalizedStringResource, days: Int, level: Double, muted: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ZStack(alignment: .bottom) {
+                Palette.backgroundElement
+                Palette.accentCyan.opacity(muted ? 0.35 : 1)
+                    .frame(height: 62 * level)
+            }
+            .frame(width: 46, height: 62)
+            .clipShape(.rect(cornerRadius: 14, style: .continuous))
+            .padding(.bottom, Spacing.sm)
+            .accessibilityHidden(true)
+
+            Text(label)
+                .font(.brandCaption)
+                .foregroundStyle(Palette.textSecondary)
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(days, format: .number)
+                    .font(.brand(.bold, size: 26, relativeTo: .title2))
+                    .foregroundStyle(muted ? Palette.textTertiary : Palette.primaryDark)
+                Text(.notifRecoverOutOfSevenDays)
+                    .font(.bodyRegular)
+                    .foregroundStyle(Palette.textTertiary)
+            }
+            Text(.notifRecoverGoalHit)
+                .font(.brandFootnote)
+                .foregroundStyle(Palette.textTertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Spacing.lg)
+        .background(.white, in: .rect(cornerRadius: Radius.xl, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 }
 

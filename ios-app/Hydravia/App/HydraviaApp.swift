@@ -23,6 +23,15 @@ struct HydraviaApp: App {
                 StartupErrorView(error: error)
             }
         }
+        // Keeps the reminder plan topped up while the app stays closed.
+        .backgroundTask(.appRefresh(BackgroundRefresh.identifier)) {
+            await refreshInBackground()
+        }
+    }
+
+    private func refreshInBackground() async {
+        guard case .success(let dependencies) = startup else { return }
+        await dependencies.refreshRemindersInBackground()
     }
 }
 

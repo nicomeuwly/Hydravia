@@ -21,6 +21,8 @@ nonisolated enum Blocker {
     static var windowActivity: DeviceActivityName { .init("hydravia.window") }
     /// A one-shot interval starting when an earned unlock runs out.
     static var relockActivity: DeviceActivityName { .init("hydravia.relock") }
+    /// A one-shot interval starting when "Try the lock now" runs out.
+    static var trialActivity: DeviceActivityName { .init("hydravia.trial") }
 
     /// Starts with the reminder prefix on purpose: the app treats it as an
     /// unanswered reminder (the ritual card lights up, tapping it opens the
@@ -36,6 +38,9 @@ nonisolated enum Blocker {
         static let unlockedUntil = "blocker.unlockedUntil.v1"
         static let progress = "blocker.progress.v1"
         static let proUntil = "blocker.proUntil.v1"
+        static let hasPro = "blocker.hasPro.v1"
+        static let notificationsUsable = "blocker.notificationsUsable.v1"
+        static let trialUntil = "blocker.trialUntil.v1"
         /// Also written by the quick-add widget (which doesn't compile this
         /// file): keep the two in step.
         static let goalReachedOn = "blocker.goalReachedOn.v1"
@@ -82,8 +87,8 @@ nonisolated enum Blocker {
         set { defaults?.set(try? JSONEncoder().encode(newValue), forKey: Key.selection) }
     }
 
-    /// The lock is wanted (reminders on, access granted, and a selection
-    /// the plan covers).
+    /// The lock is wanted (reminders on and allowed by iOS, access granted,
+    /// and a selection the plan covers at least in part: `LockGate`).
     static var isEnabled: Bool {
         get { defaults?.bool(forKey: Key.enabled) ?? false }
         set { defaults?.set(newValue, forKey: Key.enabled) }
@@ -108,6 +113,43 @@ nonisolated enum Blocker {
         get { defaults?.object(forKey: Key.proUntil) as? Date }
         set { defaults?.set(newValue, forKey: Key.proUntil) }
     }
+
+    /// Hydravia Pro as last seen by the app. Nil for installs that predate
+    /// this flag: `proUntil` alone decides then.
+    static var hasProFlag: Bool? {
+        get { defaults?.object(forKey: Key.hasPro) as? Bool }
+        set { defaults?.set(newValue, forKey: Key.hasPro) }
+    }
+
+    /// Whether the whole pick may be shielded at `date`.
+    static func hasPro(at date: Date) -> Bool {
+        (hasProFlag ?? true) && (proUntil.map { date < $0 } ?? true)
+    }
+
+    /// iOS lets Hydravia show notifications, as last checked by the app (or
+    /// found out by the shield's button). The shield's "Drink now" works
+    /// through one; without it the shield tells the user to open the app.
+    /// Unknown counts as usable.
+    static var notificationsUsable: Bool {
+        get { defaults?.object(forKey: Key.notificationsUsable) as? Bool ?? true }
+        set { defaults?.set(newValue, forKey: Key.notificationsUsable) }
+    }
+
+    /// The end of the running "Try the lock now", if any.
+    static var trialUntil: Date? {
+        get { defaults?.object(forKey: Key.trialUntil) as? Date }
+        set { defaults?.set(newValue, forKey: Key.trialUntil) }
+    }
+
+    /// Same rule as `LockTrial.isActive` in HydraviaCore (not linked here):
+    /// at most a minute ahead.
+    static func isTrialActive(at date: Date = .now) -> Bool {
+        guard let until = trialUntil else { return false }
+        return date < until && until.timeIntervalSince(date) <= trialDuration
+    }
+
+    /// `LockTrial.duration`.
+    static let trialDuration: TimeInterval = 60
 
     /// The end of the unlock earned by the last dose, if any.
     static var unlockedUntil: Date? {
@@ -156,15 +198,46 @@ nonisolated enum Blocker {
         return date < until
     }
 
+    /// An earned break is running and no test overrides it: the shield
+    /// still on screen is only ManagedSettings catching up.
+    static func isOnBreak(at date: Date) -> Bool {
+        isUnlocked(at: date) && !isTrialActive(at: date)
+    }
+
+    /// The tokens the lock shields: the whole pick with Pro or within the
+    /// free limit, else its first app (`BlockSelectionSize.coverage` in
+    /// HydraviaCore holds the same rule), else nothing.
+    struct Tokens {
+        var applications: Set<ApplicationToken> = []
+        var categories: Set<ActivityCategoryToken> = []
+        var webDomains: Set<WebDomainToken> = []
+        var isEmpty: Bool { applications.isEmpty && categories.isEmpty && webDomains.isEmpty }
+    }
+
+    static func shieldedTokens(at date: Date = .now) -> Tokens {
+        shieldedTokens(of: selection, isPro: hasPro(at: date))
+    }
+
+    static func shieldedTokens(of selection: FamilyActivitySelection, isPro: Bool) -> Tokens {
+        if isPro || isWithinFreeLimit(selection) {
+            return Tokens(applications: selection.applicationTokens,
+                          categories: selection.categoryTokens,
+                          webDomains: selection.webDomainTokens)
+        }
+        // The same app every time, in every process: a `Set`'s order isn't.
+        guard let first = ordered(selection.applicationTokens).first else { return Tokens() }
+        return Tokens(applications: [first])
+    }
+
     /// Whether the selected apps should be shielded right now. A selection
-    /// past the free limit needs Pro: a lapse while the app is closed stops
-    /// the lock rather than keep shielding more than the free plan covers.
-    /// Once today's goal is reached the lock rests until the next wake.
+    /// past the free limit needs Pro: a lapse while the app is closed
+    /// shields only the first app, what the free plan covers. Once today's
+    /// goal is reached the lock rests until the next wake. "Try the lock
+    /// now" shields for its minute whatever the hour, goal or break.
     static func shouldShield(at date: Date = .now) -> Bool {
-        let selection = selection
+        guard !shieldedTokens(at: date).isEmpty else { return false }
+        if isTrialActive(at: date) { return true }
         return isEnabled
-            && (isWithinFreeLimit(selection) || (proUntil.map { date < $0 } ?? true))
-            && selectionCount(selection) > 0
             && isWithinWindow(date)
             && !isUnlocked(at: date)
             && !isGoalReached(at: date)
@@ -184,13 +257,13 @@ nonisolated enum Blocker {
         shouldShield(at: date) ? raiseShield() : lowerShield()
     }
 
-    static func raiseShield() {
-        let selection = selection
+    static func raiseShield(at date: Date = .now) {
+        let tokens = shieldedTokens(at: date)
         let store = store
-        store.shield.applications = selection.applicationTokens.isEmpty ? nil : capped(selection.applicationTokens)
-        store.shield.applicationCategories = selection.categoryTokens.isEmpty
-            ? nil : .specific(capped(selection.categoryTokens))
-        store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : capped(selection.webDomainTokens)
+        store.shield.applications = tokens.applications.isEmpty ? nil : capped(tokens.applications)
+        store.shield.applicationCategories = tokens.categories.isEmpty
+            ? nil : .specific(capped(tokens.categories))
+        store.shield.webDomains = tokens.webDomains.isEmpty ? nil : capped(tokens.webDomains)
     }
 
     /// Screen Time shields at most 50 tokens of each kind (Apple's
@@ -206,11 +279,15 @@ nonisolated enum Blocker {
     /// ordered by their (opaque but stable) encoding.
     private static func capped<Token: Encodable & Hashable>(_ tokens: Set<Token>) -> Set<Token> {
         guard tokens.count > shieldTokenLimit else { return tokens }
+        return Set(ordered(tokens).prefix(shieldTokenLimit))
+    }
+
+    private static func ordered<Token: Encodable & Hashable>(_ tokens: Set<Token>) -> [Token] {
         let encoder = JSONEncoder()
-        let ordered = tokens
+        return tokens
             .map { (token: $0, key: (try? encoder.encode($0)) ?? Data()) }
             .sorted { $0.key.lexicographicallyPrecedes($1.key) }
-        return Set(ordered.prefix(shieldTokenLimit).map(\.token))
+            .map(\.token)
     }
 
     static func lowerShield() {
@@ -262,6 +339,32 @@ nonisolated enum Blocker {
         try center.startMonitoring(relockActivity, during: DeviceActivitySchedule(
             intervalStart: start, intervalEnd: end, repeats: false
         ))
+    }
+
+    // MARK: Try the lock now
+
+    /// Shields the pick right away until `until` (or until the ritual ends
+    /// the test), and has the monitor lower it then, app running or not.
+    static func startTrial(until: Date, calendar: Calendar = .autoupdatingCurrent) throws {
+        trialUntil = until
+        refreshShield()
+        let center = DeviceActivityCenter()
+        center.stopMonitoring([trialActivity])
+        let parts: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute, .second]
+        try center.startMonitoring(trialActivity, during: DeviceActivitySchedule(
+            intervalStart: calendar.dateComponents(parts, from: until),
+            intervalEnd: calendar.dateComponents(parts, from: until.addingTimeInterval(16 * 60)),
+            repeats: false
+        ))
+    }
+
+    /// The test is over (its minute ran out, or the ritual was done): the
+    /// shield goes back to what the real lock wants.
+    static func endTrial() {
+        guard trialUntil != nil else { return }
+        trialUntil = nil
+        DeviceActivityCenter().stopMonitoring([trialActivity])
+        refreshShield()
     }
 
     /// Ends the current unlock now (dev testing: see the shield again without

@@ -1,7 +1,8 @@
 import DeviceActivity
 import Foundation
 
-/// Raises and lowers the shield on schedule, with no app process running.
+/// Raises and lowers the shield on schedule, with no app process running
+/// (and lowers the "Try the lock now" shield once its minute is up).
 ///
 /// The class name must match `NSExtensionPrincipalClass` in Info.plist, or iOS
 /// can't instantiate the extension and no callback ever fires.
@@ -19,6 +20,9 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             // The earned break is over.
             Blocker.unlockedUntil = nil
             Blocker.refreshShield()
+        case Blocker.trialActivity:
+            // "Try the lock now" ran its minute without the ritual.
+            Blocker.endTrial()
         default:
             break
         }

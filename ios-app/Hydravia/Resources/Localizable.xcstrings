@@ -1964,6 +1964,35 @@
         }
       }
     },
+    "notif.continueBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne Hydravia, damit deine Erinnerungen weiterlaufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Hydravia to keep your reminders going."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Hydravia para seguir recibiendo tus recordatorios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Hydravia pour continuer tes rappels."
+          }
+        }
+      }
+    },
     "notifPrime.activate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2279,6 +2308,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Avec rappels"
+          }
+        }
+      }
+    },
+    "notifRecover.lock" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App-Sperre läuft über die Erinnerungen: Ohne sie werden deine Apps nie gesperrt. Du kannst sie in den Einstellungen deines iPhones aktivieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app lock works through reminders: without them, your apps never lock. You can turn them on in your iPhone's Settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El bloqueo de apps funciona con los recordatorios: sin ellos, tus apps nunca se bloquean. Puedes activarlos en los Ajustes de tu iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le verrou des apps passe par les rappels : sans eux, tes apps ne se bloquent pas. Tu peux les activer dans les Réglages de ton iPhone."
           }
         }
       }
@@ -4264,6 +4322,238 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisis des apps pour activer le verrou"
+          }
+        }
+      }
+    },
+    "settings.tryLock" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperre jetzt testen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try the lock now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probar el bloqueo ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayer le verrou maintenant"
+          }
+        }
+      }
+    },
+    "settings.tryLockHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Apps werden 1 Minute gesperrt, oder bis du deine Portion getrunken hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your apps lock for 1 minute, or until you drink your dose."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus apps se bloquean 1 minuto, o hasta que bebas tu dosis."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes apps se bloquent 1 minute, ou jusqu'à ce que tu boives ta dose."
+          }
+        }
+      }
+    },
+    "settings.tryLockActive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperre aktiv: Öffne eine gesperrte App. Tippe hier zum Beenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock on: open a blocked app. Tap here to stop."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloqueo activo: abre una app bloqueada. Toca aquí para detenerlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrou actif : ouvre une app bloquée. Touche ici pour arrêter."
+          }
+        }
+      }
+    },
+    "settings.tryLockNeedsAccess" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube zuerst den Zugriff auf Bildschirmzeit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Screen Time access first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primero permite el acceso a Tiempo de uso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorise d'abord l'accès au Temps d'écran."
+          }
+        }
+      }
+    },
+    "settings.tryLockNeedsApps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle zuerst die Apps aus, die gesperrt werden sollen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the apps to lock first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primero elige las apps que quieres bloquear."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis d'abord les apps à bloquer."
+          }
+        }
+      }
+    },
+    "settings.tryLockNeedsOneApp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gratis-Version sperrt 1 App: Wähle sie zuerst aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The free plan locks 1 app: choose it first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La versión gratuita bloquea 1 app: elígela primero."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La version gratuite bloque 1 app : choisis-la d'abord."
+          }
+        }
+      }
+    },
+    "settings.tryLockStartedTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sperre ist aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lock is on"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El bloqueo está activo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le verrou est actif"
+          }
+        }
+      }
+    },
+    "settings.tryLockStartedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne eine gesperrte App, um den Hydravia-Bildschirm zu sehen. Tippe auf „Trinken“, um das Ritual zu machen und alles zu entsperren. Sonst endet die Sperre nach 1 Minute von selbst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a blocked app to see the Hydravia screen. Tap “Drink now” to do the ritual and unlock everything. Otherwise the lock lifts on its own in 1 minute."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre una app bloqueada para ver la pantalla de Hydravia. Toca «A beber» para hacer el ritual y desbloquearlo todo. Si no, el bloqueo se levanta solo en 1 minuto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre une app bloquée : l'écran Hydravia s'affiche. Touche « Je bois » pour faire le rituel et tout débloquer. Sinon, le verrou se lève tout seul dans 1 minute."
           }
         }
       }
@@ -7053,6 +7343,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La version gratuite bloque 1 app"
+          }
+        }
+      }
+    },
+    "blocker.freeOneLocked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gratis-Version sperrt 1 dieser Apps. Tippe, um sie auszuwählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The free plan locks 1 of these apps. Tap to choose which."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La versión gratuita bloquea 1 de estas apps. Toca para elegir cuál."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La version gratuite bloque 1 de ces apps. Touche pour choisir laquelle."
+          }
+        }
+      }
+    },
+    "blocker.freeLockedApp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperre der Gratis-Version"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free plan lock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloqueo de la versión gratuita"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrou de la version gratuite"
           }
         }
       }

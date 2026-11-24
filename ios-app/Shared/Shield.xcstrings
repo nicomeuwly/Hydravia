@@ -265,6 +265,35 @@
         }
       }
     },
+    "shield.subtitle.openApp": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne Hydravia, um deine Portion zu trinken."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Hydravia to drink your dose."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre Hydravia para beber tu dosis."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvre Hydravia pour boire ta dose."
+          }
+        }
+      }
+    },
     "shield.tempUnlockButton": {
       "extractionState": "manual",
       "localizations": {
