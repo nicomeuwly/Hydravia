@@ -8,3 +8,6 @@
 /ios-app/Untitled Project/
 
 .DS_Store
+
+# Marketing and store material, kept locally only
+/ios-app/docs/
