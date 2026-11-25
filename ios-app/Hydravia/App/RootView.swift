@@ -195,10 +195,11 @@ struct RootView: View {
             // The watch gets the same settings and plan.
             watch?.push()
         }
-        // A locked Pro widget opens the app here.
+        // hydravia:// links: a locked Pro widget, an App Store in-app event.
+        // Before onboarding there is nothing to open yet.
         .onOpenURL { url in
-            guard url == URL(string: "hydravia://paywall"), settings.settings.onboardingDone else { return }
-            router.sheet = .paywall
+            guard settings.settings.onboardingDone else { return }
+            router.open(url)
         }
     }
 

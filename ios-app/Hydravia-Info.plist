@@ -13,6 +13,19 @@
 	<array>
 		<string>com.nicomeuwly.hydravia.reminders-refresh</string>
 	</array>
+	<!-- hydravia:// links (AppRouter.open): widgets, and the deep links of
+	     App Store in-app events. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.nicomeuwly.hydravia</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>hydravia</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

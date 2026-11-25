@@ -45,6 +45,21 @@ final class AppRouter {
     /// screen (see `MainTabView`).
     private(set) var unlockRequestedByReminder = false
 
+    /// A `hydravia://` link (declared in Hydravia-Info.plist): `paywall` from a
+    /// locked Pro widget, `streak` from the App Store's in-app events, `home`.
+    /// Returns false for a link it doesn't know, which is then ignored.
+    @discardableResult
+    func open(_ url: URL) -> Bool {
+        guard url.scheme == "hydravia" else { return false }
+        switch url.host() {
+        case "paywall": sheet = .paywall
+        case "streak": sheet = nil; tab = .history
+        case "home": sheet = nil; tab = .home
+        default: return false
+        }
+        return true
+    }
+
     func requestUnlockFromReminder() {
         reminderFired = true
         unlockRequestedByReminder = true
