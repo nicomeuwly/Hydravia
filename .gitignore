@@ -16,3 +16,6 @@
 # Only the app scheme is shared; Xcode regenerates the extensions' schemes
 /ios-app/Hydravia.xcodeproj/xcshareddata/xcschemes/*
 !/ios-app/Hydravia.xcodeproj/xcshareddata/xcschemes/Hydravia.xcscheme
+
+# Local list of pending work
+/ios-app/EN_SUSPENS.md

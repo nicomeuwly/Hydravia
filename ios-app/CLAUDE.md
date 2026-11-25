@@ -1,5 +1,8 @@
 # CLAUDE.md
 
+Way of working (ECC skills, checks, commits, versions and tags, App Store
+Connect): @WORKFLOW.md. Pending work: `EN_SUSPENS.md`.
+
 Native SwiftUI rewrite of Hydravia (hydration reminders + soft-block unlock
 ritual). The Expo app in `../hydravia/` is the behavioural reference: when in
 doubt about product behaviour, read its source and `../hydravia/CLAUDE.md`.
