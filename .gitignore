@@ -11,3 +11,8 @@
 
 # Marketing and store material, kept locally only
 /ios-app/docs/
+/audits/
+
+# Only the app scheme is shared; Xcode regenerates the extensions' schemes
+/ios-app/Hydravia.xcodeproj/xcshareddata/xcschemes/*
+!/ios-app/Hydravia.xcodeproj/xcshareddata/xcschemes/Hydravia.xcscheme
