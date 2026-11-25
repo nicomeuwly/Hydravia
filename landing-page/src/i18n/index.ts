@@ -56,7 +56,7 @@ export const fr = {
     'À l’intervalle que tu as choisi, les apps que tu as sélectionnées se bloquent. Uniquement pendant tes heures actives, jamais la nuit.',
   'how.step2.title': 'Tu dis comment tu vas',
   'how.step2.body':
-    'Une seule question. Ta réponse, la météo du jour et ce que tu as déjà bu donnent la quantité juste, pas un chiffre au hasard.',
+    'Une seule question. Ta réponse et ce que tu as déjà bu (et, avec Pro, la météo du jour) donnent la quantité juste, pas un chiffre au hasard.',
   'how.step3.title': 'Tu bois, tu reprends la main',
   'how.step3.body':
     'Tu confirmes, et le verrou se lève jusqu’au prochain rappel. Le niveau d’eau monte derrière l’écran. Objectif atteint ? Le verrou se repose jusqu’au lendemain.',
@@ -71,7 +71,7 @@ export const fr = {
 
   'feat.dose.title': 'La quantité juste, calculée pour toi',
   'feat.dose.body':
-    'Ton poids fixe l’objectif. Ce que tu as déjà bu, le temps qu’il reste avant le coucher, ta soif du moment et la température extérieure ajustent chaque verre.',
+    'Ton poids fixe l’objectif. Ce que tu as déjà bu, le temps qu’il reste avant le coucher, ta soif du moment et, avec Pro, la température extérieure ajustent chaque verre.',
 
   'feat.lock.title': 'Un vrai verrou, pas une notification',
   'feat.lock.body':
@@ -116,7 +116,7 @@ export const fr = {
   'price.pro.alt': 'ou 19,99 € par an, ou 39,99 € une fois pour toutes',
   'price.pro.lead': 'Tout le gratuit, plus :',
   'price.pro.f1': 'Autant d’apps et de sites verrouillés que tu veux',
-  'price.pro.f2': 'La dose ajustée à ta soif et à la météo',
+  'price.pro.f2': 'La dose ajustée à la météo du jour',
   'price.pro.f3': 'Widgets d’ajout rapide et d’écran verrouillé',
   'price.pro.f4': 'Verser un verre depuis ton Apple Watch',
   'price.pro.trial': '7 jours d’essai sur les abonnements',
@@ -148,7 +148,7 @@ export const fr = {
 
   'faq.q4': 'Comment la quantité est-elle calculée ?',
   'faq.a4':
-    'L’objectif quotidien se calcule à partir de ton poids : environ 33 ml par kilo, toujours entre 1,5 et 4 litres. Chaque verre répartit ensuite ce qu’il te reste à boire sur les rappels qui précèdent ton heure de coucher, puis s’ajuste selon ta soif et la température extérieure.',
+    'L’objectif quotidien se calcule à partir de ton poids : environ 33 ml par kilo, toujours entre 1,5 et 4 litres. Chaque verre répartit ensuite ce qu’il te reste à boire sur les rappels qui précèdent ton heure de coucher, puis s’ajuste selon ta soif et, avec Pro, la température extérieure.',
 
   'faq.q5': 'Combien ça coûte ?',
   'faq.a5':
@@ -189,7 +189,7 @@ export const fr = {
   'price.cmp.all': 'Sans limite',
   'price.cmp.r4': 'Widget de progression, Apple Watch et complications',
   'price.cmp.r5': 'Widgets d’ajout rapide et d’écran verrouillé',
-  'price.cmp.r6': 'Dose ajustée à ta soif et à la météo',
+  'price.cmp.r6': 'Dose ajustée à la météo du jour',
   'price.cmp.r7': 'Verser un verre depuis l’Apple Watch',
   'price.cmp.r8': 'Prix',
   'price.cmp.proPrice': '2,99 € par mois, 19,99 € par an ou 39,99 € à vie',
@@ -261,7 +261,7 @@ export const en: Catalogue = {
     'At the interval you chose, the apps you picked refuse to open. Only during your active hours, never at night.',
   'how.step2.title': 'You say how you feel',
   'how.step2.body':
-    'One question. Your answer, today’s weather and what you have already drunk add up to a precise dose, not a generic glass.',
+    'One question. Your answer and what you have already drunk (plus today’s weather with Pro) add up to a precise dose, not a generic glass.',
   'how.step3.title': 'You drink, you get your phone back',
   'how.step3.body':
     'Confirm, and the lock lifts until the next reminder. The water level rises behind the screen. Goal reached? The lock rests until tomorrow.',
@@ -275,7 +275,7 @@ export const en: Catalogue = {
 
   'feat.dose.title': 'A calculated dose, not a random glass',
   'feat.dose.body':
-    'Your weight sets the daily goal. What you have already drunk, the time left before bed, how thirsty you are and the outside temperature adjust every dose.',
+    'Your weight sets the daily goal. What you have already drunk, the time left before bed, how thirsty you are and, with Pro, the outside temperature adjust every dose.',
 
   'feat.lock.title': 'A real lock, not a notification',
   'feat.lock.body':
@@ -318,7 +318,7 @@ export const en: Catalogue = {
   'price.pro.alt': 'or €19.99 a year, or €39.99 once and for all',
   'price.pro.lead': 'Everything in Free, plus:',
   'price.pro.f1': 'As many apps and sites locked as you like',
-  'price.pro.f2': 'A dose adjusted to your thirst and the weather',
+  'price.pro.f2': 'A dose tuned to today’s weather',
   'price.pro.f3': 'Quick-add and Lock Screen widgets',
   'price.pro.f4': 'Pour a glass from your Apple Watch',
   'price.pro.trial': '7-day trial on subscriptions',
@@ -348,7 +348,7 @@ export const en: Catalogue = {
 
   'faq.q4': 'How is the dose calculated?',
   'faq.a4':
-    'The daily goal is worked out from your weight: roughly 33 ml per kilo, always between 1.5 and 4 litres. Each dose then spreads whatever you have left to drink across the reminders before bedtime, and adjusts for your thirst and the outside temperature.',
+    'The daily goal is worked out from your weight: roughly 33 ml per kilo, always between 1.5 and 4 litres. Each dose then spreads whatever you have left to drink across the reminders before bedtime, and adjusts for your thirst and, with Pro, the outside temperature.',
 
   'faq.q5': 'What does it cost?',
   'faq.a5':
@@ -388,7 +388,7 @@ export const en: Catalogue = {
   'price.cmp.all': 'No limit',
   'price.cmp.r4': 'Progress widget, Apple Watch and complications',
   'price.cmp.r5': 'Quick-add and Lock Screen widgets',
-  'price.cmp.r6': 'Dose adjusted to your thirst and the weather',
+  'price.cmp.r6': 'Dose tuned to today’s weather',
   'price.cmp.r7': 'Pour a glass from your Apple Watch',
   'price.cmp.r8': 'Price',
   'price.cmp.proPrice': '€2.99 a month, €19.99 a year or €39.99 for life',
