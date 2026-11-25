@@ -6,7 +6,12 @@ import UIKit
 ///
 /// The class name must match `NSExtensionPrincipalClass` in Info.plist.
 final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
-    /// Only tints the system's own blur: it ends up a deep slate blue.
+    /// The system always draws its own blur behind the shield and only tints
+    /// it with `background`. Left to the system, that blur follows the
+    /// device's appearance: light mode washed the blue out and left the
+    /// white text unreadable. A dark material keeps the shield a deep slate
+    /// blue in both modes, so the white text always reads.
+    private static let blur = UIBlurEffect.Style.systemThickMaterialDark
     private static let background = UIColor(red: 0.035, green: 0.231, blue: 0.525, alpha: 1)
     /// White text on it stays above 4.5:1 (WCAG AA).
     private static let button = UIColor(red: 0.10, green: 0.42, blue: 0.70, alpha: 1)
@@ -18,7 +23,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
         // catches up.
         if Blocker.isOnBreak(at: .now) || !Blocker.shouldShield() {
             return ShieldConfiguration(
-                backgroundBlurStyle: nil,
+                backgroundBlurStyle: Self.blur,
                 backgroundColor: Self.background,
                 icon: ShieldDrop.image,
                 title: .init(text: Blocker.string("shield.tempUnlockTitle"), color: .white),
@@ -36,7 +41,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
         if !Blocker.notificationsUsable { subtitle += "\n\n" + Blocker.string("shield.subtitle.openApp") }
         if let line = Self.progressLine() { subtitle += "\n\n" + line }
         return ShieldConfiguration(
-            backgroundBlurStyle: nil,
+            backgroundBlurStyle: Self.blur,
             backgroundColor: Self.background,
             icon: ShieldDrop.image,
             title: .init(text: Self.title(), color: .white),

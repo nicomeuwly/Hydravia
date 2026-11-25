@@ -104,7 +104,10 @@ node Scripts/generate-strings.mjs
   Use `@Observable` + `@Environment` injection; services behind protocols.
 - Strings: use the generated symbols (`Text(.homeTitle)`), never literals.
   Keys keep the Expo names (`home.title`); placeholders are positional.
-- Light-only UI for now, but every colour goes through `Palette`.
+- Light-only UI for now (`UIUserInterfaceStyle = Light`), but every colour
+  goes through `Palette`. What the system draws outside the app still follows
+  the device's appearance, so it must read in light AND dark: the shield
+  forces a dark blur, the widgets use fixed colours, the watch is dark.
 - Identifiers that must never drift: bundle `com.nicomeuwly.hydravia`, App
   Group `group.com.nicomeuwly.hydravia.blocker`, StoreKit products
   `com.nicomeuwly.hydravia.pro.monthly` / `.yearly` (group "Hydravia Pro")
