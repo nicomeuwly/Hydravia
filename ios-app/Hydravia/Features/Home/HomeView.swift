@@ -1,5 +1,6 @@
 import HydraviaCore
 import HydraviaData
+import StoreKit
 import SwiftUI
 
 /// "The phone is the glass": the day's water fills the whole screen behind
@@ -12,11 +13,14 @@ struct HomeView: View {
     @Environment(BlockerService.self) private var blocker
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.requestReview) private var requestReview
 
     @State private var physics = WaterPhysics()
     @State private var headerFrameGlobal: CGRect = .zero
     @State private var celebrations = 0
     @State private var isPickingApps = false
+    /// The day a rating request is waiting for the celebration to end.
+    @State private var reviewPending: LocalDay?
 
     /// The water only runs while it can be seen: home tab selected, app in the
     /// foreground, no unlock ritual covering it. (`onDisappear` doesn't fire
@@ -73,6 +77,16 @@ struct HomeView: View {
             guard !Task.isCancelled else { return }
             celebrateIfOwed()
         }
+        // The rating request, once the bubbles have settled. A view task, so
+        // it reads the live scene phase and ends with the view.
+        .task(id: reviewPending) {
+            guard let day = reviewPending else { return }
+            do { try await Task.sleep(for: .seconds(WaterPhysics.celebrationDuration + 0.5)) } catch { return }
+            reviewPending = nil
+            guard isWaterActive, router.sheet == nil, !isPickingApps else { return }
+            ReviewPromptRecord.save(.init(day: day, version: ReviewPromptRecord.appVersion))
+            requestReview()
+        }
     }
 
     /// Today's goal is reached and its celebration hasn't been seen yet. A
@@ -82,9 +96,22 @@ struct HomeView: View {
         guard isWaterActive, progress >= 1, !GoalCelebration.wasShown(on: hydration.today) else { return }
         GoalCelebration.markShown(on: hydration.today)
         Haptics.celebrate()
+        askForReviewAfterCelebration()
         guard !reduceMotion else { return }
         celebrations += 1
         physics.celebrate()
+    }
+
+    /// The goal just reached is a good moment to ask for a rating
+    /// (`ReviewPrompt`). The request waits for the celebration (the
+    /// `reviewPending` task) and is dropped if the home screen is no longer in
+    /// front by then: today's celebration is spent, so the next goal retries.
+    private func askForReviewAfterCelebration() {
+        let today = hydration.today
+        let goalDays = Streak.daysReached(hydration.streakTotals, goalMl: settings.dailyGoalMl, today: today)
+        guard ReviewPrompt.shouldAsk(goalDaysReached: goalDays, appVersion: ReviewPromptRecord.appVersion,
+                                     last: ReviewPromptRecord.load(), today: today) else { return }
+        reviewPending = today
     }
 
     // MARK: Foreground

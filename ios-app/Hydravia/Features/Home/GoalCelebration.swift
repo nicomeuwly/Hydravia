@@ -20,3 +20,24 @@ enum GoalCelebration {
         defaults.set(day.ordinal, forKey: key)
     }
 }
+
+/// The last App Store rating request (`ReviewPrompt` decides when the next
+/// one may come).
+enum ReviewPromptRecord {
+    private static let key = "home.reviewPrompt.v1"
+
+    static func load(defaults: UserDefaults = .standard) -> ReviewPrompt.Record? {
+        guard let data = defaults.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(ReviewPrompt.Record.self, from: data)
+    }
+
+    static func save(_ record: ReviewPrompt.Record, defaults: UserDefaults = .standard) {
+        guard let data = try? JSONEncoder().encode(record) else { return }
+        defaults.set(data, forKey: key)
+    }
+
+    /// The version the user runs (CFBundleShortVersionString).
+    static var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+    }
+}
